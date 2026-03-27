@@ -4,7 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiFetch, setToken } from "@/lib/api";
-import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 
 export function LoginForm() {
   const router = useRouter();
@@ -25,63 +27,69 @@ export function LoginForm() {
       setToken(data.token);
       router.push("/");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao fazer login");
+      setError(err instanceof Error ? err.message : "Email ou senha incorretos");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="w-full max-w-sm rounded-xl border border-border bg-card p-8 shadow-lg">
-      <h1 className="mb-6 text-2xl font-bold text-foreground">Entrar</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-1">
-          <label htmlFor="email" className="text-sm font-medium text-muted-foreground">
-            Email
-          </label>
-          <input
-            id="email"
+    <div className="w-full max-w-sm">
+      {/* Logo */}
+      <div className="mb-8 flex flex-col items-center gap-3">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary shadow-lg shadow-primary/25">
+          <span className="text-lg font-bold text-white">B</span>
+        </div>
+        <div className="text-center">
+          <h1 className="text-xl font-bold text-foreground">Entrar na Bravachain</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Bem-vindo de volta
+          </p>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card p-8 shadow-sm">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <Input
+            label="Email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className={cn(
-              "w-full rounded-lg border border-border bg-input px-3 py-2 text-sm text-foreground",
-              "placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-            )}
             placeholder="seu@email.com"
+            autoComplete="email"
           />
-        </div>
-        <div className="space-y-1">
-          <label htmlFor="password" className="text-sm font-medium text-muted-foreground">
-            Senha
-          </label>
-          <input
-            id="password"
+          <Input
+            label="Senha"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className={cn(
-              "w-full rounded-lg border border-border bg-input px-3 py-2 text-sm text-foreground",
-              "placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-            )}
             placeholder="••••••••"
+            autoComplete="current-password"
           />
-        </div>
-        {error && <p className="text-sm text-destructive">{error}</p>}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
-        >
-          {loading ? "Entrando..." : "Entrar"}
-        </button>
-      </form>
-      <p className="mt-4 text-center text-sm text-muted-foreground">
+
+          {error && (
+            <div className="rounded-lg bg-red-50 px-3 py-2">
+              <p className="text-sm text-destructive">{error}</p>
+            </div>
+          )}
+
+          <Button
+            type="submit"
+            size="lg"
+            className="w-full mt-2"
+            disabled={loading}
+          >
+            {loading ? <Spinner size="sm" className="text-white" /> : "Entrar"}
+          </Button>
+        </form>
+      </div>
+
+      <p className="mt-5 text-center text-sm text-muted-foreground">
         Não tem conta?{" "}
-        <Link href="/register" className="text-primary hover:underline">
-          Criar conta
+        <Link href="/register" className="font-medium text-primary hover:underline">
+          Criar conta grátis
         </Link>
       </p>
     </div>

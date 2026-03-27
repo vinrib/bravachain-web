@@ -2,7 +2,8 @@
 
 import { clearToken } from "@/lib/api";
 import { useRouter } from "next/navigation";
-import { LogOut } from "lucide-react";
+import { LogOut, Bell } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function Navbar() {
   const router = useRouter();
@@ -13,14 +14,22 @@ export function Navbar() {
   }
 
   return (
-    <header className="flex h-16 items-center justify-end border-b border-border bg-card px-6">
-      <button
-        onClick={handleLogout}
-        className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-      >
-        <LogOut className="h-4 w-4" />
-        Sair
-      </button>
+    <header className="flex h-16 items-center justify-between border-b border-border bg-card px-6">
+      <div />
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" size="icon" aria-label="Notificações">
+          <Bell className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleLogout}
+          className="gap-2"
+        >
+          <LogOut className="h-4 w-4" />
+          <span className="hidden sm:inline">Sair</span>
+        </Button>
+      </div>
     </header>
   );
 }
