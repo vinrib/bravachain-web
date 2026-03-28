@@ -1,0 +1,197 @@
+{
+  "nav": {
+    "home": "Início",
+    "wallet": "Carteira",
+    "send": "Enviar",
+    "deposit": "Adicionar",
+    "convert": "Converter",
+    "history": "Histórico",
+    "kyc": "Verificação",
+    "profile": "Perfil",
+    "logout": "Sair",
+    "notifications": "Notificações"
+  },
+  "common": {
+    "save": "Salvar alterações",
+    "cancel": "Cancelar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "skip": "Pular",
+    "close": "Fechar",
+    "confirm": "Confirmar",
+    "loading": "Carregando...",
+    "error": "Ocorreu um erro",
+    "send": "Enviar",
+    "pix": "PIX",
+    "copyright": "© 2025 Bravachain"
+  },
+  "onboarding": {
+    "skip": "Pular",
+    "next": "Próximo",
+    "finish": "Começar agora",
+    "stepOf": "Passo {current} de {total}",
+    "welcome": {
+      "title": "Bem-vindo à Bravachain",
+      "subtitle": "Transferências internacionais sem fronteiras",
+      "description": "Envie e receba dinheiro em BRL, USDC, EURC e BRZ com as melhores taxas do mercado. Transparente, rápido e sem surpresas."
+    },
+    "kyc": {
+      "title": "Complete seu KYC",
+      "subtitle": "Verificação de identidade",
+      "description": "Para cumprir regulamentações e garantir a segurança das suas transações, precisamos verificar sua identidade. Leva apenas alguns minutos.",
+      "action": "Verificar agora"
+    },
+    "deposit": {
+      "title": "Adicione fundos",
+      "subtitle": "Deposite via PIX ou cripto",
+      "description": "Deposite reais via PIX ou transfira criptomoedas (USDC, EURC, BRZ) diretamente para sua carteira Bravachain.",
+      "action": "Depositar agora"
+    },
+    "send": {
+      "title": "Faça sua primeira transferência",
+      "subtitle": "Tudo pronto!",
+      "description": "Envie dinheiro para qualquer lugar do mundo com taxas transparentes. Sem surpresas, sem letras miúdas.",
+      "action": "Enviar agora"
+    }
+  },
+  "send": {
+    "title": "Enviar dinheiro",
+    "subtitle": "Rápido e seguro",
+    "steps": {
+      "details": "Detalhes",
+      "review": "Revisão",
+      "confirmed": "Confirmado"
+    },
+    "amount": "Valor",
+    "amountPlaceholder": "0,00",
+    "toCurrency": "Moeda de destino",
+    "recipient": "Destinatário",
+    "recipientName": "Nome",
+    "recipientKey": "Chave PIX ou endereço de carteira",
+    "recipientNamePlaceholder": "Nome completo",
+    "recipientKeyPlaceholder": "CPF, e-mail, telefone ou endereço",
+    "continue": "Continuar",
+    "back": "Voltar",
+    "confirm": "Confirmar",
+    "newTransfer": "Nova transferência",
+    "feeBreakdown": {
+      "title": "Detalhamento",
+      "youSend": "Você envia",
+      "spread": "Spread Bravachain ({rate}%)",
+      "networkFee": "Taxa de rede",
+      "recipientReceives": "Destinatário recebe",
+      "exchangeRate": "Taxa de câmbio",
+      "estimatedTime": "Tempo estimado",
+      "estimatedTimeValue": "~2 minutos",
+      "rate": "1 {from} = {rate} {to}"
+    },
+    "review": {
+      "recipient": "Destinatário",
+      "key": "Chave / endereço",
+      "amountSent": "Valor enviado",
+      "spread": "Spread ({rate}%)",
+      "fee": "Tarifa fixa",
+      "recipientReceives": "Destinatário recebe",
+      "deadline": "Prazo estimado",
+      "deadlineValue": "Até 1 dia útil"
+    },
+    "success": {
+      "title": "Transferência enviada!",
+      "subtitle": "Seu dinheiro está a caminho",
+      "txId": "ID da transação",
+      "amountSent": "Valor enviado",
+      "recipientReceives": "Destinatário recebe",
+      "deadline": "Prazo",
+      "downloadReceipt": "Baixar Comprovante"
+    },
+    "errors": {
+      "invalidAmount": "Informe um valor válido",
+      "recipientName": "Informe o nome do destinatário",
+      "recipientKey": "Informe a chave PIX ou endereço"
+    }
+  },
+  "history": {
+    "title": "Histórico",
+    "exportCSV": "Exportar CSV",
+    "downloadReceipt": "Comprovante",
+    "searchPlaceholder": "Buscar por nome, valor, moeda…",
+    "filters": {
+      "currency": "Moeda",
+      "type": "Tipo",
+      "from": "De",
+      "to": "Até",
+      "allCurrencies": "Todas",
+      "allTypes": "Todos",
+      "clearFilters": "Limpar filtros"
+    },
+    "types": {
+      "send": "Enviado",
+      "receive": "Recebido",
+      "convert": "Conversão",
+      "deposit": "Depósito"
+    },
+    "status": {
+      "completed": "Concluído",
+      "pending": "Pendente",
+      "failed": "Falhou"
+    },
+    "empty": {
+      "title": "Nenhuma transação encontrada",
+      "subtitle": "Tente outros filtros ou termos de busca"
+    }
+  },
+  "profile": {
+    "title": "Perfil",
+    "subtitle": "Configurações e preferências",
+    "sections": {
+      "personalInfo": "Informações pessoais",
+      "security": "Segurança",
+      "kycStatus": "Status KYC",
+      "preferences": "Preferências",
+      "dangerZone": "Zona de perigo"
+    },
+    "personalInfo": {
+      "fullName": "Nome completo",
+      "email": "E-mail",
+      "emailReadOnly": "somente leitura",
+      "country": "País",
+      "save": "Salvar alterações",
+      "saving": "Salvando...",
+      "saved": "Alterações salvas!",
+      "saveError": "Erro ao salvar"
+    },
+    "security": {
+      "currentPassword": "Senha atual",
+      "newPassword": "Nova senha",
+      "confirmPassword": "Confirmar nova senha",
+      "updatePassword": "Atualizar senha",
+      "updating": "Atualizando...",
+      "updated": "Senha atualizada!",
+      "mismatch": "As senhas não coincidem",
+      "currentRequired": "Informe a senha atual"
+    },
+    "kyc": {
+      "verified": "Verificado",
+      "pending": "Em análise",
+      "notSubmitted": "Não enviado",
+      "viewKyc": "Ver verificação"
+    },
+    "preferences": {
+      "darkMode": "Modo escuro",
+      "language": "Idioma",
+      "defaultCurrency": "Moeda padrão",
+      "portuguese": "Português",
+      "english": "English"
+    },
+    "dangerZone": {
+      "logoutAll": "Sair de todas as sessões",
+      "logoutAllDesc": "Encerra todas as sessões ativas em todos os dispositivos.",
+      "deleteAccount": "Excluir conta",
+      "deleteAccountDesc": "Esta ação é irreversível. Todos os seus dados serão apagados permanentemente.",
+      "deleteConfirmTitle": "Excluir conta permanentemente?",
+      "deleteConfirmDesc": "Esta ação não pode ser desfeita. Digite DELETE para confirmar.",
+      "deleteConfirmPlaceholder": "Digite DELETE",
+      "deleteConfirmButton": "Excluir permanentemente"
+    }
+  }
+}

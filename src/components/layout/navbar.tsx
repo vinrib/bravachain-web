@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { LogOut, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-provider";
+import { LangToggle } from "@/components/i18n-provider";
 
 export function Navbar() {
   const router = useRouter();
@@ -26,6 +27,7 @@ export function Navbar() {
 
       {/* Right: actions */}
       <div className="ml-auto flex items-center gap-1">
+        <LangToggle />
         <ThemeToggle />
         <Button variant="ghost" size="icon" aria-label="Notificações" className="h-11 w-11">
           <Bell className="h-4 w-4" />

@@ -1,0 +1,197 @@
+{
+  "nav": {
+    "home": "Home",
+    "wallet": "Wallet",
+    "send": "Send",
+    "deposit": "Add Funds",
+    "convert": "Convert",
+    "history": "History",
+    "kyc": "Verification",
+    "profile": "Profile",
+    "logout": "Sign out",
+    "notifications": "Notifications"
+  },
+  "common": {
+    "save": "Save changes",
+    "cancel": "Cancel",
+    "back": "Back",
+    "next": "Next",
+    "skip": "Skip",
+    "close": "Close",
+    "confirm": "Confirm",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "send": "Send",
+    "pix": "PIX",
+    "copyright": "© 2025 Bravachain"
+  },
+  "onboarding": {
+    "skip": "Skip",
+    "next": "Next",
+    "finish": "Get started",
+    "stepOf": "Step {current} of {total}",
+    "welcome": {
+      "title": "Welcome to Bravachain",
+      "subtitle": "Borderless international transfers",
+      "description": "Send and receive money in BRL, USDC, EURC and BRZ at the best market rates. Transparent, fast and no surprises."
+    },
+    "kyc": {
+      "title": "Complete your KYC",
+      "subtitle": "Identity verification",
+      "description": "To comply with regulations and ensure the security of your transactions, we need to verify your identity. It only takes a few minutes.",
+      "action": "Verify now"
+    },
+    "deposit": {
+      "title": "Add funds",
+      "subtitle": "Deposit via PIX or crypto",
+      "description": "Deposit BRL via PIX or transfer cryptocurrencies (USDC, EURC, BRZ) directly to your Bravachain wallet.",
+      "action": "Deposit now"
+    },
+    "send": {
+      "title": "Make your first transfer",
+      "subtitle": "You're all set!",
+      "description": "Send money anywhere in the world with fair and transparent fees. No surprises, no fine print.",
+      "action": "Send now"
+    }
+  },
+  "send": {
+    "title": "Send money",
+    "subtitle": "Fast and secure",
+    "steps": {
+      "details": "Details",
+      "review": "Review",
+      "confirmed": "Confirmed"
+    },
+    "amount": "Amount",
+    "amountPlaceholder": "0.00",
+    "toCurrency": "Destination currency",
+    "recipient": "Recipient",
+    "recipientName": "Name",
+    "recipientKey": "PIX key or wallet address",
+    "recipientNamePlaceholder": "Full name",
+    "recipientKeyPlaceholder": "CPF, email, phone or address",
+    "continue": "Continue",
+    "back": "Back",
+    "confirm": "Confirm",
+    "newTransfer": "New transfer",
+    "feeBreakdown": {
+      "title": "Breakdown",
+      "youSend": "You send",
+      "spread": "Bravachain spread ({rate}%)",
+      "networkFee": "Network fee",
+      "recipientReceives": "Recipient receives",
+      "exchangeRate": "Exchange rate",
+      "estimatedTime": "Estimated time",
+      "estimatedTimeValue": "~2 minutes",
+      "rate": "1 {from} = {rate} {to}"
+    },
+    "review": {
+      "recipient": "Recipient",
+      "key": "Key / address",
+      "amountSent": "Amount sent",
+      "spread": "Spread ({rate}%)",
+      "fee": "Fixed fee",
+      "recipientReceives": "Recipient receives",
+      "deadline": "Estimated deadline",
+      "deadlineValue": "Up to 1 business day"
+    },
+    "success": {
+      "title": "Transfer sent!",
+      "subtitle": "Your money is on its way",
+      "txId": "Transaction ID",
+      "amountSent": "Amount sent",
+      "recipientReceives": "Recipient receives",
+      "deadline": "Deadline",
+      "downloadReceipt": "Download Receipt"
+    },
+    "errors": {
+      "invalidAmount": "Enter a valid amount",
+      "recipientName": "Enter the recipient's name",
+      "recipientKey": "Enter the PIX key or address"
+    }
+  },
+  "history": {
+    "title": "History",
+    "exportCSV": "Export CSV",
+    "downloadReceipt": "Receipt",
+    "searchPlaceholder": "Search by name, amount, currency…",
+    "filters": {
+      "currency": "Currency",
+      "type": "Type",
+      "from": "From",
+      "to": "To",
+      "allCurrencies": "All",
+      "allTypes": "All",
+      "clearFilters": "Clear filters"
+    },
+    "types": {
+      "send": "Sent",
+      "receive": "Received",
+      "convert": "Conversion",
+      "deposit": "Deposit"
+    },
+    "status": {
+      "completed": "Completed",
+      "pending": "Pending",
+      "failed": "Failed"
+    },
+    "empty": {
+      "title": "No transactions found",
+      "subtitle": "Try different filters or search terms"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Settings and preferences",
+    "sections": {
+      "personalInfo": "Personal information",
+      "security": "Security",
+      "kycStatus": "KYC Status",
+      "preferences": "Preferences",
+      "dangerZone": "Danger zone"
+    },
+    "personalInfo": {
+      "fullName": "Full name",
+      "email": "Email",
+      "emailReadOnly": "read only",
+      "country": "Country",
+      "save": "Save changes",
+      "saving": "Saving...",
+      "saved": "Changes saved!",
+      "saveError": "Failed to save"
+    },
+    "security": {
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password",
+      "updatePassword": "Update password",
+      "updating": "Updating...",
+      "updated": "Password updated!",
+      "mismatch": "Passwords do not match",
+      "currentRequired": "Enter your current password"
+    },
+    "kyc": {
+      "verified": "Verified",
+      "pending": "Under review",
+      "notSubmitted": "Not submitted",
+      "viewKyc": "View verification"
+    },
+    "preferences": {
+      "darkMode": "Dark mode",
+      "language": "Language",
+      "defaultCurrency": "Default currency",
+      "portuguese": "Português",
+      "english": "English"
+    },
+    "dangerZone": {
+      "logoutAll": "Sign out all sessions",
+      "logoutAllDesc": "Terminates all active sessions on all devices.",
+      "deleteAccount": "Delete account",
+      "deleteAccountDesc": "This action is irreversible. All your data will be permanently deleted.",
+      "deleteConfirmTitle": "Permanently delete account?",
+      "deleteConfirmDesc": "This action cannot be undone. Type DELETE to confirm.",
+      "deleteConfirmPlaceholder": "Type DELETE",
+      "deleteConfirmButton": "Delete permanently"
+    }
+  }
+}

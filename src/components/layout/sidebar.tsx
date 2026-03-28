@@ -11,6 +11,7 @@ import {
   RefreshCw,
   ShieldCheck,
   History,
+  User,
 } from "lucide-react";
 
 const navItems = [
@@ -21,6 +22,7 @@ const navItems = [
   { href: "/convert", label: "Converter", icon: RefreshCw },
   { href: "/historico", label: "Histórico", icon: History },
   { href: "/kyc", label: "Verificação", icon: ShieldCheck },
+  { href: "/perfil", label: "Perfil", icon: User },
 ];
 
 export function Sidebar() {

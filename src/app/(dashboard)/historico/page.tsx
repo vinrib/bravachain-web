@@ -10,10 +10,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Filter,
+  FileDown,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { apiFetch } from "@/lib/api";
-import { CURRENCIES, CURRENCY_LIST } from "@/lib/constants";
+import { CURRENCIES, CURRENCY_LIST, FALLBACK_RATES, FIXED_FEE_BRL, SPREAD_RATE } from "@/lib/constants";
 import type { Currency, Transaction, TransactionStatus, TransactionType } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -145,6 +146,28 @@ const INITIAL_FILTERS: Filters = {
 };
 
 // ─── Page ────────────────────────────────────────────────────
+
+async function handleDownloadReceipt(tx: Transaction) {
+  const { downloadReceipt } = await import("@/lib/pdf");
+  await downloadReceipt({
+    id: tx.id,
+    date: tx.created_at,
+    senderName: "Usuário Bravachain",
+    senderEmail: "usuario@bravachain.com",
+    recipientName: tx.counterparty,
+    recipientKey: "—",
+    amountSent: tx.amount,
+    fromCurrency: tx.currency,
+    amountReceived: tx.type === "send"
+      ? Math.max(0, tx.amount * (1 - SPREAD_RATE) - FIXED_FEE_BRL)
+      : tx.amount,
+    toCurrency: tx.currency,
+    fee: tx.type === "send" ? FIXED_FEE_BRL : 0,
+    spread: tx.type === "send" ? tx.amount * SPREAD_RATE : 0,
+    exchangeRate: FALLBACK_RATES[`${tx.currency}/${tx.currency}`] ?? 1,
+    status: tx.status,
+  });
+}
 
 export default function HistoricoPage() {
   const [allTx, setAllTx] = useState<Transaction[]>([]);
@@ -439,6 +462,16 @@ export default function HistoricoPage() {
                         {isCredit ? "+" : "-"}
                         {formatAmount(tx.amount, tx.currency)}
                       </p>
+
+                      {/* Download receipt */}
+                      <button
+                        onClick={() => handleDownloadReceipt(tx)}
+                        className="ml-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                        title="Baixar comprovante"
+                        aria-label="Baixar comprovante"
+                      >
+                        <FileDown className="h-3.5 w-3.5" />
+                      </button>
                     </motion.div>
                   );
                 })}

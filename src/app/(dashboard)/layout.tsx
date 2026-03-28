@@ -1,6 +1,7 @@
 import { Sidebar } from "@/components/layout/sidebar";
 import { Navbar } from "@/components/layout/navbar";
 import { BottomNav } from "@/components/layout/bottom-nav";
+import { OnboardingModal } from "@/components/onboarding-modal";
 
 export default function DashboardLayout({
   children,
@@ -8,6 +9,8 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
+    <>
+    <OnboardingModal />
     <div className="flex h-screen overflow-hidden bg-background">
       <Sidebar />
       <div className="flex flex-1 flex-col overflow-hidden">
@@ -19,5 +22,6 @@ export default function DashboardLayout({
       </div>
       <BottomNav />
     </div>
+    </>
   );
 }
