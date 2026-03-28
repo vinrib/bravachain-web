@@ -8,19 +8,25 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: "bg-primary text-primary-foreground hover:bg-[#00a36c] shadow-sm",
-        secondary: "bg-card border border-border text-foreground hover:bg-muted shadow-sm",
-        ghost: "text-muted-foreground hover:bg-muted hover:text-foreground",
-        destructive: "bg-destructive text-white hover:bg-red-600 shadow-sm",
-        outline: "border border-primary text-primary hover:bg-primary/5",
+        primary:
+          "bg-primary text-primary-foreground hover:opacity-90 active:opacity-80 shadow-sm",
+        secondary:
+          "bg-card border border-border text-foreground hover:bg-muted active:bg-muted shadow-sm",
+        ghost:
+          "text-muted-foreground hover:bg-muted hover:text-foreground active:bg-muted",
+        destructive:
+          "bg-destructive text-white hover:opacity-90 active:opacity-80 shadow-sm",
+        outline:
+          "border border-primary text-primary hover:bg-primary/5 active:bg-primary/10",
       },
       size: {
-        sm: "h-8 px-4 text-sm rounded-lg",
-        md: "h-10 px-5 text-sm rounded-xl",
-        lg: "h-12 px-8 text-base rounded-xl",
-        xl: "h-14 px-10 text-base rounded-2xl",
-        icon: "h-10 w-10 rounded-xl",
-        "icon-sm": "h-8 w-8 rounded-lg",
+        // min-h-[44px] ensures touch-friendly target on all interactive sizes
+        sm: "min-h-[44px] px-4 text-sm rounded-xl",
+        md: "min-h-[44px] px-5 text-sm rounded-xl",
+        lg: "min-h-[48px] px-8 text-base rounded-xl",
+        xl: "min-h-[56px] px-10 text-base rounded-2xl",
+        icon: "h-11 w-11 rounded-xl",
+        "icon-sm": "h-11 w-11 rounded-xl",
         "icon-lg": "h-12 w-12 rounded-2xl",
       },
     },

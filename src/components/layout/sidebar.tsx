@@ -10,6 +10,7 @@ import {
   ArrowDownLeft,
   RefreshCw,
   ShieldCheck,
+  History,
 } from "lucide-react";
 
 const navItems = [
@@ -18,6 +19,7 @@ const navItems = [
   { href: "/send", label: "Enviar", icon: ArrowUpRight },
   { href: "/deposit", label: "Adicionar", icon: ArrowDownLeft },
   { href: "/convert", label: "Converter", icon: RefreshCw },
+  { href: "/historico", label: "Histórico", icon: History },
   { href: "/kyc", label: "Verificação", icon: ShieldCheck },
 ];
 
@@ -30,7 +32,7 @@ export function Sidebar() {
       <div className="flex h-16 items-center px-6 border-b border-border">
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary">
-            <span className="text-xs font-bold text-white">B</span>
+            <span className="text-xs font-bold text-primary-foreground">B</span>
           </div>
           <span className="text-base font-bold text-foreground">Bravachain</span>
         </div>
@@ -39,15 +41,16 @@ export function Sidebar() {
       {/* Nav */}
       <nav className="flex-1 space-y-0.5 px-3 py-4">
         {navItems.map(({ href, label, icon: Icon }) => {
-          const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
+          const active =
+            href === "/" ? pathname === "/" : pathname.startsWith(href);
           return (
             <Link
               key={href}
               href={href}
               className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors min-h-[44px]",
                 active
-                  ? "bg-primary/8 text-primary"
+                  ? "bg-primary/10 text-primary"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
