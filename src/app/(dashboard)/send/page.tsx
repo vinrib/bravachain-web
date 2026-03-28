@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
+import { CurrencyIcon } from "@/components/ui/currency-icon";
 import { useToast } from "@/components/toast-provider";
 import { cn } from "@/lib/utils";
 
@@ -199,15 +200,18 @@ export default function SendPage() {
                   placeholder="0,00"
                 />
               </div>
-              <select
-                value={fromCurrency}
-                onChange={(e) => setFromCurrency(e.target.value as Currency)}
-                className="rounded-xl border border-border bg-card px-3 py-3 text-sm font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-              >
-                {CURRENCY_LIST.map((c) => (
-                  <option key={c} value={c}>{CURRENCIES[c].flag} {c}</option>
-                ))}
-              </select>
+              <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2">
+                <CurrencyIcon currency={fromCurrency} size="sm" />
+                <select
+                  value={fromCurrency}
+                  onChange={(e) => setFromCurrency(e.target.value as Currency)}
+                  className="bg-transparent text-sm font-bold text-foreground focus:outline-none cursor-pointer appearance-none"
+                >
+                  {CURRENCY_LIST.map((c) => (
+                    <option key={c} value={c}>{CURRENCIES[c].flag} {c}</option>
+                  ))}
+                </select>
+              </div>
             </div>
             {errors.amount && <p className="text-xs text-destructive">{errors.amount}</p>}
           </div>
@@ -215,15 +219,18 @@ export default function SendPage() {
           {/* To currency */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground">Moeda de destino</label>
-            <select
-              value={toCurrency}
-              onChange={(e) => setToCurrency(e.target.value as Currency)}
-              className="w-full rounded-xl border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-            >
-              {CURRENCY_LIST.map((c) => (
-                <option key={c} value={c}>{CURRENCIES[c].flag} {c} — {CURRENCIES[c].name}</option>
-              ))}
-            </select>
+            <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2.5">
+              <CurrencyIcon currency={toCurrency} size="sm" />
+              <select
+                value={toCurrency}
+                onChange={(e) => setToCurrency(e.target.value as Currency)}
+                className="flex-1 bg-transparent text-sm font-semibold text-foreground focus:outline-none cursor-pointer appearance-none"
+              >
+                {CURRENCY_LIST.map((c) => (
+                  <option key={c} value={c}>{CURRENCIES[c].flag} {c} — {CURRENCIES[c].name}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* Recipient */}

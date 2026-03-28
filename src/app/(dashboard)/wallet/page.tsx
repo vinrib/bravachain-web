@@ -8,6 +8,7 @@ import type { Currency, Transaction, WalletData } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
+import { CurrencyIcon } from "@/components/ui/currency-icon";
 import { cn } from "@/lib/utils";
 
 function formatAmount(value: number, currency: Currency) {
@@ -116,12 +117,7 @@ export default function WalletPage() {
           return (
             <Card key={b.currency} className="p-5">
               <div className="flex items-start gap-3">
-                <div
-                  className="flex h-11 w-11 items-center justify-center rounded-full text-xl shrink-0"
-                  style={{ backgroundColor: `${info.color}15` }}
-                >
-                  {info.flag}
-                </div>
+                <CurrencyIcon currency={b.currency} size="md" />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-muted-foreground">{info.name}</p>
                   <p className="text-xl font-bold text-foreground mt-0.5">
@@ -170,8 +166,11 @@ export default function WalletPage() {
                 const isCredit = tx.type === "receive" || tx.type === "deposit";
                 return (
                   <div key={tx.id} className="flex items-center gap-3 px-5 py-4">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted shrink-0">
-                      {txTypeIcon[tx.type]}
+                    <div className="relative shrink-0">
+                      <CurrencyIcon currency={tx.currency} size="sm" />
+                      <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-white ring-1 ring-white shadow-sm">
+                        {txTypeIcon[tx.type]}
+                      </span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-foreground truncate">

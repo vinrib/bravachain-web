@@ -8,6 +8,7 @@ import type { Currency, RatesResponse } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
+import { CurrencyIcon } from "@/components/ui/currency-icon";
 import { useToast } from "@/components/toast-provider";
 import { cn } from "@/lib/utils";
 
@@ -63,18 +64,22 @@ interface CurrencySelectProps {
 
 function CurrencySelect({ value, onChange, label }: CurrencySelectProps) {
   return (
-    <select
-      aria-label={label}
-      value={value}
-      onChange={(e) => onChange(e.target.value as Currency)}
-      className="bg-muted border-0 rounded-lg px-2 py-1.5 text-sm font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer"
-    >
-      {CURRENCY_LIST.map((c) => (
-        <option key={c} value={c}>
-          {CURRENCIES[c].flag} {c}
-        </option>
-      ))}
-    </select>
+    <div className="flex items-center gap-1.5">
+      <CurrencyIcon currency={value} size="sm" />
+      <select
+        aria-label={label}
+        value={value}
+        onChange={(e) => onChange(e.target.value as Currency)}
+        className="bg-transparent border-0 text-sm font-bold text-foreground focus:outline-none cursor-pointer pr-1 appearance-none"
+        style={{ minWidth: 60 }}
+      >
+        {CURRENCY_LIST.map((c) => (
+          <option key={c} value={c}>
+            {CURRENCIES[c].flag} {c}
+          </option>
+        ))}
+      </select>
+    </div>
   );
 }
 
