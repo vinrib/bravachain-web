@@ -1,0 +1,4730 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "AppController_health",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/circle/accounts": {
+      "get": {
+        "operationId": "CircleController_getAccounts",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Circle"
+        ]
+      }
+    },
+    "/circle/balances": {
+      "get": {
+        "operationId": "CircleController_getBalances",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Circle"
+        ]
+      }
+    },
+    "/circle/payment": {
+      "post": {
+        "operationId": "CircleController_createPayment",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePaymentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Circle"
+        ]
+      }
+    },
+    "/circle/payment/{id}": {
+      "get": {
+        "operationId": "CircleController_findPayment",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Circle"
+        ]
+      }
+    },
+    "/circle/deposit": {
+      "post": {
+        "operationId": "CircleController_createDeposit",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDepositDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Circle"
+        ]
+      }
+    },
+    "/circle/transfers/{id}": {
+      "get": {
+        "operationId": "CircleController_getTransfer",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Circle"
+        ]
+      }
+    },
+    "/circle/withdraw": {
+      "post": {
+        "operationId": "CircleController_createWithdraw",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWithdrawDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Circle"
+        ]
+      }
+    },
+    "/circle/payouts/{id}": {
+      "get": {
+        "operationId": "CircleController_getPayout",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Circle"
+        ]
+      }
+    },
+    "/circle/fees": {
+      "get": {
+        "operationId": "CircleController_getFees",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Circle"
+        ]
+      }
+    },
+    "/fireblocks/vault/accounts": {
+      "get": {
+        "operationId": "FireblocksController_getVaultAccounts",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Fireblocks"
+        ]
+      },
+      "post": {
+        "operationId": "FireblocksController_createVaultAccount",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Fireblocks"
+        ]
+      }
+    },
+    "/fireblocks/vault/transfer": {
+      "post": {
+        "operationId": "FireblocksController_transferBetweenVaults",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Fireblocks"
+        ]
+      }
+    },
+    "/fireblocks/vault/accounts/{vaultId}/assets": {
+      "post": {
+        "operationId": "FireblocksController_activateAsset",
+        "parameters": [
+          {
+            "name": "vaultId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Fireblocks"
+        ]
+      }
+    },
+    "/fireblocks/vault/accounts/{vaultId}/assets/{assetId}": {
+      "get": {
+        "operationId": "FireblocksController_getVaultAccountAsset",
+        "parameters": [
+          {
+            "name": "vaultId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "assetId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Fireblocks"
+        ]
+      }
+    },
+    "/fireblocks/vault/accounts/{vaultId}/assets/{assetId}/addresses": {
+      "get": {
+        "operationId": "FireblocksController_getDepositAddresses",
+        "parameters": [
+          {
+            "name": "vaultId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "assetId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Fireblocks"
+        ]
+      },
+      "post": {
+        "operationId": "FireblocksController_createDepositAddress",
+        "parameters": [
+          {
+            "name": "vaultId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "assetId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Fireblocks"
+        ]
+      }
+    },
+    "/fireblocks/transactions": {
+      "post": {
+        "operationId": "FireblocksController_createTransaction",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTransactionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Fireblocks"
+        ]
+      },
+      "get": {
+        "operationId": "FireblocksController_getTransactions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Fireblocks"
+        ]
+      }
+    },
+    "/fireblocks/transactions/{id}": {
+      "get": {
+        "operationId": "FireblocksController_getTransaction",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Fireblocks"
+        ]
+      }
+    },
+    "/fireblocks/transactions/{id}/cancel": {
+      "post": {
+        "operationId": "FireblocksController_cancelTransaction",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Fireblocks"
+        ]
+      }
+    },
+    "/fireblocks/assets": {
+      "get": {
+        "operationId": "FireblocksController_getSupportedAssets",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Fireblocks"
+        ]
+      }
+    },
+    "/fireblocks/wallets/external": {
+      "get": {
+        "operationId": "FireblocksController_getExternalWallets",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Fireblocks"
+        ]
+      },
+      "post": {
+        "operationId": "FireblocksController_createExternalWallet",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Fireblocks"
+        ]
+      }
+    },
+    "/fireblocks/wallets/external/{id}/assets": {
+      "post": {
+        "operationId": "FireblocksController_addAssetToExternalWallet",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Fireblocks"
+        ]
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "operationId": "AuthController_register",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "operationId": "AuthController_me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/profile": {
+      "get": {
+        "operationId": "AuthController_getProfile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "operationId": "AuthController_refresh",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRefreshDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/accounts/admin-only": {
+      "get": {
+        "operationId": "AccountController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Account"
+        ]
+      }
+    },
+    "/accounts/me": {
+      "get": {
+        "operationId": "AccountController_getMyAccount",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Account"
+        ]
+      }
+    },
+    "/accounts/user/{userId}": {
+      "get": {
+        "operationId": "AccountController_findByUser",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Account"
+        ]
+      }
+    },
+    "/accounts/{id}": {
+      "get": {
+        "operationId": "AccountController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Account"
+        ]
+      }
+    },
+    "/accounts": {
+      "post": {
+        "operationId": "AccountController_create",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Account"
+        ]
+      }
+    },
+    "/ledger/balance/{accountId}": {
+      "get": {
+        "operationId": "LedgerController_getBalance",
+        "parameters": [
+          {
+            "name": "accountId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Ledger"
+        ]
+      }
+    },
+    "/ledger/statement/{accountId}": {
+      "get": {
+        "operationId": "LedgerController_getStatement",
+        "parameters": [
+          {
+            "name": "accountId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Ledger"
+        ]
+      }
+    },
+    "/ledger/aggregate/{accountId}": {
+      "get": {
+        "operationId": "LedgerController_aggregate",
+        "parameters": [
+          {
+            "name": "accountId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Ledger"
+        ]
+      }
+    },
+    "/ledger/statement/{accountId}/export": {
+      "get": {
+        "operationId": "LedgerController_exportStatement",
+        "parameters": [
+          {
+            "name": "accountId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Ledger"
+        ]
+      }
+    },
+    "/users": {
+      "get": {
+        "operationId": "UserController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "User"
+        ]
+      },
+      "post": {
+        "operationId": "UserController_create",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/transactions": {
+      "post": {
+        "operationId": "TransactionController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTransactionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Transaction"
+        ]
+      },
+      "get": {
+        "operationId": "TransactionController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Transaction"
+        ]
+      }
+    },
+    "/transactions/account/{accountId}": {
+      "get": {
+        "operationId": "TransactionController_findByAccount",
+        "parameters": [
+          {
+            "name": "accountId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Transaction"
+        ]
+      }
+    },
+    "/transactions/{id}/status": {
+      "patch": {
+        "operationId": "TransactionController_updateStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Transaction"
+        ]
+      }
+    },
+    "/transfero/emitir": {
+      "post": {
+        "operationId": "TransferoController_emitir",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Transfero"
+        ]
+      }
+    },
+    "/transfero/resgatar": {
+      "post": {
+        "operationId": "TransferoController_resgatar",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Transfero"
+        ]
+      }
+    },
+    "/transfero/saldo": {
+      "get": {
+        "operationId": "TransferoController_saldo",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Transfero"
+        ]
+      }
+    },
+    "/transfero/cotacao": {
+      "get": {
+        "operationId": "TransferoController_cotacao",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Transfero"
+        ]
+      }
+    },
+    "/webhooks/transfero": {
+      "post": {
+        "operationId": "TransferoWebhookController_transferoWebhook",
+        "parameters": [
+          {
+            "name": "x-signature",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "x-timestamp",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "TransferoWebhook"
+        ]
+      }
+    },
+    "/webhooks/circle": {
+      "post": {
+        "operationId": "WebhooksController_circleWebhook",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Webhooks"
+        ]
+      }
+    },
+    "/webhooks/fireblocks": {
+      "post": {
+        "operationId": "WebhooksController_fireblocksWebhook",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Webhooks"
+        ]
+      }
+    },
+    "/pix/qrcode": {
+      "post": {
+        "operationId": "PixController_gerarQRCode",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Pix"
+        ]
+      }
+    },
+    "/pix/status/{txid}": {
+      "get": {
+        "operationId": "PixController_consultarPagamento",
+        "parameters": [
+          {
+            "name": "txid",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Pix"
+        ]
+      }
+    },
+    "/pix/mock/simular-pagamento": {
+      "post": {
+        "operationId": "PixController_simularPagamento",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Pix"
+        ]
+      }
+    },
+    "/webhooks/pix": {
+      "post": {
+        "operationId": "PixWebhookController_pixWebhook",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "PixWebhook"
+        ]
+      }
+    },
+    "/admin/avenia/quote": {
+      "post": {
+        "operationId": "AveniaController_createQuote",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuoteParams"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Avenia"
+        ]
+      }
+    },
+    "/admin/avenia/ticket": {
+      "post": {
+        "operationId": "AveniaController_createTicket",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TicketDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Avenia"
+        ]
+      }
+    },
+    "/admin/avenia/ticket/{id}": {
+      "get": {
+        "operationId": "AveniaController_getTicketStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subAccountId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Avenia"
+        ]
+      }
+    },
+    "/admin/avenia/sandbox/simulate-pix/{ticketId}": {
+      "post": {
+        "operationId": "AveniaController_simulateSandboxPix",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subAccountId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Avenia"
+        ]
+      }
+    },
+    "/admin/avenia/request-otp": {
+      "post": {
+        "operationId": "AveniaController_requestOtp",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Avenia"
+        ]
+      }
+    },
+    "/admin/avenia/validate-otp": {
+      "post": {
+        "operationId": "AveniaController_validateOtp",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Avenia"
+        ]
+      }
+    },
+    "/admin/avenia/webhook/probe-formats": {
+      "post": {
+        "operationId": "AveniaController_probeWebhookFormats",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Avenia"
+        ]
+      }
+    },
+    "/admin/avenia/register-webhook": {
+      "post": {
+        "operationId": "AveniaController_registerWebhook",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Avenia"
+        ]
+      }
+    },
+    "/admin/avenia/kyc/status/{userId}": {
+      "get": {
+        "operationId": "AveniaController_getKycStatus",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Avenia"
+        ]
+      }
+    },
+    "/admin/avenia/kyc/sandbox-approve": {
+      "post": {
+        "operationId": "AveniaController_sandboxApproveKyc",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Avenia"
+        ]
+      }
+    },
+    "/admin/avenia/kyc/provision-subaccount": {
+      "post": {
+        "operationId": "AveniaController_provisionSubaccount",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Avenia"
+        ]
+      }
+    },
+    "/admin/avenia/reconciliation/run": {
+      "post": {
+        "operationId": "AveniaController_runReconciliation",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Avenia"
+        ]
+      }
+    },
+    "/admin/avenia/simulate-webhook": {
+      "post": {
+        "operationId": "AveniaController_simulateWebhook",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Avenia"
+        ]
+      }
+    },
+    "/webhooks/avenia": {
+      "post": {
+        "operationId": "AveniaWebhookHandler_handleAveniaWebhook",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "AveniaWebhookHandler"
+        ]
+      }
+    },
+    "/admin/pricing/{userId}/fx": {
+      "get": {
+        "operationId": "PricingController_getFxPricing",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Pricing"
+        ]
+      },
+      "put": {
+        "operationId": "PricingController_updateFxPricing",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Pricing"
+        ]
+      },
+      "delete": {
+        "operationId": "PricingController_resetFxPricing",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Pricing"
+        ]
+      }
+    },
+    "/admin/pricing/{userId}/stablecoin": {
+      "get": {
+        "operationId": "PricingController_getStablecoinPricing",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Pricing"
+        ]
+      },
+      "put": {
+        "operationId": "PricingController_updateStablecoinPricing",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Pricing"
+        ]
+      },
+      "delete": {
+        "operationId": "PricingController_resetStablecoinPricing",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Pricing"
+        ]
+      }
+    },
+    "/v1/onboarding/company": {
+      "post": {
+        "operationId": "OnboardingController_submitCompanyData",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanyDataDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Submete dados da empresa para o processo de KYB",
+        "tags": [
+          "Onboarding / KYB"
+        ]
+      }
+    },
+    "/v1/onboarding/documents/{type}": {
+      "post": {
+        "operationId": "OnboardingController_uploadDocument",
+        "parameters": [
+          {
+            "name": "type",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Faz upload de documento KYB (PDF/JPEG/PNG, máx 10MB)",
+        "tags": [
+          "Onboarding / KYB"
+        ]
+      }
+    },
+    "/v1/onboarding/documents/{type}/download": {
+      "get": {
+        "operationId": "OnboardingController_downloadDocument",
+        "parameters": [
+          {
+            "name": "type",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Gera uma URL assinada (curta) para baixar o próprio documento KYB. O bucket é privado; a URL expira em minutos.",
+        "tags": [
+          "Onboarding / KYB"
+        ]
+      }
+    },
+    "/v1/onboarding/submit": {
+      "post": {
+        "operationId": "OnboardingController_submitKyb",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Envia o KYB para análise da Avenia (requer 5 documentos)",
+        "tags": [
+          "Onboarding / KYB"
+        ]
+      }
+    },
+    "/v1/onboarding/status": {
+      "get": {
+        "operationId": "OnboardingController_getStatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Retorna status atual do KYB e documentos enviados/pendentes",
+        "tags": [
+          "Onboarding / KYB"
+        ]
+      }
+    },
+    "/v1/importers": {
+      "post": {
+        "operationId": "ImportersController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateImporterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cadastra novo importador recorrente",
+        "tags": [
+          "Importers"
+        ]
+      },
+      "get": {
+        "operationId": "ImportersController_findAll",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "country",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "US",
+              "type": "string"
+            }
+          },
+          {
+            "name": "rail",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "USD_WIRE",
+                "USD_ACH",
+                "EUR_SEPA"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "orderBy",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "totalVolumeUsd",
+              "type": "string",
+              "enum": [
+                "totalVolumeUsd",
+                "createdAt",
+                "companyName"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lista importadores com sumário e filtros",
+        "tags": [
+          "Importers"
+        ]
+      }
+    },
+    "/v1/importers/{id}": {
+      "get": {
+        "operationId": "ImportersController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Detalhe do importador + últimas 5 cobranças",
+        "tags": [
+          "Importers"
+        ]
+      },
+      "patch": {
+        "operationId": "ImportersController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateImporterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Atualiza dados do importador",
+        "tags": [
+          "Importers"
+        ]
+      },
+      "delete": {
+        "operationId": "ImportersController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remove importador (sem cobranças pendentes)",
+        "tags": [
+          "Importers"
+        ]
+      }
+    },
+    "/v1/importers/{id}/charges": {
+      "post": {
+        "operationId": "ImportersController_createCharge",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateChargeForImporterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cria cobrança pré-preenchida para o importador",
+        "tags": [
+          "Importers"
+        ]
+      }
+    },
+    "/v1/dashboard/financial": {
+      "get": {
+        "operationId": "FinancialDashboardController_getFullDashboard",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "30d",
+                "90d",
+                "12m",
+                "ytd"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Dashboard completo: todas as métricas em uma única chamada",
+        "tags": [
+          "Financial Dashboard"
+        ]
+      }
+    },
+    "/v1/dashboard/financial/summary": {
+      "get": {
+        "operationId": "FinancialDashboardController_getSummary",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "30d",
+                "90d",
+                "12m",
+                "ytd"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Métricas consolidadas: TPV, taxa média, receita e saques",
+        "tags": [
+          "Financial Dashboard"
+        ]
+      }
+    },
+    "/v1/dashboard/financial/tpv": {
+      "get": {
+        "operationId": "FinancialDashboardController_getTpvTimeSeries",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "6m",
+                "12m",
+                "24m"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Série temporal de TPV agrupada por mês",
+        "tags": [
+          "Financial Dashboard"
+        ]
+      }
+    },
+    "/v1/dashboard/financial/rates": {
+      "get": {
+        "operationId": "FinancialDashboardController_getRateTimeSeries",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "6m",
+                "12m",
+                "24m"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Série temporal de taxas USD/EUR aplicadas por mês",
+        "tags": [
+          "Financial Dashboard"
+        ]
+      }
+    },
+    "/v1/dashboard/financial/rails": {
+      "get": {
+        "operationId": "FinancialDashboardController_getRailBreakdown",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "30d",
+                "90d",
+                "12m",
+                "ytd"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Breakdown de volume por rail de pagamento",
+        "tags": [
+          "Financial Dashboard"
+        ]
+      }
+    },
+    "/v1/dashboard/financial/importers": {
+      "get": {
+        "operationId": "FinancialDashboardController_getImporterRanking",
+        "parameters": [
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "30d",
+                "90d",
+                "12m",
+                "ytd"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Ranking de importadores por volume no período",
+        "tags": [
+          "Financial Dashboard"
+        ]
+      }
+    },
+    "/transfer/executar": {
+      "post": {
+        "operationId": "TransferOrchestratorController_executar",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "TransferOrchestrator"
+        ]
+      }
+    },
+    "/transfer/{txid}/status": {
+      "get": {
+        "operationId": "TransferOrchestratorController_status",
+        "parameters": [
+          {
+            "name": "txid",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "TransferOrchestrator"
+        ]
+      }
+    },
+    "/transfer/{txid}/retry": {
+      "post": {
+        "operationId": "TransferOrchestratorController_retry",
+        "parameters": [
+          {
+            "name": "txid",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "TransferOrchestrator"
+        ]
+      }
+    },
+    "/v1/auth/signup": {
+      "post": {
+        "operationId": "PublicAuthController_signup",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignupDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Criar conta de usuário",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/auth/login": {
+      "post": {
+        "operationId": "PublicAuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Autenticar usuário — retorna access + refresh token",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/auth/refresh": {
+      "post": {
+        "operationId": "PublicAuthController_refresh",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Renovar access token com refresh token",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/auth/logout": {
+      "post": {
+        "operationId": "PublicAuthController_logout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Encerrar sessão — invalida refresh token",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/v1/profile/branding": {
+      "get": {
+        "operationId": "ProfileController_getBranding",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Consultar identidade visual cadastrada",
+        "tags": [
+          "Profile"
+        ]
+      },
+      "post": {
+        "operationId": "ProfileController_saveBranding",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "logo": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Imagem (JPEG/PNG/WebP/SVG, máx 2 MB)"
+                  },
+                  "companyDisplayName": {
+                    "type": "string",
+                    "maxLength": 80
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cadastrar logo e nome público da empresa",
+        "tags": [
+          "Profile"
+        ]
+      }
+    },
+    "/v1/wallet": {
+      "get": {
+        "operationId": "WalletController_getWallet",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Retorna saldo e dados da conta do usuário autenticado",
+        "tags": [
+          "Wallet"
+        ]
+      }
+    },
+    "/v1/wallet/history": {
+      "get": {
+        "operationId": "WalletController_getHistory",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Extrato de transações do usuário",
+        "tags": [
+          "Wallet"
+        ]
+      }
+    },
+    "/v1/wallet/hedge": {
+      "post": {
+        "operationId": "WalletController_hedge",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HedgeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Hedge: converter PIX confirmado em stablecoin mantida na plataforma (proteção cambial)",
+        "tags": [
+          "Wallet"
+        ]
+      }
+    },
+    "/v1/wallet/convert": {
+      "post": {
+        "operationId": "WalletController_convert",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConvertStablecoinDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Conversão interna: troca stablecoin por outra dentro da plataforma (ex: USDC → EURC)",
+        "tags": [
+          "Wallet"
+        ]
+      }
+    },
+    "/v1/transfer/executar": {
+      "post": {
+        "operationId": "TransferController_executar",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitiateTransferDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Iniciar transferÃªncia cross-border (PIX â†’ Stablecoin â†’ Destino)",
+        "tags": [
+          "Transfer"
+        ]
+      }
+    },
+    "/v1/transfer/{txid}/status": {
+      "get": {
+        "operationId": "TransferController_status",
+        "parameters": [
+          {
+            "name": "txid",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Consultar status de uma transferÃªncia",
+        "tags": [
+          "Transfer"
+        ]
+      }
+    },
+    "/v1/transfer/{txid}/retry": {
+      "post": {
+        "operationId": "TransferController_retry",
+        "parameters": [
+          {
+            "name": "txid",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Retentar transferÃªncia com falha",
+        "tags": [
+          "Transfer"
+        ]
+      }
+    },
+    "/v1/pix/qrcode": {
+      "post": {
+        "operationId": "PublicPixController_gerarQRCode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PixQrCodeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Gerar QR Code PIX para depósito",
+        "tags": [
+          "PIX"
+        ]
+      }
+    },
+    "/v1/pix/status/{txid}": {
+      "get": {
+        "operationId": "PublicPixController_consultarPagamento",
+        "parameters": [
+          {
+            "name": "txid",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Consultar status de um pagamento PIX",
+        "tags": [
+          "PIX"
+        ]
+      }
+    },
+    "/v1/receive/pix-key": {
+      "get": {
+        "operationId": "ReceiveController_getPixKey",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Consultar chave PIX padrão para recebimento",
+        "tags": [
+          "Receive"
+        ]
+      },
+      "put": {
+        "operationId": "ReceiveController_savePixKey",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SavePixKeyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cadastrar ou atualizar chave PIX padrão para recebimento",
+        "tags": [
+          "Receive"
+        ]
+      },
+      "delete": {
+        "operationId": "ReceiveController_removePixKey",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remover chave PIX padrão",
+        "tags": [
+          "Receive"
+        ]
+      }
+    },
+    "/v1/receive/request-payment": {
+      "post": {
+        "operationId": "ReceiveController_requestPayment",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestPaymentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Solicitar recebimento via Wire Transfer, ACH ou USDT",
+        "tags": [
+          "Receive"
+        ]
+      }
+    },
+    "/v1/receive/{id}/renew-token": {
+      "post": {
+        "operationId": "ReceiveController_renewToken",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Renovar link compartilhável expirado (reseta para +30 dias)",
+        "tags": [
+          "Receive"
+        ]
+      }
+    },
+    "/v1/receive/{ticketId}/status": {
+      "get": {
+        "operationId": "ReceiveController_getStatus",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Consultar status de recebimento",
+        "tags": [
+          "Receive"
+        ]
+      }
+    },
+    "/v1/receive/{ticketId}/instructions": {
+      "get": {
+        "operationId": "ReceiveController_getInstructions",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Instruções de pagamento para o cliente no exterior",
+        "tags": [
+          "Receive"
+        ]
+      }
+    },
+    "/v1/receive/pay/{shareToken}": {
+      "get": {
+        "description": "Endpoint público (sem autenticação). Retorna as instruções bancárias para o pagador no exterior. O link expira em 30 dias após a criação.",
+        "operationId": "ReceivePublicController_getPaymentInstructions",
+        "parameters": [
+          {
+            "name": "shareToken",
+            "required": true,
+            "in": "path",
+            "description": "Token único obtido ao criar o pedido de recebimento",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Instruções de pagamento via link compartilhável",
+        "tags": [
+          "Receive"
+        ]
+      }
+    },
+    "/v1/receive/pay/{shareToken}/pdf": {
+      "get": {
+        "description": "Retorna um PDF com os dados bancários, wireMemo e identidade visual do exportador.",
+        "operationId": "ReceivePublicController_getPaymentInstructionsPdf",
+        "parameters": [
+          {
+            "name": "shareToken",
+            "required": true,
+            "in": "path",
+            "description": "Token único obtido ao criar o pedido de recebimento",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "PDF de instruções de pagamento (sem autenticação)",
+        "tags": [
+          "Receive"
+        ]
+      }
+    },
+    "/v1/rates": {
+      "get": {
+        "operationId": "RatesController_getCotacao",
+        "parameters": [
+          {
+            "name": "valorBRL",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "moeda",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "USD",
+                "EUR",
+                "BRL",
+                "USDC",
+                "EURC",
+                "BRZ"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "Moeda de origem para taxa live (ex: USD, EUR, USDC)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "Moeda de destino para taxa live (ex: BRL)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Cotações de câmbio. ?from=USD&to=BRL retorna taxa live da Avenia; sem parâmetros retorna todas as cotações.",
+        "tags": [
+          "Rates"
+        ]
+      }
+    },
+    "/v1/wix/info": {
+      "get": {
+        "operationId": "WixController_getInfo",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Informações públicas do produto para o site Wix",
+        "tags": [
+          "Wix"
+        ]
+      }
+    },
+    "/v1/wix/lead": {
+      "post": {
+        "operationId": "WixController_capturarLead",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WixLeadDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Capturar lead do site Wix (formulário de interesse)",
+        "tags": [
+          "Wix"
+        ]
+      }
+    },
+    "/v1/wix/cotacao": {
+      "post": {
+        "operationId": "WixController_calcularCotacao",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WixRateRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Calcular cotação BRL → Stablecoin para exibir no site",
+        "tags": [
+          "Wix"
+        ]
+      }
+    },
+    "/v1/charges/summary": {
+      "get": {
+        "operationId": "ChargesController_getSummary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Métricas do dashboard: totais, taxa e saldo BRLA",
+        "tags": [
+          "Charges"
+        ]
+      }
+    },
+    "/v1/charges": {
+      "get": {
+        "operationId": "ChargesController_listCharges",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "ALL",
+              "type": "string",
+              "enum": [
+                "ALL",
+                "PENDING",
+                "DEPOSIT_CONFIRMED",
+                "CONVERTING",
+                "CREDITED",
+                "COMPLETED",
+                "EXPIRED",
+                "CANCELLED",
+                "FAILED"
+              ]
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "Timber Global",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "orderBy",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "createdAt",
+              "type": "string",
+              "enum": [
+                "createdAt",
+                "amount"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lista cobranças do exportador com filtros e sumário",
+        "tags": [
+          "Charges"
+        ]
+      }
+    },
+    "/v1/charges/{id}": {
+      "get": {
+        "operationId": "ChargesController_getDetail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Detalhe completo da cobrança + timeline de eventos",
+        "tags": [
+          "Charges"
+        ]
+      }
+    },
+    "/v1/charges/{id}/cancel": {
+      "patch": {
+        "operationId": "ChargesController_cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cancela uma cobrança PENDING",
+        "tags": [
+          "Charges"
+        ]
+      }
+    },
+    "/v1/charges/{id}/duplicate": {
+      "post": {
+        "operationId": "ChargesController_duplicate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Cria nova cobrança com os mesmos dados",
+        "tags": [
+          "Charges"
+        ]
+      }
+    },
+    "/v1/rates/live": {
+      "get": {
+        "operationId": "LiveRatesController_getLiveRate",
+        "parameters": [
+          {
+            "name": "pair",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "USD_BRL",
+                "EUR_BRL"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Taxa live USD/BRL e EUR/BRL (público)",
+        "tags": [
+          "Rates"
+        ]
+      }
+    },
+    "/v1/rates/history": {
+      "get": {
+        "operationId": "LiveRatesController_getRateHistory",
+        "parameters": [
+          {
+            "name": "pair",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "USD_BRL",
+                "EUR_BRL"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "1D",
+                "1W",
+                "1M",
+                "3M",
+                "1Y"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Histórico de taxas por período (público)",
+        "tags": [
+          "Rates"
+        ]
+      }
+    },
+    "/v1/rates/convert": {
+      "get": {
+        "operationId": "LiveRatesController_calculateConversion",
+        "parameters": [
+          {
+            "name": "pair",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "USD_BRL",
+                "EUR_BRL"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "amount",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Calculadora de conversão (taxa de mercado sem spread, público)",
+        "tags": [
+          "Rates"
+        ]
+      }
+    },
+    "/v1/rates/summary": {
+      "get": {
+        "operationId": "LiveRatesController_getSummary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Sumário de taxas + alertas ativos do usuário",
+        "tags": [
+          "Rates"
+        ]
+      }
+    },
+    "/v1/rates/alerts": {
+      "post": {
+        "operationId": "LiveRatesController_createAlert",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAlertDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Criar alerta de taxa",
+        "tags": [
+          "Rates"
+        ]
+      },
+      "get": {
+        "operationId": "LiveRatesController_listAlerts",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Listar alertas do usuário com distância até o target",
+        "tags": [
+          "Rates"
+        ]
+      }
+    },
+    "/v1/rates/alerts/{id}": {
+      "patch": {
+        "operationId": "LiveRatesController_updateAlert",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAlertDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Atualizar alerta",
+        "tags": [
+          "Rates"
+        ]
+      },
+      "delete": {
+        "operationId": "LiveRatesController_deleteAlert",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remover alerta",
+        "tags": [
+          "Rates"
+        ]
+      }
+    },
+    "/v1/receipts": {
+      "get": {
+        "operationId": "ReceiptController_listReceipts",
+        "parameters": [
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lista comprovantes de saques PIX concluídos",
+        "tags": [
+          "Receipts"
+        ]
+      }
+    },
+    "/v1/receipts/{withdrawalId}": {
+      "get": {
+        "operationId": "ReceiptController_getReceipt",
+        "parameters": [
+          {
+            "name": "withdrawalId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Dados completos do comprovante",
+        "tags": [
+          "Receipts"
+        ]
+      }
+    },
+    "/v1/receipts/{withdrawalId}/pdf": {
+      "get": {
+        "operationId": "ReceiptController_downloadPdf",
+        "parameters": [
+          {
+            "name": "withdrawalId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Baixar comprovante em PDF",
+        "tags": [
+          "Receipts"
+        ]
+      }
+    },
+    "/v1/receipts/{withdrawalId}/send-email": {
+      "post": {
+        "operationId": "ReceiptController_sendByEmail",
+        "parameters": [
+          {
+            "name": "withdrawalId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Enviar comprovante por e-mail",
+        "tags": [
+          "Receipts"
+        ]
+      }
+    },
+    "/v1/accountant-report": {
+      "get": {
+        "operationId": "AccountantReportController_getReport",
+        "parameters": [
+          {
+            "name": "period",
+            "required": true,
+            "in": "query",
+            "description": "YYYY-MM | YYYY-Qn | YYYY",
+            "schema": {
+              "example": "2026-04",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Dados do relatório como JSON",
+        "tags": [
+          "Accountant Report"
+        ]
+      }
+    },
+    "/v1/accountant-report/pdf": {
+      "get": {
+        "operationId": "AccountantReportController_getPdf",
+        "parameters": [
+          {
+            "name": "period",
+            "required": true,
+            "in": "query",
+            "description": "YYYY-MM | YYYY-Qn | YYYY",
+            "schema": {
+              "example": "2026-04",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download PDF do relatório",
+        "tags": [
+          "Accountant Report"
+        ]
+      }
+    },
+    "/v1/accountant-report/csv": {
+      "get": {
+        "operationId": "AccountantReportController_getCsv",
+        "parameters": [
+          {
+            "name": "period",
+            "required": true,
+            "in": "query",
+            "description": "YYYY-MM | YYYY-Qn | YYYY",
+            "schema": {
+              "example": "2026-04",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download CSV do relatório",
+        "tags": [
+          "Accountant Report"
+        ]
+      }
+    },
+    "/v1/accountant-report/sped": {
+      "get": {
+        "operationId": "AccountantReportController_getSped",
+        "parameters": [
+          {
+            "name": "period",
+            "required": true,
+            "in": "query",
+            "description": "YYYY-MM | YYYY-Qn | YYYY",
+            "schema": {
+              "example": "2026-04",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Download arquivo SPED do relatório",
+        "tags": [
+          "Accountant Report"
+        ]
+      }
+    },
+    "/v1/accountant-report/send": {
+      "post": {
+        "operationId": "AccountantReportController_sendReport",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendReportDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Enviar relatório por e-mail ao contador",
+        "tags": [
+          "Accountant Report"
+        ]
+      }
+    },
+    "/v1/accountant-report/history": {
+      "get": {
+        "operationId": "AccountantReportController_getHistory",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Histórico de relatórios gerados",
+        "tags": [
+          "Accountant Report"
+        ]
+      }
+    },
+    "/v1/accountant-report/accountant": {
+      "patch": {
+        "operationId": "AccountantReportController_updateAccountant",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAccountantEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Atualizar e-mail e nome do contador",
+        "tags": [
+          "Accountant Report"
+        ]
+      }
+    },
+    "/v1/statement/export": {
+      "get": {
+        "operationId": "StatementController_export",
+        "parameters": [
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Data início ISO (default: 30 dias atrás)",
+            "schema": {
+              "example": "2026-04-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "Data fim ISO (default: hoje)",
+            "schema": {
+              "example": "2026-05-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "ALL",
+              "type": "string",
+              "enum": [
+                "INBOUND",
+                "WITHDRAWAL",
+                "ALL"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "format",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "csv",
+              "type": "string",
+              "enum": [
+                "csv",
+                "pdf"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Exportar extrato em CSV ou PDF",
+        "tags": [
+          "Statement"
+        ]
+      }
+    },
+    "/v1/statement/{type}/{id}": {
+      "get": {
+        "operationId": "StatementController_getDetail",
+        "parameters": [
+          {
+            "name": "type",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Detalhe de uma transação (inbound ou withdrawal)",
+        "tags": [
+          "Statement"
+        ]
+      }
+    },
+    "/v1/statement": {
+      "get": {
+        "operationId": "StatementController_getStatement",
+        "parameters": [
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Data início ISO (default: 30 dias atrás)",
+            "schema": {
+              "example": "2026-04-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "Data fim ISO (default: hoje)",
+            "schema": {
+              "example": "2026-05-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "ALL",
+              "type": "string",
+              "enum": [
+                "INBOUND",
+                "WITHDRAWAL",
+                "ALL"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Extrato financeiro consolidado do exportador",
+        "tags": [
+          "Statement"
+        ]
+      }
+    },
+    "/kyc/submit": {
+      "post": {
+        "operationId": "KycController_submit",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitKycDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Kyc"
+        ]
+      }
+    },
+    "/kyc/status": {
+      "get": {
+        "operationId": "KycController_getStatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Kyc"
+        ]
+      }
+    },
+    "/kyc/attempts/{attemptId}": {
+      "get": {
+        "operationId": "KycController_getAttempt",
+        "parameters": [
+          {
+            "name": "attemptId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Kyc"
+        ]
+      }
+    },
+    "/kyc/mock-approve": {
+      "post": {
+        "operationId": "KycController_mockApprove",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Kyc"
+        ]
+      }
+    },
+    "/kyc/approve-all-mock": {
+      "get": {
+        "operationId": "KycController_approveAllMock",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Kyc"
+        ]
+      }
+    },
+    "/v1/withdraw/pix": {
+      "post": {
+        "operationId": "PixWithdrawalController_requestWithdrawal",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestPixWithdrawalDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Solicitar saque PIX (BRLA → BRL)",
+        "tags": [
+          "Withdraw"
+        ]
+      },
+      "get": {
+        "operationId": "PixWithdrawalController_listWithdrawals",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Listar saques do usuário (últimos 20)",
+        "tags": [
+          "Withdraw"
+        ]
+      }
+    },
+    "/v1/withdraw/pix/{id}": {
+      "get": {
+        "operationId": "PixWithdrawalController_getStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Consultar status de um saque PIX",
+        "tags": [
+          "Withdraw"
+        ]
+      }
+    },
+    "/v1/notifications/unread-count": {
+      "get": {
+        "operationId": "NotificationsController_getUnreadCount",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Contagem de notificações não lidas",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/v1/notifications": {
+      "get": {
+        "operationId": "NotificationsController_listNotifications",
+        "parameters": [
+          {
+            "name": "type",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "isRead",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lista notificações com filtros",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/v1/notifications/read-all": {
+      "patch": {
+        "operationId": "NotificationsController_markAllAsRead",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Marca todas as notificações como lidas",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/v1/notifications/{id}/read": {
+      "patch": {
+        "operationId": "NotificationsController_markAsRead",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Marca uma notificação como lida",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/v1/notifications/{id}": {
+      "delete": {
+        "operationId": "NotificationsController_deleteNotification",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remove notificação",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Bravachain API",
+    "description": "API para pagamentos internacionais B2B via stablecoins. Integra PIX, Transfero (BRZ), Fireblocks e Circle.",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Autenticacao e gerenciamento de sessao"
+    },
+    {
+      "name": "Wallet",
+      "description": "Saldo e extrato do usuario"
+    },
+    {
+      "name": "Withdraw",
+      "description": "Saque PIX (BRLA -> BRL)"
+    },
+    {
+      "name": "Transfer",
+      "description": "Transferencias cross-border"
+    },
+    {
+      "name": "PIX",
+      "description": "Deposito via PIX"
+    },
+    {
+      "name": "Rates",
+      "description": "Cotacoes BRL para stablecoin"
+    }
+  ],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "CreatePaymentDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateDepositDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateWithdrawDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateTransactionDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "AuthRefreshDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "QuoteParams": {
+        "type": "object",
+        "properties": {}
+      },
+      "TicketDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CompanyDataDto": {
+        "type": "object",
+        "properties": {
+          "companyName": {
+            "type": "string",
+            "example": "Acme Exportações Ltda"
+          },
+          "companyCnpj": {
+            "type": "string",
+            "example": "12.345.678/0001-99"
+          },
+          "companyOpeningDate": {
+            "type": "string",
+            "example": "2010-03-15"
+          },
+          "companyCnae": {
+            "type": "string",
+            "example": "4661-3"
+          },
+          "estimatedRevenue": {
+            "type": "string",
+            "example": "BRL_1M_5M"
+          },
+          "mainBuyerCountry": {
+            "type": "string",
+            "example": "US"
+          }
+        },
+        "required": [
+          "companyName",
+          "companyCnpj"
+        ]
+      },
+      "CreateImporterDto": {
+        "type": "object",
+        "properties": {
+          "companyName": {
+            "type": "string",
+            "example": "Timber Global LLC"
+          },
+          "country": {
+            "type": "string",
+            "example": "US"
+          },
+          "city": {
+            "type": "string",
+            "example": "New York"
+          },
+          "contactName": {
+            "type": "string",
+            "example": "John Smith"
+          },
+          "contactEmail": {
+            "type": "string",
+            "example": "john@timbeglobal.com"
+          },
+          "contactPhone": {
+            "type": "string",
+            "example": "+1-555-0100"
+          },
+          "preferredRail": {
+            "type": "string",
+            "enum": [
+              "USD_WIRE",
+              "USD_ACH",
+              "EUR_SEPA"
+            ],
+            "default": "USD_WIRE"
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "companyName",
+          "country"
+        ]
+      },
+      "UpdateImporterDto": {
+        "type": "object",
+        "properties": {
+          "companyName": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "contactName": {
+            "type": "string"
+          },
+          "contactEmail": {
+            "type": "string"
+          },
+          "contactPhone": {
+            "type": "string"
+          },
+          "preferredRail": {
+            "type": "string",
+            "enum": [
+              "USD_WIRE",
+              "USD_ACH",
+              "EUR_SEPA"
+            ]
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateChargeForImporterDto": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "example": 5000
+          },
+          "paymentRail": {
+            "type": "string",
+            "enum": [
+              "USD_WIRE",
+              "USD_ACH",
+              "EUR_SEPA"
+            ]
+          },
+          "notes": {
+            "type": "string"
+          },
+          "sendEmail": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "amount"
+        ]
+      },
+      "SignupDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "João Silva"
+          },
+          "email": {
+            "type": "string",
+            "example": "joao@empresa.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "senha_segura_123",
+            "minLength": 8
+          },
+          "documentNumber": {
+            "type": "string",
+            "example": "123.456.789-09",
+            "description": "CPF para pessoa física ou CNPJ para empresa (com ou sem formatação)"
+          },
+          "accountType": {
+            "type": "string",
+            "enum": [
+              "INDIVIDUAL",
+              "COMPANY"
+            ],
+            "example": "INDIVIDUAL",
+            "description": "Tipo de conta: INDIVIDUAL (pessoa física) ou COMPANY (empresa)"
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "password",
+          "documentNumber",
+          "accountType"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "joao@empresa.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "senha_segura_123"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "RefreshDto": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "refreshToken"
+        ]
+      },
+      "HedgeDto": {
+        "type": "object",
+        "properties": {
+          "pixTxid": {
+            "type": "string",
+            "example": "txid-pix-123",
+            "description": "txid do PIX já confirmado a ser convertido"
+          },
+          "targetCurrency": {
+            "type": "string",
+            "example": "USDC",
+            "enum": [
+              "USDC",
+              "USDT",
+              "EURC",
+              "BRZ"
+            ],
+            "description": "Stablecoin para guardar"
+          },
+          "chain": {
+            "type": "string",
+            "example": "POLYGON"
+          },
+          "beneficiaryWalletId": {
+            "type": "string",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "description": "Wallet Avenia pré-cadastrada (opcional — usa sub-conta padrão se omitido)"
+          }
+        },
+        "required": [
+          "pixTxid",
+          "targetCurrency"
+        ]
+      },
+      "ConvertStablecoinDto": {
+        "type": "object",
+        "properties": {
+          "fromCurrency": {
+            "type": "string",
+            "example": "USDC",
+            "enum": [
+              "USDC",
+              "USDT",
+              "EURC",
+              "BRZ"
+            ],
+            "description": "Moeda de origem (saldo existente na conta)"
+          },
+          "amount": {
+            "type": "number",
+            "example": 100,
+            "description": "Valor a converter na moeda de origem"
+          },
+          "toCurrency": {
+            "type": "string",
+            "example": "EURC",
+            "enum": [
+              "USDC",
+              "USDT",
+              "EURC",
+              "BRZ"
+            ],
+            "description": "Moeda de destino"
+          },
+          "fromChain": {
+            "type": "string",
+            "example": "POLYGON",
+            "description": "Rede da moeda de origem (padrão: POLYGON)"
+          },
+          "toChain": {
+            "type": "string",
+            "example": "POLYGON",
+            "description": "Rede da moeda de destino (padrão: POLYGON)"
+          }
+        },
+        "required": [
+          "fromCurrency",
+          "amount",
+          "toCurrency"
+        ]
+      },
+      "InitiateTransferDto": {
+        "type": "object",
+        "properties": {
+          "pixTxid": {
+            "type": "string",
+            "description": "txid do PIX recebido"
+          },
+          "contaOrigemId": {
+            "type": "string",
+            "description": "ID da conta de origem"
+          },
+          "moedaDestino": {
+            "type": "string",
+            "example": "USDC",
+            "enum": [
+              "USDC",
+              "USDT",
+              "EURC",
+              "BRZ",
+              "USD",
+              "EUR"
+            ],
+            "description": "Moeda de destino. Use USD/EUR para entrega em conta bancária (ACH/WIRE/SEPA). Use USDC/USDT/EURC para entrega em carteira crypto."
+          },
+          "enderecoDestino": {
+            "type": "string",
+            "example": "0xABC123...",
+            "description": "Endereço de carteira (apenas para entregas crypto)"
+          },
+          "outputPaymentMethod": {
+            "type": "string",
+            "example": "USD_ACH",
+            "description": "Método de entrega: POLYGON, TRON, EVM (crypto) | USD_ACH, USD_WIRE (conta USD) | EUR_SEPA (IBAN EUR)"
+          },
+          "walletChain": {
+            "type": "string",
+            "example": "POLYGON"
+          },
+          "blockchainSendMethod": {
+            "type": "string",
+            "example": "PERMIT"
+          },
+          "beneficiaryWalletId": {
+            "type": "string",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "description": "ID de carteira Avenia pré-cadastrada (entrega crypto)"
+          },
+          "beneficiaryBankAccountId": {
+            "type": "string",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "description": "ID de conta bancária Avenia pré-cadastrada (entrega USD ACH/WIRE ou EUR SEPA)"
+          }
+        },
+        "required": [
+          "pixTxid",
+          "contaOrigemId",
+          "moedaDestino"
+        ]
+      },
+      "PixQrCodeDto": {
+        "type": "object",
+        "properties": {
+          "valor": {
+            "type": "number",
+            "example": 250
+          },
+          "descricao": {
+            "type": "string",
+            "example": "Pagamento Bravachain"
+          }
+        },
+        "required": [
+          "valor",
+          "descricao"
+        ]
+      },
+      "SavePixKeyDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "RequestPaymentDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "WixLeadDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "João Silva"
+          },
+          "email": {
+            "type": "string",
+            "example": "joao@empresa.com"
+          },
+          "phone": {
+            "type": "string",
+            "example": "+55 11 99999-9999"
+          },
+          "mensagem": {
+            "type": "string",
+            "example": "Quero enviar R$10.000 para fornecedor nos EUA"
+          }
+        },
+        "required": [
+          "name",
+          "email"
+        ]
+      },
+      "WixRateRequestDto": {
+        "type": "object",
+        "properties": {
+          "valorBRL": {
+            "type": "number",
+            "example": 1000
+          },
+          "moedaDestino": {
+            "type": "string",
+            "example": "USDC",
+            "enum": [
+              "USDC",
+              "BRZ",
+              "EURC"
+            ]
+          }
+        },
+        "required": [
+          "valorBRL",
+          "moedaDestino"
+        ]
+      },
+      "CreateAlertDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateAlertDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "SendReportDto": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "type": "string",
+            "example": "2026-04"
+          },
+          "recipientEmail": {
+            "type": "string",
+            "example": "contador@empresa.com"
+          },
+          "recipientName": {
+            "type": "string",
+            "example": "Dr. João Silva"
+          }
+        },
+        "required": [
+          "period",
+          "recipientEmail"
+        ]
+      },
+      "UpdateAccountantEmailDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "contador@empresa.com"
+          },
+          "name": {
+            "type": "string",
+            "example": "João Silva"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "SubmitKycDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "RequestPixWithdrawalDto": {
+        "type": "object",
+        "properties": {
+          "amountBrla": {
+            "type": "number",
+            "description": "Valor em BRLA a sacar",
+            "example": 100
+          },
+          "pixKey": {
+            "type": "string",
+            "description": "Chave PIX do beneficiário",
+            "example": "user@email.com"
+          },
+          "pixKeyType": {
+            "type": "string",
+            "enum": [
+              "CPF_CNPJ",
+              "EMAIL",
+              "PHONE",
+              "RANDOM"
+            ],
+            "description": "Tipo de chave PIX"
+          }
+        },
+        "required": [
+          "amountBrla",
+          "pixKey",
+          "pixKeyType"
+        ]
+      }
+    }
+  }
+}

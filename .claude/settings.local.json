@@ -3,7 +3,21 @@
     "allow": [
       "Bash(npm install:*)",
       "Bash(npx tsc:*)",
-      "Bash(wc -l C:Usersvinicbravachain-web/src/**/*.tsx C:Usersvinicbravachain-web/src/**/*.ts)"
+      "Bash(wc -l C:Usersvinicbravachain-web/src/**/*.tsx C:Usersvinicbravachain-web/src/**/*.ts)",
+      "Bash(corepack pnpm@9.15.4 --filter @bravachain/shared typecheck)",
+      "Bash(corepack pnpm@9.15.4 --filter @bravachain/api-client typecheck)",
+      "Bash(node -e \"try{require.resolve\\('server-only',{paths:['./apps/web']}\\);console.log\\('RESOLVES'\\)}catch\\(e\\){console.log\\('MISSING:'+e.code\\)}\")",
+      "Bash(corepack pnpm@9.15.4 --filter @bravachain/web add server-only)",
+      "Bash(corepack pnpm@9.15.4 exec next typegen)",
+      "Bash(corepack pnpm@9.15.4 exec tsc --noEmit)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(corepack pnpm@9.15.4 exec next lint)",
+      "Bash(corepack pnpm@9.15.4 exec eslint .)",
+      "Bash(grep -nA20 \"@Get\\('status'\\)\" src/onboarding/onboarding.controller.ts)",
+      "Bash(grep -nA20 \"async submit\" src/kyc/kyc.service.ts)",
+      "Bash(grep -niA15 \"enum LedgerEntryType\\\\|enum LedgerType\\\\|type\\\\s\\\\+.*Ledger\" prisma/schema.prisma)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }
