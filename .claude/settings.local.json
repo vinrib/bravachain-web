@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(npm install:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(wc -l C:Usersvinicbravachain-web/src/**/*.tsx C:Usersvinicbravachain-web/src/**/*.ts)"
     ]
   }
 }
