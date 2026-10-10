@@ -7,13 +7,17 @@ import { login, ApiError } from "@/lib/client-api";
 import { isValidEmail } from "@bravachain/shared";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Spinner } from "@/components/ui/spinner";
+import { PasswordToggle } from "@/components/auth/password-toggle";
 
 export function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -26,12 +30,16 @@ export function LoginForm() {
     }
     setLoading(true);
     try {
-      await login({ email, password });
+      await login({ email, password, rememberMe });
       const next = params.get("next");
       router.replace(next && next.startsWith("/") ? next : "/");
       router.refresh();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "E-mail ou senha incorretos.");
+      if (err instanceof ApiError && err.status === 429) {
+        setError("Muitas tentativas. Tente novamente em alguns minutos.");
+      } else {
+        setError("E-mail ou senha incorretos.");
+      }
     } finally {
       setLoading(false);
     }
@@ -44,7 +52,7 @@ export function LoginForm() {
           <span className="text-lg font-bold text-primary-foreground">B</span>
         </div>
         <div className="text-center">
-          <h1 className="text-xl font-bold text-foreground">Entrar na Bravachain</h1>
+          <h1 className="text-xl font-bold text-foreground">Entrar na sua conta</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Acesse o painel da sua cooperativa
           </p>
@@ -60,17 +68,37 @@ export function LoginForm() {
             onChange={(e) => setEmail(e.target.value)}
             required
             placeholder="cooperativa@email.com"
-            autoComplete="email"
+            autoComplete="username"
           />
           <Input
             label="Senha"
-            type="password"
+            type={showPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
             placeholder="••••••••"
             autoComplete="current-password"
+            suffix={
+              <PasswordToggle
+                visible={showPassword}
+                onToggle={() => setShowPassword((v) => !v)}
+              />
+            }
           />
+
+          <div className="flex items-center justify-between">
+            <Checkbox
+              label="Lembrar de mim"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+            />
+            <Link
+              href="/forgot-password"
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              Esqueceu a senha?
+            </Link>
+          </div>
 
           {error && (
             <div className="rounded-lg bg-destructive/10 px-3 py-2">
@@ -85,9 +113,9 @@ export function LoginForm() {
       </div>
 
       <p className="mt-5 text-center text-sm text-muted-foreground">
-        Ainda não tem cadastro?{" "}
+        Ainda não tem conta?{" "}
         <Link href="/register" className="font-medium text-primary hover:underline">
-          Cadastrar cooperativa
+          Comece seu cadastro
         </Link>
       </p>
     </div>

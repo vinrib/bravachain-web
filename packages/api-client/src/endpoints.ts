@@ -18,6 +18,22 @@ export const endpoints = {
     signup: "/v1/auth/signup",
     /** POST { refreshToken } -> { user, accessToken, refreshToken } (rotation) */
     refresh: "/v1/auth/refresh",
+    /**
+     * POST { email } -> 200 { message } ALWAYS (never reveals whether the
+     * account exists); 429 when rate-limited.
+     *
+     * NOTE: present on the backend (main @ 8c74ac1, in production) but not yet
+     * reflected in the committed `openapi.json`. Do not hand-edit that schema;
+     * regenerate it from the backend when convenient.
+     */
+    forgotPassword: "/v1/auth/forgot-password",
+    /**
+     * POST { token, newPassword } -> 200 { message: "Senha redefinida com
+     * sucesso." }; 401 when the token is invalid, expired, or already used.
+     *
+     * NOTE: same stale-schema caveat as `forgotPassword` above.
+     */
+    resetPassword: "/v1/auth/reset-password",
     /** POST (Bearer) -> { message } — invalidates the stored refresh token */
     logout: "/v1/auth/logout",
     /** GET (Bearer) -> { id, email, name, kycStatus } */
