@@ -61,6 +61,30 @@ export const endpoints = {
     /** GET (Bearer) -> últimos saques */
     list: "/v1/withdraw/pix",
   },
+  /**
+   * Inbound remittance (Wire-In). All require Bearer + approved KYB except
+   * `pay`/`payPdf`, which are public (share link for the importer).
+   *
+   * NOTE: present on the backend (`main`) but the committed `openapi.json` does
+   * not type these request/response bodies; see apps/web/src/lib/receive/types.ts
+   * for the manually-typed shapes. Do not hand-edit openapi.json.
+   */
+  receive: {
+    /** POST (Idempotency-Key) { method, amount, pixKey? } -> CreateReceiveResponse */
+    requestPayment: "/v1/receive/request-payment",
+    /** GET -> { pixKey }; PUT { pixKey } -> { pixKey, message }; DELETE -> { pixKey:null, message } */
+    pixKey: "/v1/receive/pix-key",
+    /** GET -> formatted bank-transfer instructions */
+    instructions: (ticketId: string) => `/v1/receive/${ticketId}/instructions`,
+    /** GET -> { ticketId, method, status, ... } */
+    status: (ticketId: string) => `/v1/receive/${ticketId}/status`,
+    /** GET (public) -> instructions + exporter + createdAt; 404/410 */
+    pay: (shareToken: string) => `/v1/receive/pay/${shareToken}`,
+    /** GET (public) -> application/pdf */
+    payPdf: (shareToken: string) => `/v1/receive/pay/${shareToken}/pdf`,
+    /** POST -> renews the share link (+30d). Uses InboundRemittance.id, NOT ticketId. */
+    renewToken: (id: string) => `/v1/receive/${id}/renew-token`,
+  },
 } as const;
 
 export type Endpoints = typeof endpoints;
