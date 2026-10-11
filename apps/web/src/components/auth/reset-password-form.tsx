@@ -16,6 +16,11 @@ export function ResetPasswordForm() {
   // The reset token lives only in memory for the lifetime of this component.
   // It is never rendered into the DOM, logged, or put back into the URL.
   const tokenRef = useRef<string | null>(null);
+  // Guards the one-time URL read. The read has a destructive side effect (it
+  // strips the token from the URL), so it must run exactly once — a second run
+  // (React StrictMode in dev, a concurrent double-render, or a remount) would
+  // re-read the now-empty URL and wrongly flip the view to "invalid".
+  const initializedRef = useRef(false);
   const [view, setView] = useState<View>("loading");
 
   const [password, setPassword] = useState("");
@@ -29,10 +34,15 @@ export function ResetPasswordForm() {
   // Read the token from the URL once on mount, then strip it so it can't leak
   // via the address bar, history, bookmarks, or a Referer header.
   useEffect(() => {
+    // Run the destructive URL read exactly once, even if the effect fires
+    // again (StrictMode/concurrent/remount). Without this guard the second run
+    // reads the already-stripped URL and shows "Link inválido" on a valid link.
+    if (initializedRef.current) return;
+    initializedRef.current = true;
+
     // One-time read of the reset token from the browser URL (an external
-    // system), then strip it from the address bar/history. The setState runs
-    // exactly once on mount, so the cascading-render concern this rule guards
-    // against does not apply.
+    // system), then strip it from the address bar/history so it can't leak via
+    // the URL, history, bookmarks, or a Referer header.
     /* eslint-disable react-hooks/set-state-in-effect */
     const token = new URLSearchParams(window.location.search).get("token");
     if (token) {
