@@ -64,6 +64,27 @@ export function backendSignup(payload: unknown): Promise<BackendCallResult> {
   return postJson(endpoints.auth.signup, payload);
 }
 
+/**
+ * Requests a password-reset e-mail. The backend answers 200 with a generic
+ * message regardless of whether the account exists, and 429 when rate-limited.
+ * The caller must never branch on anything that could reveal account existence.
+ */
+export function backendForgotPassword(email: string): Promise<BackendCallResult> {
+  return postJson(endpoints.auth.forgotPassword, { email });
+}
+
+/**
+ * Consumes a reset token and sets a new password. Returns 200 on success and
+ * 401 when the token is invalid/expired/used. The token is treated as a secret:
+ * it is never logged here or anywhere downstream.
+ */
+export function backendResetPassword(
+  token: string,
+  newPassword: string,
+): Promise<BackendCallResult> {
+  return postJson(endpoints.auth.resetPassword, { token, newPassword });
+}
+
 /** Exchanges a refresh token for a rotated token pair. */
 export async function refreshTokens(
   refreshToken: string,

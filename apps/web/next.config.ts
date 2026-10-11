@@ -13,6 +13,20 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: monorepoRoot,
   },
+  async headers() {
+    return [
+      {
+        // The reset-password page carries a secret token in its URL. Prevent it
+        // from leaking via the Referer header to any third party, and keep the
+        // page (and any token still in a client URL) out of all caches.
+        source: "/reset-password",
+        headers: [
+          { key: "Referrer-Policy", value: "no-referrer" },
+          { key: "Cache-Control", value: "no-store" },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

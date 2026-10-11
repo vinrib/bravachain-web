@@ -49,8 +49,31 @@ async function authAction<T>(action: string, payload?: unknown): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-export function login(credentials: { email: string; password: string }) {
+export function login(credentials: {
+  email: string;
+  password: string;
+  rememberMe?: boolean;
+}) {
   return authAction<{ ok: true; user: unknown }>("login", credentials);
+}
+
+/**
+ * Requests a password-reset e-mail. Resolves for any outcome the BFF treats as
+ * success (which is every outcome except rate limiting) so the UI can show a
+ * single state regardless of whether the account exists. Throws `ApiError`
+ * with status 429 when rate-limited.
+ */
+export function forgotPassword(email: string) {
+  return authAction<{ ok: true }>("forgot-password", { email });
+}
+
+/**
+ * Completes a password reset. Throws `ApiError` — status 400 means the link is
+ * invalid/expired, 429 means rate-limited. The token stays in the argument and
+ * is never logged.
+ */
+export function resetPassword(token: string, newPassword: string) {
+  return authAction<{ ok: true }>("reset-password", { token, newPassword });
 }
 
 export function signup(payload: Record<string, unknown>) {
