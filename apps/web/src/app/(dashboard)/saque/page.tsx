@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Banknote, ShieldAlert, ArrowRight } from "lucide-react";
+import { Banknote, ShieldAlert, ArrowRight, Clock } from "lucide-react";
 import {
   parseBRL,
   formatMoney,
@@ -14,6 +14,7 @@ import {
 import { endpoints } from "@bravachain/api-client";
 import { apiFetch, ApiError } from "@/lib/client-api";
 import { useBalance, useKycState } from "@/lib/hooks";
+import { mapWithdrawError } from "@/lib/withdraw-errors";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,8 @@ export default function SaquePage() {
   const [amountInput, setAmountInput] = useState("");
   const [pixKey, setPixKey] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  // 24h security-hold banner (set only by WITHDRAW_DESTINATION_ON_HOLD).
+  const [holdMessage, setHoldMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const amount = useMemo(() => parseBRL(amountInput), [amountInput]);
@@ -61,6 +64,7 @@ export default function SaquePage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setHoldMessage(null);
     if (!validate() || amount === null || !pixKeyType) return;
     setSubmitting(true);
     try {
@@ -79,9 +83,21 @@ export default function SaquePage() {
       router.push("/extrato");
       router.refresh();
     } catch (err) {
-      setErrors({
-        form: err instanceof ApiError ? err.message : "Não foi possível solicitar o saque.",
-      });
+      if (err instanceof ApiError) {
+        // Regra A: map the backend { code, message } to field/banner. The
+        // message is shown verbatim; the code only drives presentation.
+        const view = mapWithdrawError(err.code, err.message);
+        if (view.hold) {
+          setHoldMessage(view.message);
+          setErrors({});
+        } else if (view.field) {
+          setErrors({ [view.field]: view.message });
+        } else {
+          setErrors({ form: view.message });
+        }
+      } else {
+        setErrors({ form: "Não foi possível solicitar o saque." });
+      }
     } finally {
       setSubmitting(false);
     }
@@ -169,6 +185,7 @@ export default function SaquePage() {
                 onChange={(e) => {
                   setPixKey(e.target.value);
                   setErrors((p) => ({ ...p, pixKey: "" }));
+                  setHoldMessage(null);
                 }}
                 placeholder="CPF, CNPJ, e-mail, telefone ou chave aleatória"
                 error={errors.pixKey}
@@ -179,6 +196,15 @@ export default function SaquePage() {
                 }
               />
             </div>
+
+            {holdMessage && (
+              <div className="flex items-start gap-2 rounded-lg bg-amber-500/10 px-3 py-2.5">
+                <Clock className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+                <p className="text-sm text-amber-700 dark:text-amber-400">
+                  {holdMessage}
+                </p>
+              </div>
+            )}
 
             {errors.form && (
               <div className="rounded-lg bg-destructive/10 px-3 py-2">
