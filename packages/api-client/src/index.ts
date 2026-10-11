@@ -3,6 +3,7 @@ import type { paths } from "./generated/schema";
 
 export type { paths };
 export * from "./endpoints";
+export * from "./auth-types";
 
 /** The typed Bravachain API client (becomes fully typed after codegen). */
 export type BravachainClient = Client<paths>;
