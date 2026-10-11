@@ -43,7 +43,7 @@ Todas as **outras** seções da lista (Depósito, Pagamentos recebidos, Invoices
 | # | Seção | Design | Repo hoje | Backend (preferência `/v1`) | Esforço | Dependências |
 |---|-------|--------|-----------|------------------------------|---------|--------------|
 | — | **Acesso** (login / esqueci / redefinir) | ✅ Desenhada | ✅ **Feito** (em prod) | `/v1/auth/login\|signup\|refresh\|logout\|forgot-password\|reset-password` | — | — |
-| 1 | **Dados de conta** (USD/EUR/BRL) | ✅ Desenhada | ❌ Não existe | BRL: `/v1/receive/pix-key`; instruções: `/v1/receive/{ticketId}/instructions`; **USD/EUR bancário: a confirmar** (`/circle/accounts`?) | M | Confirmar endpoint de dados bancários USD/EUR |
+| 1 | **Dados de conta** (USD/EUR/BRL) | ✅ Desenhada | ❌ Não existe | **Depende de backend + Avenia (endpoint NOVO a ser criado).** Hoje a conta dedicada (`dedicatedBankAccount` na subconta) é registrada manualmente e só aparece nas **instruções de um recebimento**: `/v1/receive/request-payment`, `/v1/receive/{ticketId}/instructions`, `/v1/receive/pay/{shareToken}` | M | **Backend novo (Avenia)** |
 | 2 | **Início** (dashboard) | 🔸 Só menu | ⚠️ Existe (`/`) — usa saldo + transações; sem sessão mostra "Missing Bearer token" | `/v1/dashboard/financial/{summary,tpv,rates,rails,importers}`, `/v1/wallet` | M | Sessão válida; design do dashboard |
 | 3 | **Extrato** | 🔸 Só menu | ⚠️ Existe (`/extrato`) — usa `/v1/wallet/history` | `/v1/statement`, `/v1/statement/export`, `/v1/wallet/history` | P–M | — |
 | 4 | **Saques via PIX** | 🔸 Só menu | ⚠️ Existe (`/saque`) — usa `POST /v1/withdraw/pix` | `/v1/withdraw/pix` (POST/GET), `/v1/withdraw/pix/{id}`, `/v1/receipts*` | P–M | KYB aprovado |
@@ -77,7 +77,7 @@ Conteúdo do design (turn 16):
 - **EUR (16b):** mesma estrutura, baseada em **IBAN**.
 - **BRL (16c):** baseada em **PIX** (chave PIX de recebimento).
 
-Backend: BRL via `/v1/receive/pix-key`; instruções via `/v1/receive/{ticketId}/instructions`. **Os dados bancários de USD/EUR (Wire/ACH/IBAN) não têm endpoint `/v1` óbvio** — candidato é `/circle/accounts` (superfície não-`/v1`). **Precisa de confirmação no backend** (ver seção 7).
+Backend (confirmado): **não há endpoint hoje** que devolva os dados bancários da conta dedicada. A conta (`dedicatedBankAccount` na subconta Avenia) é **registrada manualmente** e só aparece nas **instruções de um recebimento** (`/v1/receive/request-payment` → `/v1/receive/{ticketId}/instructions` / `/v1/receive/pay/{shareToken}`). Para a tela "Dados de conta" exibir os dados de forma estável (sem criar um recebimento), **será preciso um endpoint novo no backend** (a ser criado). Portanto esta seção **depende de backend + Avenia** — não dá para começar pelo front.
 
 ### 2. Início (dashboard)
 Repo já tem `/` com saldo (`/v1/wallet`) e transações recentes. O backend tem um **dashboard financeiro** rico (`/v1/dashboard/financial/*`: summary, TPV, rates, rails, importers) ainda **não consumido**. O design não detalha o dashboard no canvas (só thumbnail) — exige decisão de design.
@@ -100,39 +100,36 @@ Têm **backend** (ver tabela), mas **não têm tela desenhada** no canvas legív
 - **Pronto e já usado:** auth, wallet (saldo/histórico), KYC, saque PIX (criação).
 - **Pronto e NÃO usado (oportunidade):** dashboard financeiro, statement/export, recibos, cotações (rates/convert/history/alerts), charges/invoices, importers, receive/instructions, profile/branding, notifications, accountant-report.
 - **Sem backend:** Central de ajuda.
-- **A confirmar (superfície não-`/v1`):** dados bancários USD/EUR (`/circle/accounts`?), depósito (`/circle/deposit`?), usuários/contas (`/users`, `/accounts/*`).
+- **Depende de backend NOVO:** dados bancários da conta dedicada (USD/EUR/BRL) — hoje só via instruções de recebimento; precisa de endpoint novo (Avenia).
+- **A confirmar (superfície não-`/v1`):** depósito (`/circle/deposit`?), usuários/contas (`/users`, `/accounts/*`).
 
 ---
 
 ## 6. Regra de produto (confirmada)
-**Não inventar conteúdo.** Uma seção **sem backend** (ou com backend não confirmado) **não entra no menu** ou entra marcada **"Em breve"** — **nunca** com dados fictícios. Aplicar isso ao crescer o menu de 4 → 11 itens: só promover um item quando a tela tiver dados reais.
+**Não inventar conteúdo.** O menu mostra **só o que funciona**: hoje **Início, Extrato, Saque PIX, Verificação** — e cada seção nova entra no menu **só quando for entregue com dados reais**. O resto fica **escondido** (sem item no menu). **Não** usar rótulo "Em breve"; **nunca** dados fictícios.
 
 ---
 
-## 7. Perguntas abertas / onde preciso de você
-1. **Dados bancários USD/EUR:** qual endpoint serve Titular/Conta/Routing(ABA)/IBAN e nome do banco? Parece `/circle/accounts`, mas é não-`/v1`. Pode apontar o código do backend (controller/service)?
-2. **Menu:** quais itens você quer já visíveis agora vs. "Em breve"?
-3. **Dashboard "Início":** usar os `/v1/dashboard/financial/*` já existentes? Há design para ele além do thumbnail?
-4. **Prioridade:** confirmar/ajustar a ordem sugerida abaixo.
+## 7. Decisões (confirmadas com o produto)
+1. **Dados bancários USD/EUR/BRL:** ❌ não há endpoint hoje. A conta dedicada é registrada manualmente e só aparece nas instruções de um recebimento. → **"Dados de conta" depende de um backend novo (Avenia), a ser criado.**
+2. **Menu:** mostrar só o que funciona (Início, Extrato, Saque PIX, Verificação + o que for entregue). Esconder o resto. Sem "Em breve". *(Ver seção 6.)*
+3. **Saque PIX e Instruções de recebimento** não têm tela no canvas → **a tela proposta é descrita e confirmada antes de codar** (um PR por seção).
+
+### Ainda aberto
+- **Dashboard "Início":** usar os `/v1/dashboard/financial/*` já existentes? Há design para ele?
+- **Limite diário disponível (Saque PIX):** existe endpoint/campo que devolva o limite do dia e o quanto resta **antes** de submeter? (ver proposta de Saque PIX.)
 
 ---
 
-## 8. Ordem de implementação sugerida (uma seção por PR)
+## 8. Ordem de implementação (definida com o produto)
 
-Equilíbrio entre "já está desenhado", "backend pronto" e "valor para a cooperativa (receber/movimentar dinheiro)":
+Um PR por seção. Para seções "🔸 só menu", **confirmar o design antes de codar**.
 
-1. **Dados de conta (USD/EUR/BRL)** — única outra tela desenhada; alto valor (receber). _Bloqueado por_ confirmar endpoint USD/EUR (#7.1).
-2. **Instruções de recebimento** — reaproveita #1; backend pronto.
-3. **Extrato** (refino) — baixo esforço, backend pronto (`/v1/statement` + export).
-4. **Saques via PIX** (refino) — adicionar listagem + recibos.
-5. **Cotações** — backend pronto e rico.
-6. **Pagamentos recebidos** — backend pronto.
-7. **Início / dashboard financeiro** — consumir `/v1/dashboard/financial/*` (precisa de design).
-8. **Configurações** — chave PIX, branding, e-mail do contador, alertas.
-9. **Empresa e usuários** — maior; onboarding/company + usuários.
-10. **Invoices** — maior; charges + importers.
-11. **Depósito** — depende de #1.
-12. **Central de ajuda** — estático / "Em breve" (sem backend).
-- **Verificação (KYB):** revisar o existente conforme necessário (não é seção nova).
+1. **Saque PIX alinhado ao design** — tratar os erros da **Regra A**: `WITHDRAW_DESTINATION_NOT_OWN_CNPJ`, `WITHDRAW_LIMIT_PER_TX`, `WITHDRAW_LIMIT_PER_DAY`, `WITHDRAW_DESTINATION_ON_HOLD`; mostrar **limite disponível do dia** e **aviso de hold de 24h**. *(Refino do `/saque` existente. Proposta de tela para confirmar antes de codar.)*
+2. **Instruções de recebimento** — backend pronto (`/v1/receive/*`). *(Tela nova — proposta para confirmar.)*
+3. **Dados de conta (USD/EUR/BRL)** — **bloqueada** até existir o backend novo (Avenia).
+4. **Extrato / recibos / dashboard** — refino do extrato (`/v1/statement` + export), recibos do saque (`/v1/receipts*`), e dashboard financeiro (`/v1/dashboard/financial/*`).
+
+Demais seções (Cotações, Pagamentos recebidos, Configurações, Empresa e usuários, Invoices, Depósito, Central de ajuda) ficam **fora do menu** até serem priorizadas e entregues. **Verificação (KYB)** já existe; revisar conforme necessário.
 
 > Cada item vira um PR próprio, com design confirmado antes de codar quando a seção for "🔸 só menu".
