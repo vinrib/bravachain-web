@@ -12,15 +12,34 @@ const MIN_LENGTH = 8;
 
 type View = "loading" | "form" | "success" | "invalid";
 
+// Module-scoped, memory-only cache for the reset token. Stripping the token
+// from the URL via history.replaceState makes Next's App Router remount this
+// component; the remounted instance reads the already-stripped URL and would
+// otherwise see no token. A component ref can't survive that remount, so the
+// captured token is kept here (never in the DOM, URL, or storage) for the
+// lifetime of the page load.
+let cachedToken: string | null = null;
+
+/**
+ * Returns the reset token, reading it from the URL when present and stripping
+ * it immediately, or falling back to the value captured earlier this page load
+ * (after a strip-triggered remount). A token actually present in the URL always
+ * wins, so a freshly opened link is picked up correctly.
+ */
+function readAndStripToken(): string | null {
+  const fromUrl = new URLSearchParams(window.location.search).get("token");
+  if (fromUrl) {
+    cachedToken = fromUrl;
+    window.history.replaceState(null, "", window.location.pathname);
+    return fromUrl;
+  }
+  return cachedToken;
+}
+
 export function ResetPasswordForm() {
-  // The reset token lives only in memory for the lifetime of this component.
-  // It is never rendered into the DOM, logged, or put back into the URL.
+  // The reset token lives only in memory. It is never rendered into the DOM,
+  // logged, or put back into the URL.
   const tokenRef = useRef<string | null>(null);
-  // Guards the one-time URL read. The read has a destructive side effect (it
-  // strips the token from the URL), so it must run exactly once — a second run
-  // (React StrictMode in dev, a concurrent double-render, or a remount) would
-  // re-read the now-empty URL and wrongly flip the view to "invalid".
-  const initializedRef = useRef(false);
   const [view, setView] = useState<View>("loading");
 
   const [password, setPassword] = useState("");
@@ -31,28 +50,15 @@ export function ResetPasswordForm() {
   // Only surface the confirm-mismatch hint once the user has engaged with it.
   const [confirmTouched, setConfirmTouched] = useState(false);
 
-  // Read the token from the URL once on mount, then strip it so it can't leak
-  // via the address bar, history, bookmarks, or a Referer header.
+  // On mount, resolve the token (from the URL, or the memory cache after a
+  // strip-triggered remount). Strips it from the address bar so it can't leak
+  // via the URL, history, bookmarks, or a Referer header.
   useEffect(() => {
-    // Run the destructive URL read exactly once, even if the effect fires
-    // again (StrictMode/concurrent/remount). Without this guard the second run
-    // reads the already-stripped URL and shows "Link inválido" on a valid link.
-    if (initializedRef.current) return;
-    initializedRef.current = true;
-
-    // One-time read of the reset token from the browser URL (an external
-    // system), then strip it from the address bar/history so it can't leak via
-    // the URL, history, bookmarks, or a Referer header.
-    /* eslint-disable react-hooks/set-state-in-effect */
-    const token = new URLSearchParams(window.location.search).get("token");
-    if (token) {
-      tokenRef.current = token;
-      window.history.replaceState(null, "", window.location.pathname);
-      setView("form");
-    } else {
-      setView("invalid");
-    }
-    /* eslint-enable react-hooks/set-state-in-effect */
+    const token = readAndStripToken();
+    tokenRef.current = token;
+    // Safe: setState runs at most once per mount with a stable value.
+    /* eslint-disable-next-line react-hooks/set-state-in-effect */
+    setView(token ? "form" : "invalid");
   }, []);
 
   const meetsLength = password.length >= MIN_LENGTH;
