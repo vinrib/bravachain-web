@@ -3,6 +3,11 @@
  * directly. Requests carry the httpOnly session cookie automatically; no token
  * is ever handled in client JS.
  */
+import type {
+  LoginRequest,
+  ForgotPasswordRequest,
+  ResetPasswordRequest,
+} from "@bravachain/api-client";
 
 export class ApiError extends Error {
   constructor(
@@ -49,11 +54,7 @@ async function authAction<T>(action: string, payload?: unknown): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-export function login(credentials: {
-  email: string;
-  password: string;
-  rememberMe?: boolean;
-}) {
+export function login(credentials: LoginRequest) {
   return authAction<{ ok: true; user: unknown }>("login", credentials);
 }
 
@@ -64,7 +65,8 @@ export function login(credentials: {
  * with status 429 when rate-limited.
  */
 export function forgotPassword(email: string) {
-  return authAction<{ ok: true }>("forgot-password", { email });
+  const body: ForgotPasswordRequest = { email };
+  return authAction<{ ok: true }>("forgot-password", body);
 }
 
 /**
@@ -73,7 +75,8 @@ export function forgotPassword(email: string) {
  * is never logged.
  */
 export function resetPassword(token: string, newPassword: string) {
-  return authAction<{ ok: true }>("reset-password", { token, newPassword });
+  const body: ResetPasswordRequest = { token, newPassword };
+  return authAction<{ ok: true }>("reset-password", body);
 }
 
 export function signup(payload: Record<string, unknown>) {
