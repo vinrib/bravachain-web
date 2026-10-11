@@ -13,15 +13,22 @@ export class ApiError extends Error {
   constructor(
     public status: number,
     message: string,
+    /** Machine-readable error code from the backend body, when present. */
+    public code?: string,
   ) {
     super(message);
     this.name = "ApiError";
   }
 }
 
-async function parseError(res: Response): Promise<string> {
-  const body = await res.json().catch(() => null);
-  return (body as { message?: string } | null)?.message ?? res.statusText;
+async function parseError(res: Response): Promise<{ message: string; code?: string }> {
+  const body = (await res.json().catch(() => null)) as
+    | { message?: string; code?: string }
+    | null;
+  return {
+    message: body?.message ?? res.statusText,
+    code: body?.code,
+  };
 }
 
 /** Authenticated call to the backend via the BFF proxy (`/api/backend/...`). */
@@ -38,7 +45,10 @@ export async function apiFetch<T>(
     },
   });
 
-  if (!res.ok) throw new ApiError(res.status, await parseError(res));
+  if (!res.ok) {
+    const { message, code } = await parseError(res);
+    throw new ApiError(res.status, message, code);
+  }
   if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
 }
@@ -50,7 +60,10 @@ async function authAction<T>(action: string, payload?: unknown): Promise<T> {
     headers: payload ? { "Content-Type": "application/json" } : {},
     body: payload ? JSON.stringify(payload) : undefined,
   });
-  if (!res.ok) throw new ApiError(res.status, await parseError(res));
+  if (!res.ok) {
+    const { message, code } = await parseError(res);
+    throw new ApiError(res.status, message, code);
+  }
   return res.json() as Promise<T>;
 }
 
