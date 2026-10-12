@@ -70,6 +70,8 @@ export const endpoints = {
    * for the manually-typed shapes. Do not hand-edit openapi.json.
    */
   receive: {
+    /** GET (Bearer + KYB) -> { accounts: DedicatedAccount[], pendingCurrencies } */
+    accounts: "/v1/receive/accounts",
     /** POST (Idempotency-Key) { method, amount, pixKey? } -> CreateReceiveResponse */
     requestPayment: "/v1/receive/request-payment",
     /** GET -> { pixKey }; PUT { pixKey } -> { pixKey, message }; DELETE -> { pixKey:null, message } */

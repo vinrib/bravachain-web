@@ -12,4 +12,6 @@ export const featureFlags = {
    */
   recebimentosRenew:
     process.env.NEXT_PUBLIC_FEATURE_RECEBIMENTOS_RENEW === "true",
+  /** "Dados de conta" (dedicated USD/EUR account details) section. */
+  dadosConta: process.env.NEXT_PUBLIC_FEATURE_DADOS_CONTA === "true",
 } as const;
