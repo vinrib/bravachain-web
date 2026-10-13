@@ -26,6 +26,10 @@ const REDIRECT_WHEN_AUTHED = new Set(["/login", "/register", "/forgot-password"]
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Public payer share link — always accessible, with or without a session.
+  if (pathname.startsWith("/pay/")) return NextResponse.next();
+
   const hasSession =
     request.cookies.has(ACCESS_COOKIE) || request.cookies.has(REFRESH_COOKIE);
 
