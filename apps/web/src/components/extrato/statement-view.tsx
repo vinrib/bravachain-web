@@ -72,7 +72,13 @@ function Segmented<T extends string>({
   );
 }
 
-export function StatementView() {
+export function StatementView({
+  embedded,
+  onViewReceipts,
+}: {
+  embedded?: boolean;
+  onViewReceipts?: () => void;
+} = {}) {
   const [period, setPeriod] = useState<Period>("30d");
   const [type, setType] = useState<StatementFilterType>("ALL");
   const [page, setPage] = useState(1);
@@ -119,14 +125,18 @@ export function StatementView() {
   const pagination = data?.pagination;
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className={cn("space-y-6", !embedded && "mx-auto max-w-2xl")}>
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Extrato</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Todas as movimentações da conta
-          </p>
-        </div>
+        {embedded ? (
+          <span />
+        ) : (
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Extrato</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Todas as movimentações da conta
+            </p>
+          </div>
+        )}
         <div className="flex gap-2">
           <Button asChild variant="secondary" size="sm" className="gap-2">
             <a href={statementExportUrl(query, "csv")} download>
@@ -194,7 +204,9 @@ export function StatementView() {
             icon={Receipt}
           />
         ) : (
-          rows.map((row) => <StatementRow key={row.id} row={row} />)
+          rows.map((row) => (
+            <StatementRow key={row.id} row={row} onViewReceipts={onViewReceipts} />
+          ))
         )}
       </Card>
 

@@ -64,6 +64,16 @@ export const endpoints = {
     /** GET (Bearer) type=inbound|withdrawal -> detail */
     detail: (type: string, id: string) => `/v1/statement/${type}/${id}`,
   },
+  receipts: {
+    /** GET (Bearer + KYB) ?page&limit -> { summary, receipts[], pagination } (só saques PIX concluídos) */
+    list: "/v1/receipts",
+    /** GET (Bearer) -> comprovante completo */
+    detail: (withdrawalId: string) => `/v1/receipts/${withdrawalId}`,
+    /** GET (Bearer) -> application/pdf (attachment) */
+    pdf: (withdrawalId: string) => `/v1/receipts/${withdrawalId}/pdf`,
+    /** POST (Bearer) { recipientEmail } -> { sent, recipientEmail } */
+    sendEmail: (withdrawalId: string) => `/v1/receipts/${withdrawalId}/send-email`,
+  },
   withdrawals: {
     /** POST (Bearer, KYB-approved) { amountBrla, pixKey, pixKeyType } */
     createPix: "/v1/withdraw/pix",

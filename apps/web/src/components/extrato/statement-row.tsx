@@ -1,11 +1,21 @@
-import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
+"use client";
+
+import { ArrowDownLeft, ArrowUpRight, FileText } from "lucide-react";
 import { formatMoney, formatDateTime } from "@bravachain/shared";
 import { cn } from "@/lib/utils";
 import type { StatementRow as Row } from "@/lib/statement/types";
 
-export function StatementRow({ row }: { row: Row }) {
+export function StatementRow({
+  row,
+  onViewReceipts,
+}: {
+  row: Row;
+  onViewReceipts?: () => void;
+}) {
   const inbound = row.type === "INBOUND";
   const Icon = inbound ? ArrowDownLeft : ArrowUpRight;
+  // Shortcut to the Comprovantes tab (only for withdrawals, when enabled).
+  const showReceiptShortcut = !inbound && typeof onViewReceipts === "function";
 
   // Foreign amount sub-line (INBOUND only, when provided).
   const foreign =
@@ -32,6 +42,16 @@ export function StatementRow({ row }: { row: Row }) {
         <p className="truncate text-xs text-muted-foreground">
           {[row.counterparty, formatDateTime(row.createdAt)].filter(Boolean).join(" · ")}
         </p>
+        {showReceiptShortcut && (
+          <button
+            type="button"
+            onClick={onViewReceipts}
+            className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+          >
+            <FileText className="h-3 w-3" />
+            Comprovante
+          </button>
+        )}
       </div>
 
       <div className="shrink-0 text-right">
