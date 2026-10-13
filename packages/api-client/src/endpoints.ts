@@ -106,6 +106,19 @@ export const endpoints = {
     /** POST -> renews the share link (+30d). Uses InboundRemittance.id, NOT ticketId. */
     renewToken: (id: string) => `/v1/receive/${id}/renew-token`,
   },
+  /**
+   * Financial dashboard. All GET (Bearer) with ?period=30d|90d|12m|ytd.
+   * NOTE: responses are not typed in the committed openapi.json — the frontend
+   * normalizers (apps/web/src/lib/dashboard) map the real keys defensively.
+   */
+  dashboard: {
+    summary: "/v1/dashboard/financial/summary",
+    tpv: "/v1/dashboard/financial/tpv",
+    rates: "/v1/dashboard/financial/rates",
+    rails: "/v1/dashboard/financial/rails",
+    /** Combined payload (if used). */
+    financial: "/v1/dashboard/financial",
+  },
 } as const;
 
 export type Endpoints = typeof endpoints;

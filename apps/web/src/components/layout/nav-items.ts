@@ -5,6 +5,7 @@ import {
   ShieldCheck,
   ArrowDownToLine,
   Landmark,
+  LineChart,
   type LucideIcon,
 } from "lucide-react";
 import { featureFlags } from "@/lib/feature-flags";
@@ -18,6 +19,10 @@ export interface NavItem {
 /** Single source of truth for the dashboard navigation. */
 export const navItems: NavItem[] = [
   { href: "/", label: "Início", icon: LayoutDashboard },
+  // Behind NEXT_PUBLIC_FEATURE_DASHBOARD (default off).
+  ...(featureFlags.dashboard
+    ? [{ href: "/financeiro", label: "Dashboard financeiro", icon: LineChart }]
+    : []),
   { href: "/extrato", label: "Extrato", icon: Receipt },
   // Behind NEXT_PUBLIC_FEATURE_RECEBIMENTOS (default off).
   ...(featureFlags.recebimentos
