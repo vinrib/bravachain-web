@@ -55,6 +55,15 @@ export const endpoints = {
     /** GET (Bearer) -> ledger entries (extrato) */
     history: "/v1/wallet/history",
   },
+  statement: {
+    /** GET (Bearer) ?startDate&endDate&type=ALL|INBOUND|WITHDRAWAL&page&limit(≤100)
+     *  -> { summary, transactions[], pagination } */
+    list: "/v1/statement",
+    /** GET (Bearer) ?...&format=csv|pdf -> file (attachment) */
+    export: "/v1/statement/export",
+    /** GET (Bearer) type=inbound|withdrawal -> detail */
+    detail: (type: string, id: string) => `/v1/statement/${type}/${id}`,
+  },
   withdrawals: {
     /** POST (Bearer, KYB-approved) { amountBrla, pixKey, pixKeyType } */
     createPix: "/v1/withdraw/pix",
