@@ -21,6 +21,8 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/toast-provider";
+import { InfoAlert } from "@/components/ui/info-alert";
+import { PIX_RETURN_WARNING_FULL, PIX_RETURN_WARNING_SHORT } from "@/lib/pix-warning";
 
 const PIX_KEY_LABELS: Record<string, string> = {
   cpf: "CPF",
@@ -78,7 +80,7 @@ export default function SaquePage() {
       });
       success(
         "Saque solicitado!",
-        `${formatMoney(amount)} a caminho via PIX.`,
+        `${formatMoney(amount)} a caminho via PIX. ${PIX_RETURN_WARNING_SHORT}`,
       );
       router.push("/extrato");
       router.refresh();
@@ -211,6 +213,8 @@ export default function SaquePage() {
                 <p className="text-sm text-destructive">{errors.form}</p>
               </div>
             )}
+
+            <InfoAlert>{PIX_RETURN_WARNING_FULL}</InfoAlert>
 
             <Button
               type="submit"
