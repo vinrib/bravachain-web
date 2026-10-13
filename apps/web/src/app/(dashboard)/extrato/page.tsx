@@ -10,8 +10,16 @@ import { TransactionRowSkeleton } from "@/components/ui/skeleton";
 import { ErrorState, EmptyState } from "@/components/ui/state";
 import { TransactionRow } from "@/components/dashboard/transaction-row";
 import { useToast } from "@/components/toast-provider";
+import { featureFlags } from "@/lib/feature-flags";
+import { StatementView } from "@/components/extrato/statement-view";
 
 export default function ExtratoPage() {
+  // Extrato V2 (/v1/statement) behind a flag; legacy wallet/history is the fallback.
+  if (featureFlags.extratoV2) return <StatementView />;
+  return <LegacyExtrato />;
+}
+
+function LegacyExtrato() {
   const { data, loading, error, reload } = useTransactions();
   const { error: toastError } = useToast();
   const [exporting, setExporting] = useState(false);

@@ -88,6 +88,9 @@ async function handle(
   const responseHeaders = new Headers();
   const contentType = upstream.headers.get("content-type");
   if (contentType) responseHeaders.set("content-type", contentType);
+  // Preserve attachment filename for file downloads (e.g. statement export).
+  const disposition = upstream.headers.get("content-disposition");
+  if (disposition) responseHeaders.set("content-disposition", disposition);
   responseHeaders.set("cache-control", "no-store");
 
   const responseBody =
