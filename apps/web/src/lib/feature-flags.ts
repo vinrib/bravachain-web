@@ -18,4 +18,6 @@ export const featureFlags = {
   dadosConta: process.env.NEXT_PUBLIC_FEATURE_DADOS_CONTA === "true",
   /** "Comprovantes" (PIX withdrawal receipts) tab in Extrato. */
   recibos: process.env.NEXT_PUBLIC_FEATURE_RECIBOS === "true",
+  /** "Dashboard financeiro" section. */
+  dashboard: process.env.NEXT_PUBLIC_FEATURE_DASHBOARD === "true",
 } as const;
