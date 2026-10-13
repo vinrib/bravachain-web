@@ -145,6 +145,11 @@ export function DashboardFinanceiro() {
                     <p className="text-lg font-bold tabular-nums text-foreground">
                       R$ {formatRate(s.avgRateUsd)}
                     </p>
+                    {/* Variation is computed from USD on the backend — show it only
+                        next to USD, and only when there's a USD rate. */}
+                    {s.avgRateUsd !== null && s.avgRateUsd !== 0 && (
+                      <MetricDelta variation={s.avgRateVariation} />
+                    )}
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">EUR</p>
@@ -153,12 +158,9 @@ export function DashboardFinanceiro() {
                     </p>
                   </div>
                 </div>
-                <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                  <MetricDelta variation={s.avgRateVariation} />
-                  <span className="text-xs text-muted-foreground">
-                    R$ por unidade · {CAPTION}
-                  </span>
-                </div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  R$ por unidade · {CAPTION}
+                </p>
               </CardContent>
             </Card>
 
