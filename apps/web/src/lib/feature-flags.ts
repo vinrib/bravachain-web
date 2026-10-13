@@ -14,4 +14,6 @@ export const featureFlags = {
     process.env.NEXT_PUBLIC_FEATURE_RECEBIMENTOS_RENEW === "true",
   /** Extrato backed by /v1/statement (filters, pagination, server export). */
   extratoV2: process.env.NEXT_PUBLIC_FEATURE_EXTRATO_V2 === "true",
+  /** "Dados de conta" (dedicated USD/EUR account details) section. */
+  dadosConta: process.env.NEXT_PUBLIC_FEATURE_DADOS_CONTA === "true",
 } as const;
