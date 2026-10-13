@@ -10,25 +10,19 @@ import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import { KpiCard, MetricDelta } from "./kpi-card";
 import { TpvChart, RailsChart, RatesChart } from "./charts";
-import { getSummary, getTpv, getRails, getRates } from "@/lib/dashboard/api";
+import { getDashboard } from "@/lib/dashboard/api";
 import { formatRate } from "@/lib/dashboard/chart";
 import {
   PERIODS,
+  type DashboardData,
   type DashboardPeriod,
-  type DashboardSummary,
-  type RailSlice,
-  type RatePoint,
-  type TpvPoint,
 } from "@/lib/dashboard/types";
 
 const CAPTION = "vs. período anterior";
 
 export function DashboardFinanceiro() {
   const [period, setPeriod] = useState<DashboardPeriod>("30d");
-  const [summary, setSummary] = useState<DashboardSummary | null>(null);
-  const [tpv, setTpv] = useState<TpvPoint[]>([]);
-  const [rails, setRails] = useState<RailSlice[]>([]);
-  const [rates, setRates] = useState<RatePoint[]>([]);
+  const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [nonce, setNonce] = useState(0);
@@ -38,18 +32,9 @@ export function DashboardFinanceiro() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     setError(false);
-    Promise.all([
-      getSummary(period),
-      getTpv(period),
-      getRails(period),
-      getRates(period),
-    ])
-      .then(([s, t, ra, rt]) => {
-        if (!active) return;
-        setSummary(s);
-        setTpv(t);
-        setRails(ra);
-        setRates(rt);
+    getDashboard(period)
+      .then((d) => {
+        if (active) setData(d);
       })
       .catch(() => {
         if (active) setError(true);
@@ -62,14 +47,15 @@ export function DashboardFinanceiro() {
     };
   }, [period, nonce]);
 
+  const s = data?.summary;
   const hasData =
-    !!summary &&
-    (summary.tpv !== null ||
-      summary.feesPaid !== null ||
-      summary.withdrawals !== null ||
-      tpv.length > 0 ||
-      rails.length > 0 ||
-      rates.length > 0);
+    !!s &&
+    (s.tpvBrl !== null ||
+      s.feesPaid !== null ||
+      s.withdrawalsTotal !== null ||
+      (data?.tpv.length ?? 0) > 0 ||
+      (data?.rails.length ?? 0) > 0 ||
+      (data?.rates.length ?? 0) > 0);
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
@@ -80,7 +66,6 @@ export function DashboardFinanceiro() {
         </p>
       </div>
 
-      {/* Period selector */}
       <div className="inline-flex flex-wrap gap-1 rounded-xl border border-border p-1">
         {PERIODS.map((p) => (
           <button
@@ -118,7 +103,7 @@ export function DashboardFinanceiro() {
             </Button>
           </CardContent>
         </Card>
-      ) : !hasData ? (
+      ) : !hasData || !s || !data ? (
         <Card>
           <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
             <LineChartIcon className="h-10 w-10 text-muted-foreground" />
@@ -138,16 +123,15 @@ export function DashboardFinanceiro() {
         </Card>
       ) : (
         <>
-          {/* KPIs */}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <KpiCard
               label="Volume recebido (TPV)"
-              value={summary!.tpv !== null ? formatMoney(summary!.tpv) : "—"}
-              variation={summary!.tpvVariation}
+              value={s.tpvBrl !== null ? formatMoney(s.tpvBrl) : "—"}
+              variation={s.tpvVariation}
               caption={CAPTION}
             />
 
-            {/* Taxa média de câmbio (USD/EUR) */}
+            {/* Taxa média de câmbio (USD/EUR) — backend provides one variation. */}
             <Card>
               <CardContent className="pt-5">
                 <p className="text-xs text-muted-foreground">
@@ -159,42 +143,45 @@ export function DashboardFinanceiro() {
                       <Star className="h-3 w-3 fill-current text-amber-500" /> USD
                     </p>
                     <p className="text-lg font-bold tabular-nums text-foreground">
-                      R$ {formatRate(summary!.avgRateUsd)}
+                      R$ {formatRate(s.avgRateUsd)}
                     </p>
-                    <MetricDelta variation={summary!.avgRateUsdVariation} />
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">EUR</p>
                     <p className="text-lg font-bold tabular-nums text-foreground">
-                      R$ {formatRate(summary!.avgRateEur)}
+                      R$ {formatRate(s.avgRateEur)}
                     </p>
-                    <MetricDelta variation={summary!.avgRateEurVariation} />
                   </div>
                 </div>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  R$ por unidade · {CAPTION}
-                </p>
+                <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                  <MetricDelta variation={s.avgRateVariation} />
+                  <span className="text-xs text-muted-foreground">
+                    R$ por unidade · {CAPTION}
+                  </span>
+                </div>
               </CardContent>
             </Card>
 
             <KpiCard
               label="Taxas pagas à Bravachain"
-              value={summary!.feesPaid !== null ? formatMoney(summary!.feesPaid) : "—"}
-              variation={summary!.feesPaidVariation}
+              value={s.feesPaid !== null ? formatMoney(s.feesPaid) : "—"}
+              variation={s.feesPaidVariation}
               caption={CAPTION}
             />
             <KpiCard
               label="Saques realizados"
-              value={summary!.withdrawals !== null ? formatMoney(summary!.withdrawals) : "—"}
-              variation={summary!.withdrawalsVariation}
-              caption={CAPTION}
+              value={s.withdrawalsTotal !== null ? formatMoney(s.withdrawalsTotal) : "—"}
+              caption={
+                s.withdrawalsCount !== null
+                  ? `${s.withdrawalsCount} ${s.withdrawalsCount === 1 ? "saque" : "saques"}`
+                  : undefined
+              }
             />
           </div>
 
-          {/* Charts */}
-          <TpvChart data={tpv} />
-          <RailsChart data={rails} />
-          <RatesChart data={rates} />
+          <TpvChart data={data.tpv} />
+          <RailsChart data={data.rails} />
+          <RatesChart data={data.rates} />
         </>
       )}
     </div>

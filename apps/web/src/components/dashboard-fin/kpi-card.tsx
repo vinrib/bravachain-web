@@ -6,6 +6,13 @@ import { formatVariation } from "@/lib/dashboard/chart";
 export function MetricDelta({ variation }: { variation: number | null }) {
   const v = formatVariation(variation);
   if (!v) return null;
+  if (v.kind === "new") {
+    return (
+      <span className="inline-flex items-center rounded-full bg-success/10 px-1.5 py-0.5 text-xs font-medium text-success">
+        Novo
+      </span>
+    );
+  }
   const Icon = v.dir > 0 ? ArrowUpRight : v.dir < 0 ? ArrowDownRight : null;
   return (
     <span
