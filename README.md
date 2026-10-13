@@ -1,7 +1,7 @@
 # Bravachain
 
 Frontend web da **Bravachain** — plataforma B2B de pagamentos cross-border para
-cooperativas exportadoras da Amazônia. Organizado como um monorepo Turborepo,
+empresas exportadoras da Amazônia. Organizado como um monorepo Turborepo,
 já preparado para abrigar um futuro app React Native.
 
 ## Estrutura

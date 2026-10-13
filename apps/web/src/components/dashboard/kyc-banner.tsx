@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Compact verification prompt for the dashboard. Renders nothing when the
- * cooperative is already approved.
+ * company is already approved.
  */
 export function KycBanner({ status }: { status: KycStatus }) {
   if (status === "approved") return null;

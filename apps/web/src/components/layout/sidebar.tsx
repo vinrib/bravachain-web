@@ -42,7 +42,7 @@ export function Sidebar() {
 
       <div className="border-t border-border p-4">
         <p className="text-xs text-muted-foreground text-center">
-          Pagamentos cross-border para cooperativas
+          Pagamentos internacionais, liquidação em reais
         </p>
       </div>
     </aside>

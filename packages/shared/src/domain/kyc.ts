@@ -1,7 +1,7 @@
 /**
  * KYC / KYB domain model.
  *
- * The cooperative (our end user) is normally a legal entity (PJ), so the KYB
+ * The company (our end user) is normally a legal entity (PJ), so the KYB
  * flow is the common path. Avenia returns different verification links per
  * account type:
  *   - PF (individual):  a single `kycUrl`

@@ -115,7 +115,7 @@ export default function SaquePage() {
                 Verificação necessária
               </h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                Para sacar via PIX, a cooperativa precisa concluir a verificação (KYB).
+                Para sacar via PIX, a sua empresa precisa concluir a verificação (KYB).
               </p>
             </div>
             <Button asChild className="gap-2">
@@ -135,7 +135,7 @@ export default function SaquePage() {
       <div>
         <h1 className="text-2xl font-bold text-foreground">Saque via PIX</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Transfira o saldo da cooperativa para uma chave PIX
+          Transfira o saldo da sua empresa para uma chave PIX
         </p>
       </div>
 

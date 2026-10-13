@@ -36,7 +36,7 @@ export function RegisterForm() {
     if (!validate()) return;
     setLoading(true);
     try {
-      // Cooperative = pessoa jurídica → accountType COMPANY. The backend starts
+      // Exporter company = pessoa jurídica → accountType COMPANY. The backend starts
       // the Avenia KYB during signup and returns the verification links.
       const res = await signup({
         name: companyName,
@@ -73,7 +73,7 @@ export function RegisterForm() {
           <span className="text-lg font-bold text-primary-foreground">B</span>
         </div>
         <div className="text-center">
-          <h1 className="text-xl font-bold text-foreground">Cadastrar cooperativa</h1>
+          <h1 className="text-xl font-bold text-foreground">Cadastrar empresa</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Depois do cadastro você concluirá a verificação (KYB)
           </p>
@@ -86,7 +86,7 @@ export function RegisterForm() {
             label="Razão social"
             value={companyName}
             onChange={(e) => setCompanyName(e.target.value)}
-            placeholder="Cooperativa Agroextrativista..."
+            placeholder="Exportadora Amazônia Ltda..."
             error={errors.companyName}
             autoComplete="organization"
           />
@@ -103,7 +103,7 @@ export function RegisterForm() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="cooperativa@email.com"
+            placeholder="empresa@email.com"
             error={errors.email}
             autoComplete="email"
           />
