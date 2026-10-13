@@ -109,3 +109,22 @@ export interface PixKeyResponse {
   pixKey: string | null;
   message?: string;
 }
+
+/** A dedicated inbound bank account (GET /v1/receive/accounts). */
+export interface DedicatedAccount {
+  currency: "USD" | "EUR";
+  bankName?: string;
+  beneficiaryName?: string;
+  accountNumber?: string;
+  routingNumber?: string;
+  iban?: string;
+  swift?: string;
+  reference?: string;
+  confirmedAt?: string;
+}
+
+export interface AccountsResponse {
+  accounts: DedicatedAccount[];
+  /** Currencies whose dedicated account is still being set up. */
+  pendingCurrencies: string[];
+}

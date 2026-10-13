@@ -9,12 +9,17 @@
 import { endpoints } from "@bravachain/api-client";
 import { apiFetch } from "@/lib/client-api";
 import type {
+  AccountsResponse,
   CreateReceiveBody,
   CreateReceiveResponse,
   Instructions,
   PixKeyResponse,
   ReceiveStatus,
 } from "./types";
+
+export function getAccounts(): Promise<AccountsResponse> {
+  return apiFetch<AccountsResponse>(endpoints.receive.accounts);
+}
 
 export function getPixKey(): Promise<PixKeyResponse> {
   return apiFetch<PixKeyResponse>(endpoints.receive.pixKey);
