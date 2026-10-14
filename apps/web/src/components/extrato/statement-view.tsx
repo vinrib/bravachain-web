@@ -99,6 +99,8 @@ export function StatementView({
   const [period, setPeriod] = useState<Period>("30d");
   const [periodOpen, setPeriodOpen] = useState(false);
   const [type, setType] = useState<StatementFilterType>("ALL");
+  const [currency, setCurrency] = useState<string>("ALL");
+  const [currencyOpen, setCurrencyOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [data, setData] = useState<StatementResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -148,9 +150,21 @@ export function StatementView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [andamentoCount, historicoCount]);
 
-  const rows = (scope === "historico" ? partition.historico : partition.andamento).filter(
-    (r) => matchesSearch(r, search),
-  );
+  // Currencies present in the loaded data (for the Moeda filter options).
+  const currencyOptions = useMemo(() => {
+    const set = new Set<string>();
+    for (const r of all) set.add(r.foreignCurrency ?? "BRL");
+    return ["ALL", ...Array.from(set)];
+  }, [all]);
+
+  function matchesCurrency(r: StatementRow): boolean {
+    if (currency === "ALL") return true;
+    return (r.foreignCurrency ?? "BRL") === currency;
+  }
+
+  const rows = (scope === "historico" ? partition.historico : partition.andamento)
+    .filter((r) => matchesSearch(r, search))
+    .filter(matchesCurrency);
 
   const summary = data?.summary;
   const periodLabel = PERIODS.find((p) => p.value === period)?.label ?? "";
@@ -253,6 +267,42 @@ export function StatementView({
           />
         </div>
         <Segmented options={TYPES} value={type} onChange={setType} />
+
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setCurrencyOpen((o) => !o)}
+            className="flex h-10 items-center gap-2 rounded-xl border border-border bg-card px-3.5 text-sm text-foreground"
+          >
+            <span className="text-muted-foreground">Moeda:</span>
+            <span className="font-medium">
+              {currency === "ALL" ? "Todas as moedas" : currency}
+            </span>
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+          </button>
+          {currencyOpen && (
+            <div className="absolute right-0 z-10 mt-1 w-44 overflow-hidden rounded-xl border border-border bg-card shadow-lg">
+              {currencyOptions.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => {
+                    setCurrency(c);
+                    setCurrencyOpen(false);
+                  }}
+                  className={cn(
+                    "block w-full px-3.5 py-2 text-left text-sm",
+                    c === currency
+                      ? "bg-muted text-foreground"
+                      : "text-muted-foreground hover:bg-muted",
+                  )}
+                >
+                  {c === "ALL" ? "Todas as moedas" : c}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Table */}
