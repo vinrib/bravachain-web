@@ -10,6 +10,12 @@ function num(value: unknown): number {
   return Number.isFinite(n) ? n : 0;
 }
 
+function numN(value: unknown): number | null {
+  if (value === null || value === undefined || value === "") return null;
+  const n = typeof value === "string" ? Number(value) : (value as number);
+  return Number.isFinite(n) ? n : null;
+}
+
 function str(value: unknown, fallback = ""): string {
   return typeof value === "string" ? value : fallback;
 }
@@ -28,6 +34,9 @@ function normalizeItem(raw: unknown): ReceiptListItem {
     bankName: strN(r.bankName),
     pixSentAt: str(r.pixSentAt),
     createdAt: str(r.createdAt),
+    // Optional — present only if the backend includes them on the list item.
+    feeBrl: numN(r.feeBrl),
+    netAmountBrl: numN(r.netAmountBrl),
   };
 }
 

@@ -9,6 +9,8 @@ import { TransactionRowSkeleton } from "@/components/ui/skeleton";
 import { ErrorState, EmptyState } from "@/components/ui/state";
 import { getReceipts } from "@/lib/receipts/api";
 import { ReceiptRow } from "./receipt-row";
+import { InfoAlert } from "@/components/ui/info-alert";
+import { PIX_RETURN_WARNING_SHORT } from "@/lib/pix-warning";
 import type { ReceiptsResponse } from "@/lib/receipts/types";
 
 export function ReceiptsView({ embedded }: { embedded?: boolean }) {
@@ -117,6 +119,8 @@ export function ReceiptsView({ embedded }: { embedded?: boolean }) {
           </div>
         </div>
       )}
+
+      <InfoAlert>{PIX_RETURN_WARNING_SHORT}</InfoAlert>
     </div>
   );
 }

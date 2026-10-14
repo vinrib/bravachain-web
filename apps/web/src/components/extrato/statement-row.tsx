@@ -3,6 +3,7 @@
 import { ArrowDownLeft, ArrowUpRight, FileText } from "lucide-react";
 import { formatMoney, formatDateTime } from "@bravachain/shared";
 import { cn } from "@/lib/utils";
+import { WithdrawBreakdown } from "./withdraw-breakdown";
 import type { StatementRow as Row } from "@/lib/statement/types";
 
 export function StatementRow({
@@ -51,6 +52,11 @@ export function StatementRow({
             <FileText className="h-3 w-3" />
             Comprovante
           </button>
+        )}
+        {!inbound && (
+          <div className="mt-1">
+            <WithdrawBreakdown gross={row.amountBrl} fee={row.feeBrl} net={row.netAmountBrl} />
+          </div>
         )}
       </div>
 

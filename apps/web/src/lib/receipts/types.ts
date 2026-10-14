@@ -12,6 +12,9 @@ export interface ReceiptListItem {
   bankName: string | null;
   pixSentAt: string;
   createdAt: string;
+  /** Present only when the backend includes fee/net on the list item. */
+  feeBrl: number | null;
+  netAmountBrl: number | null;
 }
 
 export interface ReceiptsSummary {

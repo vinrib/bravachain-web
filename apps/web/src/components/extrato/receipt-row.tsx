@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { receiptPdfUrl, sendReceiptEmail } from "@/lib/receipts/api";
+import { WithdrawBreakdown } from "./withdraw-breakdown";
 import type { ReceiptListItem } from "@/lib/receipts/types";
 
 export function ReceiptRow({ receipt }: { receipt: ReceiptListItem }) {
@@ -55,6 +56,11 @@ export function ReceiptRow({ receipt }: { receipt: ReceiptListItem }) {
           </p>
           <p className="truncate text-xs text-muted-foreground">{meta}</p>
           <p className="truncate text-xs text-muted-foreground">PIX: {receipt.pixKey}</p>
+          <WithdrawBreakdown
+            gross={receipt.amountBrl}
+            fee={receipt.feeBrl}
+            net={receipt.netAmountBrl}
+          />
         </div>
         <div className="flex shrink-0 gap-1">
           <Button asChild size="sm" variant="ghost" className="gap-1.5">
