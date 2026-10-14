@@ -25,7 +25,7 @@ export default function DashboardPage() {
       <div>
         <h1 className="text-2xl font-bold text-foreground">Início</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Acompanhe o saldo e as movimentações da cooperativa
+          Acompanhe o saldo e as movimentações da sua empresa
         </p>
       </div>
 

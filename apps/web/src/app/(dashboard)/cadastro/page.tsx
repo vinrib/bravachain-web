@@ -46,7 +46,7 @@ export default function CadastroPage() {
       const res = await apiFetch(endpoints.kyc.submit, {
         method: "POST",
         body: JSON.stringify({
-          name: me?.name ?? me?.email ?? "Cooperativa",
+          name: me?.name ?? me?.email ?? "Empresa",
           accountType: "COMPANY",
         }),
       });
@@ -86,7 +86,7 @@ export default function CadastroPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Verificação da cooperativa</h1>
+        <h1 className="text-2xl font-bold text-foreground">Verificação da empresa</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Concluir o KYB libera saques e o uso completo da plataforma
         </p>
@@ -164,8 +164,8 @@ export default function CadastroPage() {
                 <VerificationLinkCard
                   step={1}
                   title="Dados da empresa"
-                  audience="Administrador da cooperativa"
-                  description="Preenchimento das informações cadastrais da cooperativa (razão social, endereço, documentos)."
+                  audience="Administrador da empresa"
+                  description="Preenchimento das informações cadastrais da empresa (razão social, endereço, documentos)."
                   url={state.basicCompanyDataUrl}
                 />
               )}
@@ -174,7 +174,7 @@ export default function CadastroPage() {
                   step={2}
                   title="Representante legal"
                   audience="Representante legal"
-                  description="Verificação de identidade da pessoa autorizada a representar a cooperativa."
+                  description="Verificação de identidade da pessoa autorizada a representar a empresa."
                   url={state.authorizedRepresentativeUrl}
                 />
               )}

@@ -4,7 +4,7 @@ import { setSession } from "@/lib/auth/session";
 import { stripTokens } from "@/lib/auth/sanitize";
 
 /**
- * BFF signup. Registers the cooperative against the backend. If the backend
+ * BFF signup. Registers the company against the backend. If the backend
  * returns tokens (auto-login), they are stored in httpOnly cookies. The
  * response body (minus any tokens) is passed through so the client can act on
  * onboarding data such as Avenia KYC/KYB links.

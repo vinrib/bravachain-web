@@ -5,13 +5,13 @@ export interface ExtratoExportOptions {
   transactions: Transaction[];
   /** Currency for the summary line; individual rows carry their own. */
   currency?: string;
-  /** Cooperative / account label printed in the header. */
+  /** Company / account label printed in the header. */
   accountLabel?: string;
 }
 
 /**
  * Generates and downloads a PDF account statement (extrato) for the
- * cooperative. Runs entirely client-side; jspdf is imported dynamically so it
+ * exporter company. Runs entirely client-side; jspdf is imported dynamically so it
  * stays out of the initial bundle.
  */
 export async function downloadExtrato({
@@ -86,7 +86,7 @@ export async function downloadExtrato({
   doc.setFontSize(8);
   doc.setTextColor(150, 150, 150);
   doc.text(
-    "Bravachain — Pagamentos cross-border para cooperativas",
+    "Bravachain — Pagamentos internacionais, liquidação em reais",
     pageW / 2,
     footerY,
     { align: "center" },

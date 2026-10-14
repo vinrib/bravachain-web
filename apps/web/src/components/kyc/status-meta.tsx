@@ -21,7 +21,7 @@ export const kycStatusMeta: Record<KycStatus, KycStatusMeta> = {
     Icon: ShieldCheck,
     title: "Verificação aprovada",
     description:
-      "A cooperativa está verificada. Você tem acesso completo à plataforma, incluindo saques via PIX.",
+      "A sua empresa está verificada. Você tem acesso completo à plataforma, incluindo saques via PIX.",
   },
   under_review: {
     label: "Em análise",
@@ -53,6 +53,6 @@ export const kycStatusMeta: Record<KycStatus, KycStatusMeta> = {
     Icon: AlertCircle,
     title: "Verificação necessária",
     description:
-      "Para movimentar a conta e sacar via PIX, conclua a verificação (KYB) da cooperativa.",
+      "Para movimentar a conta e sacar via PIX, conclua a verificação (KYB) da empresa.",
   },
 };

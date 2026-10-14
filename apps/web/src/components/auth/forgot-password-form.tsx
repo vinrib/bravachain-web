@@ -145,7 +145,7 @@ export function ForgotPasswordForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            placeholder="cooperativa@email.com"
+            placeholder="empresa@email.com"
             autoComplete="username"
           />
 

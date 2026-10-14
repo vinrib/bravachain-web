@@ -54,7 +54,7 @@ export function LoginForm() {
         <div className="text-center">
           <h1 className="text-xl font-bold text-foreground">Entrar na sua conta</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Acesse o painel da sua cooperativa
+            Acesse o painel da sua empresa
           </p>
         </div>
       </div>
@@ -67,7 +67,7 @@ export function LoginForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            placeholder="cooperativa@email.com"
+            placeholder="empresa@email.com"
             autoComplete="username"
           />
           <Input
