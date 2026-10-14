@@ -27,8 +27,13 @@ export function initials(text: string): string {
  */
 export function rowTitle(row: StatementRow): { title: string; sub: string | null } {
   if (row.type === "WITHDRAWAL") {
+    // Destination is the PIX key (counterparty). When the backend starts
+    // sending bankName, prefer it here.
     return { title: "Saque PIX", sub: row.counterparty };
   }
+  // NOTE: for inbound, counterparty is currently the account holder (the
+  // company itself), not the importer — a backend fix is pending. We display
+  // it as-is; no front-side workaround.
   const desc = row.description ?? "";
   const hasInternal = /bruto|taxa/i.test(desc);
   const title = row.counterparty || (hasInternal ? "Recebimento" : desc || "Recebimento");

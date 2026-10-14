@@ -102,22 +102,31 @@ export function StatementView({
   const [currency, setCurrency] = useState<string>("ALL");
   const [currencyOpen, setCurrencyOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [data, setData] = useState<StatementResponse | null>(null);
+  const [items, setItems] = useState<StatementRow[]>([]);
+  const [summaryData, setSummaryData] = useState<StatementResponse["summary"] | null>(null);
+  const [totalPages, setTotalPages] = useState(1);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [nonce, setNonce] = useState(0);
 
   const { startDate, endDate } = periodRange(period);
   const query: StatementQuery = { startDate, endDate, type, limit: LIMIT };
 
+  // Load page 1 (reset) when filters change.
   useEffect(() => {
     let active = true;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     setError(null);
+    setPage(1);
     getStatement({ startDate, endDate, type, page: 1, limit: LIMIT })
       .then((r) => {
-        if (active) setData(r);
+        if (!active) return;
+        setItems(r.transactions);
+        setSummaryData(r.summary);
+        setTotalPages(r.pagination.totalPages);
       })
       .catch(() => {
         if (active) setError("Não foi possível carregar o extrato.");
@@ -130,7 +139,22 @@ export function StatementView({
     };
   }, [startDate, endDate, type, nonce]);
 
-  const all = useMemo(() => data?.transactions ?? [], [data]);
+  async function loadMore() {
+    const next = page + 1;
+    setLoadingMore(true);
+    try {
+      const r = await getStatement({ startDate, endDate, type, page: next, limit: LIMIT });
+      setItems((prev) => [...prev, ...r.transactions]);
+      setTotalPages(r.pagination.totalPages);
+      setPage(next);
+    } catch {
+      /* keep what we have; the user can retry */
+    } finally {
+      setLoadingMore(false);
+    }
+  }
+
+  const all = items;
 
   // Partition by status into the two tabs (real data; counts are per loaded page).
   const partition = useMemo(() => {
@@ -166,8 +190,9 @@ export function StatementView({
     .filter((r) => matchesSearch(r, search))
     .filter(matchesCurrency);
 
-  const summary = data?.summary;
+  const summary = summaryData;
   const periodLabel = PERIODS.find((p) => p.value === period)?.label ?? "";
+  const hasMore = page < totalPages;
 
   return (
     <div className="space-y-5">
@@ -349,10 +374,26 @@ export function StatementView({
         </div>
       </Card>
 
-      {!loading && !error && rows.length > 0 && (
-        <p className="text-right text-xs text-muted-foreground">
-          {rows.length} {rows.length === 1 ? "lançamento" : "lançamentos"}
-        </p>
+      {!loading && !error && (
+        <div className="flex items-center justify-between gap-3">
+          {rows.length > 0 ? (
+            <p className="text-xs text-muted-foreground">
+              {rows.length} {rows.length === 1 ? "lançamento" : "lançamentos"}
+            </p>
+          ) : (
+            <span />
+          )}
+          {hasMore && (
+            <button
+              type="button"
+              onClick={loadMore}
+              disabled={loadingMore}
+              className="rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-muted disabled:opacity-60"
+            >
+              {loadingMore ? "Carregando…" : "Carregar mais"}
+            </button>
+          )}
+        </div>
       )}
     </div>
   );
