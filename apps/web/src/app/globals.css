@@ -17,43 +17,51 @@
   --color-ring: var(--ring);
   --color-destructive: var(--destructive);
   --color-success: var(--success);
-  --font-sans: var(--font-inter);
+  --color-warning: var(--warning);
+  --color-foreign: var(--foreign);
+  --font-sans: var(--font-instrument);
+  --font-serif: var(--font-merriweather);
+  --font-mono: var(--font-plex-mono);
 }
 
-/* ─── Light mode ──────────────────────────────────────────── */
+/* ─── Light mode — Claude Design identity (Areia / Papel) ──── */
 :root {
   color-scheme: light;
-  --background: #f8f9fa;
-  --foreground: #1a1a2e;
-  --card: #ffffff;
-  --card-foreground: #1a1a2e;
-  --primary: #00b67a;
-  --primary-foreground: #ffffff;
-  --muted: #f0f2f5;
-  --muted-foreground: #6b7280;
-  --border: #e5e7eb;
-  --input: #ffffff;
-  --ring: #00b67a;
-  --destructive: #ef4444;
-  --success: #00b67a;
+  --background: #edeae3; /* Areia */
+  --foreground: #0b3b2e; /* Verde Bravo (ink) */
+  --card: #fbfaf7; /* Papel */
+  --card-foreground: #0b3b2e;
+  --primary: #12a46b; /* Verde Ação */
+  --primary-foreground: #fbfaf7;
+  --muted: #ece9e1;
+  --muted-foreground: #5a625e; /* Texto apoio */
+  --border: #e3e0d8;
+  --input: #fbfaf7;
+  --ring: #12a46b;
+  --destructive: #b03030; /* Atenção */
+  --success: #0f8d5c;
+  --warning: #c77a18; /* Âmbar Processo */
+  --foreign: #1e5fa8; /* Azul Exterior (USD/EUR) */
 }
 
-/* ─── Dark mode ──────────────────────────────────────────── */
+/* ─── Dark mode — derived from the palette (design is light-only) ── */
 .dark {
   color-scheme: dark;
-  --background: #0a0a0f;
-  --foreground: #e8e8f0;
-  --card: #12121a;
-  --card-foreground: #e8e8f0;
-  --primary: #00d4aa;
-  --primary-foreground: #0a0a0f;
-  --muted: #1c1c28;
-  --muted-foreground: #8888a8;
-  --border: #1e1e2e;
-  --input: #1c1c28;
-  --ring: #00d4aa;
-  --destructive: #ff4d6d;
-  --success: #00d4aa;
+  --background: #011a0f; /* deepest Verde */
+  --foreground: #f0eee8;
+  --card: #0b2a20;
+  --card-foreground: #f0eee8;
+  --primary: #19b981; /* Verde Ação, lifted for dark surfaces */
+  --primary-foreground: #011a0f;
+  --muted: #0e2f24;
+  --muted-foreground: #9aa39d;
+  --border: #1e3a30;
+  --input: #0e2f24;
+  --ring: #19b981;
+  --destructive: #e07a7a;
+  --success: #7be0b0;
+  --warning: #d79a3a;
+  --foreign: #6ba0d6;
 }
 
 /* ─── Base styles ────────────────────────────────────────── */
@@ -72,9 +80,15 @@ html {
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headings and hero numbers use Merriweather (the design's display face). */
+h1,
+h2 {
+  font-family: var(--font-serif), Georgia, serif;
 }
 
 input:focus,

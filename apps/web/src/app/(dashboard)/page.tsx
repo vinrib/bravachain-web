@@ -11,6 +11,7 @@ import { Skeleton, TransactionRowSkeleton } from "@/components/ui/skeleton";
 import { ErrorState, EmptyState } from "@/components/ui/state";
 import { TransactionRow } from "@/components/dashboard/transaction-row";
 import { KycBanner } from "@/components/dashboard/kyc-banner";
+import { ReceiveCurrencyCards } from "@/components/dashboard/receive-currency-cards";
 
 export default function DashboardPage() {
   const balance = useBalance();
@@ -31,7 +32,7 @@ export default function DashboardPage() {
 
       {kyc.data && <KycBanner status={kyc.data.status} />}
 
-      {/* Saldo */}
+      {/* Saldo (BRL) */}
       <Card className="overflow-hidden">
         <CardContent className="pt-6">
           {balance.loading ? (
@@ -53,7 +54,7 @@ export default function DashboardPage() {
                   {hidden ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              <p className="mt-1 text-3xl font-bold tabular-nums text-foreground">
+              <p className="mt-1 font-serif text-4xl font-bold tabular-nums text-foreground">
                 {hidden
                   ? "••••••"
                   : formatMoney(balance.data?.available ?? 0, {
@@ -79,6 +80,9 @@ export default function DashboardPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Receber do exterior (USD/EUR) — instruções, nunca saldo */}
+      <ReceiveCurrencyCards />
 
       {/* Extrato recente */}
       <div>

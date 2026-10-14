@@ -77,3 +77,20 @@ export function useKycState(): AsyncState<KycState> {
     [],
   );
 }
+
+export interface Me {
+  name: string | null;
+  email: string | null;
+}
+
+/** The signed-in company profile (GET /auth/me). Name is the company name. */
+export function useMe(): AsyncState<Me> {
+  return useResource(
+    () =>
+      apiFetch<{ name?: string; email?: string }>(endpoints.auth.me).then((r) => ({
+        name: typeof r?.name === "string" ? r.name : null,
+        email: typeof r?.email === "string" ? r.email : null,
+      })),
+    [],
+  );
+}
