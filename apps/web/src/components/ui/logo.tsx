@@ -1,9 +1,10 @@
 import { cn } from "@/lib/utils";
+import { BravaMark } from "./brava-mark";
 
 const SIZES = {
-  sm: { box: "h-7 w-7 rounded-lg text-sm", word: "text-sm" },
-  md: { box: "h-8 w-8 rounded-xl text-base", word: "text-base" },
-  lg: { box: "h-12 w-12 rounded-2xl text-2xl", word: "text-lg" },
+  sm: { box: "h-7 w-7 rounded-lg", mark: 18, word: "text-sm" },
+  md: { box: "h-8 w-8 rounded-xl", mark: 22, word: "text-base" },
+  lg: { box: "h-12 w-12 rounded-2xl", mark: 30, word: "text-lg" },
 } as const;
 
 /**
@@ -25,11 +26,11 @@ export function Logo({
       <span
         aria-hidden="true"
         className={cn(
-          "inline-flex items-center justify-center bg-primary font-serif font-bold leading-none text-primary-foreground shadow-sm",
+          "inline-flex items-center justify-center bg-primary text-primary-foreground shadow-sm",
           s.box,
         )}
       >
-        B
+        <BravaMark size={s.mark} />
       </span>
       {withWordmark && (
         <span className={cn("font-serif font-bold text-foreground", s.word)}>

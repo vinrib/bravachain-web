@@ -1,8 +1,10 @@
-import { Logo } from "@/components/ui/logo";
+import { BravaMark } from "@/components/ui/brava-mark";
 
 /**
- * Split-panel auth shell (Claude Design): a deep-green brand panel on the left
- * (desktop) and the form on the right. The brand panel is theme-independent.
+ * Auth shell matching the Claude Design login artboard (17a): a deep-green
+ * brand panel on the left (desktop) with decorative concentric circles and the
+ * bottom-anchored headline; a rounded-bottom green header on mobile. The form
+ * area sits directly on the sand surface. Brand surfaces are theme-independent.
  */
 export default function AuthLayout({
   children,
@@ -10,30 +12,45 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen bg-background">
-      <aside className="relative hidden w-1/2 max-w-[560px] flex-col justify-between bg-[#011a0f] p-10 text-[#f0eee8] lg:flex">
-        <div className="flex items-center gap-2">
-          <Logo size="md" withWordmark={false} />
-          <span className="font-serif text-base font-bold text-[#f0eee8]">
-            Bravachain
+    <div className="flex min-h-screen flex-col bg-[#f4f2ec] dark:bg-background lg:flex-row">
+      {/* Mobile green header (rounded bottom) */}
+      <div className="relative overflow-hidden rounded-b-[26px] bg-[#011a0f] px-6 pb-7 pt-5 text-white lg:hidden">
+        <div className="pointer-events-none absolute -right-[90px] -top-[70px] h-[240px] w-[240px] rounded-full border border-white/[0.08]" />
+        <div className="relative flex items-center gap-2.5">
+          <span className="flex h-7 w-7 items-center justify-center rounded-[8px] bg-white text-black">
+            <BravaMark size={20} />
           </span>
+          <span className="font-serif text-base font-bold">Bravachain</span>
+        </div>
+        <h2 className="relative mt-5 font-serif text-[22px] font-bold leading-[1.3]">
+          Pagamentos internacionais, liquidação em reais.
+        </h2>
+      </div>
+
+      {/* Desktop brand panel */}
+      <aside className="relative hidden flex-col overflow-hidden bg-[#011a0f] p-10 text-white lg:flex lg:w-[38%] lg:max-w-[480px] lg:px-12">
+        <div className="pointer-events-none absolute -right-[180px] -top-[140px] h-[520px] w-[520px] rounded-full border border-white/[0.07]" />
+        <div className="pointer-events-none absolute -right-[100px] -top-[60px] h-[360px] w-[360px] rounded-full border border-white/[0.07]" />
+        <div className="pointer-events-none absolute -bottom-[200px] -left-[120px] h-[420px] w-[420px] rounded-full bg-[rgba(18,164,107,0.07)]" />
+
+        <div className="relative flex items-center gap-2.5">
+          <span className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-white text-black">
+            <BravaMark size={22} />
+          </span>
+          <span className="font-serif text-lg font-bold">Bravachain</span>
         </div>
 
-        <div className="max-w-md">
-          <h2 className="font-serif text-3xl font-bold leading-tight text-[#f0eee8]">
-            Pagamentos internacionais, liquidação em reais
+        <div className="relative mt-auto">
+          <h2 className="font-serif text-[32px] font-bold leading-[1.28] tracking-[-0.015em]">
+            Pagamentos internacionais, liquidação em reais.
           </h2>
-          <p className="mt-4 text-sm leading-relaxed text-[#b7c3bc]">
+          <p className="mt-4 max-w-[380px] text-[15.5px] leading-[1.6] text-white/[0.78]">
             Receba de importadores em dólar ou euro e saque em reais via PIX.
           </p>
         </div>
-
-        <p className="text-xs text-[#7f958b]">
-          O dinheiro da sua exportação, em reais.
-        </p>
       </aside>
 
-      <main className="flex flex-1 items-center justify-center p-4 sm:p-8">
+      <main className="flex flex-1 items-start justify-center p-6 sm:p-10 lg:items-center">
         {children}
       </main>
     </div>

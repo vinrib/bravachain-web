@@ -28,7 +28,7 @@
 :root {
   color-scheme: light;
   --background: #edeae3; /* Areia */
-  --foreground: #0b3b2e; /* Verde Bravo (ink) */
+  --foreground: #011a0f; /* ink (deep green used across artboards) */
   --card: #fbfaf7; /* Papel */
   --card-foreground: #0b3b2e;
   --primary: #12a46b; /* Verde Ação */
