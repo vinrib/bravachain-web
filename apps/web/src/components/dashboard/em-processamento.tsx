@@ -14,6 +14,7 @@ import { statementStatusView } from "@/lib/statement/status";
  */
 export function EmProcessamento() {
   const [total, setTotal] = useState<number | null>(null);
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
     let active = true;
@@ -29,10 +30,11 @@ export function EmProcessamento() {
     })
       .then((r) => {
         if (!active) return;
-        const sum = r.transactions
-          .filter((t) => !statementStatusView(t.status).final)
-          .reduce((acc, t) => acc + t.amountBrl, 0);
-        setTotal(sum);
+        const processing = r.transactions.filter(
+          (t) => !statementStatusView(t.status).final,
+        );
+        setTotal(processing.reduce((acc, t) => acc + t.amountBrl, 0));
+        setCount(processing.length);
       })
       .catch(() => {
         if (active) setTotal(0);
@@ -57,6 +59,9 @@ export function EmProcessamento() {
           </p>
           <p className="font-serif text-lg font-bold tabular-nums text-[#8a5310] dark:text-[#d79a3a]">
             ≈ {formatMoney(total)}
+          </p>
+          <p className="text-xs text-[#8a5310]/80 dark:text-[#d79a3a]/80">
+            {count} {count === 1 ? "pagamento sendo convertido" : "pagamentos sendo convertidos"}
           </p>
         </div>
       </div>

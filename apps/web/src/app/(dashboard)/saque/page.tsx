@@ -40,7 +40,12 @@ export default function SaquePage() {
   const balance = useBalance();
   const kyc = useKycState();
 
-  const [amountInput, setAmountInput] = useState("");
+  // Prefill the amount from a ?valor= query (e.g. the Início "Saque rápido"
+  // card). Read once on mount; no money moves without the user submitting here.
+  const [amountInput, setAmountInput] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return new URLSearchParams(window.location.search).get("valor") ?? "";
+  });
   const [pixKey, setPixKey] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [holdMessage, setHoldMessage] = useState<string | null>(null);
