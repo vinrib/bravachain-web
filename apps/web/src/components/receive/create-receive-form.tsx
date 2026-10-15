@@ -74,12 +74,14 @@ export function CreateReceiveForm() {
       });
       router.push(`/recebimentos/${res.ticketId}`);
     } catch (err) {
-      setErrors({
-        form:
-          err instanceof ApiError
-            ? err.message
-            : "Não foi possível criar o recebimento.",
-      });
+      // Never surface backend technical text (e.g. the 412 for a currency that
+      // has a dedicated account). Map to a short pt-BR message.
+      let msg = "Não foi possível criar o recebimento.";
+      if (err instanceof ApiError && err.status === 412) {
+        msg =
+          "Para esta moeda, o recebimento é feito direto na sua conta dedicada. Veja as instruções de recebimento.";
+      }
+      setErrors({ form: msg });
     } finally {
       setSubmitting(false);
     }

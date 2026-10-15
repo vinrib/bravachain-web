@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ChevronDown, Download, Receipt, Search } from "lucide-react";
+import { ChevronDown, Receipt, Search } from "lucide-react";
+import { ExportMenu } from "@/components/ui/export-menu";
 import { Card } from "@/components/ui/card";
 import { TransactionRowSkeleton } from "@/components/ui/skeleton";
 import { ErrorState, EmptyState } from "@/components/ui/state";
@@ -197,12 +198,12 @@ export function StatementView({
   return (
     <div className="space-y-5">
       {/* Header actions */}
-      <div className="flex flex-wrap items-center justify-end gap-2">
+      <div className="flex flex-wrap items-center justify-end gap-3">
         <div className="relative">
           <button
             type="button"
             onClick={() => setPeriodOpen((o) => !o)}
-            className="flex h-10 items-center gap-2 rounded-xl border border-border bg-card px-3.5 text-sm font-medium text-foreground"
+            className="flex h-11 items-center gap-2 rounded-xl border border-border bg-card px-3.5 text-sm font-medium text-foreground"
           >
             {periodLabel}
             <ChevronDown className="h-4 w-4 text-muted-foreground" />
@@ -231,27 +232,11 @@ export function StatementView({
           )}
         </div>
 
-        {/* Dark Export button with CSV/PDF */}
-        <div className="flex overflow-hidden rounded-xl bg-[#011a0f] text-white dark:bg-primary dark:text-primary-foreground">
-          <span className="flex items-center gap-1.5 pl-3.5 text-sm font-semibold">
-            <Download className="h-4 w-4" />
-            Exportar
-          </span>
-          <a
-            href={statementExportUrl(query, "csv")}
-            download
-            className="ml-2 flex items-center px-2.5 text-xs font-medium hover:bg-white/10"
-          >
-            CSV
-          </a>
-          <a
-            href={statementExportUrl(query, "pdf")}
-            download
-            className="flex items-center px-3 text-xs font-medium hover:bg-white/10"
-          >
-            PDF
-          </a>
-        </div>
+        {/* Dark Export button with an accessible CSV/PDF menu */}
+        <ExportMenu
+          csvHref={statementExportUrl(query, "csv")}
+          pdfHref={statementExportUrl(query, "pdf")}
+        />
       </div>
 
       {/* Period summary */}
