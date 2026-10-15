@@ -71,7 +71,7 @@ export function ReceiveCurrencyCards() {
   return (
     <div>
       <h2 className="mb-2 px-1 text-base font-semibold text-foreground">
-        Receber do exterior
+        Minhas contas
       </h2>
       <div className="grid gap-3 sm:grid-cols-2">
         {confirmed.map((acc) => (
