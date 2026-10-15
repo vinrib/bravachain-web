@@ -107,6 +107,21 @@ export const endpoints = {
     renewToken: (id: string) => `/v1/receive/${id}/renew-token`,
   },
   /**
+   * FX rates (Cotações). Responses are not typed in the committed openapi.json;
+   * the frontend normalizers (apps/web/src/lib/rates) map the real keys.
+   */
+  rates: {
+    /** GET -> { USD_BRL, EUR_BRL } live rates (no pair param). */
+    live: "/v1/rates/live",
+    /** GET ?pair=USD_BRL|EUR_BRL&period=1D|1W|1M|3M|1Y -> { pair, period, dataPoints, stats } */
+    history: "/v1/rates/history",
+    /** GET ?pair&amount -> { pair, amount, result, rate } */
+    convert: "/v1/rates/convert",
+    /** GET list; POST create; PATCH {id}; DELETE {id} — rate alerts (Bearer). */
+    alerts: "/v1/rates/alerts",
+    alert: (id: string) => `/v1/rates/alerts/${id}`,
+  },
+  /**
    * Financial dashboard. All GET (Bearer) with ?period=30d|90d|12m|ytd.
    * NOTE: responses are not typed in the committed openapi.json — the frontend
    * normalizers (apps/web/src/lib/dashboard) map the real keys defensively.

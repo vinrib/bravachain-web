@@ -7,6 +7,7 @@ import {
   Landmark,
   LineChart,
   FileText,
+  ArrowLeftRight,
   type LucideIcon,
 } from "lucide-react";
 import { featureFlags } from "@/lib/feature-flags";
@@ -39,6 +40,10 @@ export const navItems: NavItem[] = [
   // Behind NEXT_PUBLIC_FEATURE_DADOS_CONTA (default off).
   ...(featureFlags.dadosConta
     ? [{ href: "/dados-de-conta", label: "Dados de conta", icon: Landmark }]
+    : []),
+  // Behind NEXT_PUBLIC_FEATURE_COTACOES (default off).
+  ...(featureFlags.cotacoes
+    ? [{ href: "/cotacoes", label: "Cotações", icon: ArrowLeftRight }]
     : []),
   { href: "/saque", label: "Saque PIX", icon: Banknote },
   { href: "/cadastro", label: "Verificação", icon: ShieldCheck },

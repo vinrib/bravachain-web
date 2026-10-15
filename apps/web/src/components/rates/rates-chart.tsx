@@ -1,0 +1,150 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ErrorState } from "@/components/ui/state";
+import { TabsPill } from "@/components/ui/tabs-pill";
+import { getRateHistory } from "@/lib/rates/api";
+import { formatRate4 } from "./rates-live-cards";
+import {
+  PAIRS,
+  PERIODS,
+  type HistoryPeriod,
+  type RateHistory,
+  type RatePair,
+} from "@/lib/rates/types";
+
+const GRID = "color-mix(in srgb, var(--border) 60%, transparent)";
+const AXIS = { fontSize: 11, fill: "var(--muted-foreground)" };
+
+function dateLabel(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+}
+
+export function RatesChart() {
+  const [pair, setPair] = useState<RatePair>("USD_BRL");
+  const [period, setPeriod] = useState<HistoryPeriod>("1M");
+  const [data, setData] = useState<RateHistory | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [nonce, setNonce] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setLoading(true);
+    setError(false);
+    getRateHistory(pair, period)
+      .then((r) => {
+        if (active) setData(r);
+      })
+      .catch(() => {
+        if (active) setError(true);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [pair, period, nonce]);
+
+  const points = data?.points ?? [];
+  const stats = data?.stats;
+
+  return (
+    <Card>
+      <CardContent className="pt-5">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <TabsPill
+            tabs={PAIRS.map((p) => ({ value: p.value, label: p.label }))}
+            value={pair}
+            onChange={setPair}
+          />
+          <TabsPill
+            tabs={PERIODS.map((p) => ({ value: p.value, label: p.label }))}
+            value={period}
+            onChange={setPeriod}
+          />
+        </div>
+
+        {loading ? (
+          <Skeleton className="h-56 w-full" />
+        ) : error ? (
+          <ErrorState message="Não foi possível carregar o histórico." onRetry={() => setNonce((n) => n + 1)} />
+        ) : points.length < 2 ? (
+          <p className="py-16 text-center text-sm text-muted-foreground">
+            Histórico ainda sendo coletado.
+          </p>
+        ) : (
+          <>
+            {/* Textual summary for screen readers */}
+            <p className="sr-only">
+              Gráfico de {pair.replace("_", "/")} no período {period}. Mínimo{" "}
+              {formatRate4(stats?.min ?? null)}, máximo {formatRate4(stats?.max ?? null)}, média{" "}
+              {formatRate4(stats?.avg ?? null)}.
+            </p>
+            <ResponsiveContainer width="100%" height={224}>
+              <LineChart data={points} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
+                <CartesianGrid vertical={false} stroke={GRID} />
+                <XAxis
+                  dataKey="date"
+                  tick={AXIS}
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={dateLabel}
+                  minTickGap={32}
+                />
+                <YAxis
+                  tick={AXIS}
+                  tickLine={false}
+                  axisLine={false}
+                  width={52}
+                  domain={["auto", "auto"]}
+                  tickFormatter={(v) => formatRate4(Number(v))}
+                />
+                <Tooltip
+                  labelFormatter={(l) => new Date(String(l)).toLocaleDateString("pt-BR")}
+                  formatter={(v) => [`R$ ${formatRate4(Number(v))}`, "Taxa"]}
+                  contentStyle={{ fontSize: 12, borderRadius: 8 }}
+                />
+                <Line type="monotone" dataKey="rate" stroke="#12a46b" strokeWidth={2} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+
+            {stats && (
+              <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+                <Stat label="Mínimo" value={stats.min} />
+                <Stat label="Máximo" value={stats.max} />
+                <Stat label="Média" value={stats.avg} />
+              </div>
+            )}
+          </>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: number | null }) {
+  return (
+    <div>
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="text-sm font-semibold tabular-nums text-foreground">
+        R$ {formatRate4(value)}
+      </p>
+    </div>
+  );
+}
