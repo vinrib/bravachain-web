@@ -2,16 +2,18 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Clock } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { formatMoney } from "@bravachain/shared";
-import { Card, CardContent } from "@/components/ui/card";
 import { getStatement } from "@/lib/statement/api";
 import { statementStatusView } from "@/lib/statement/status";
-import type { StatementRow } from "@/lib/statement/types";
 
-/** Sidebar panel: in-progress receivings from /v1/statement (real data). */
+/**
+ * "Em processamento" amber summary card (artboard 4a): total of in-progress
+ * inbound receivings from /v1/statement. No same-day promise ("previsão hoje")
+ * — that would be an unverifiable claim.
+ */
 export function EmProcessamento() {
-  const [rows, setRows] = useState<StatementRow[] | null>(null);
+  const [total, setTotal] = useState<number | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -23,50 +25,42 @@ export function EmProcessamento() {
       endDate: end.toISOString().slice(0, 10),
       type: "INBOUND",
       page: 1,
-      limit: 20,
+      limit: 50,
     })
       .then((r) => {
-        if (active) {
-          setRows(r.transactions.filter((t) => !statementStatusView(t.status).final));
-        }
+        if (!active) return;
+        const sum = r.transactions
+          .filter((t) => !statementStatusView(t.status).final)
+          .reduce((acc, t) => acc + t.amountBrl, 0);
+        setTotal(sum);
       })
       .catch(() => {
-        if (active) setRows([]);
+        if (active) setTotal(0);
       });
     return () => {
       active = false;
     };
   }, []);
 
-  // Don't render until we know, and hide when there's nothing in progress.
-  if (!rows || rows.length === 0) return null;
+  if (total === null || total <= 0) return null;
 
   return (
-    <Card>
-      <CardContent className="pt-5">
-        <div className="mb-3 flex items-center gap-2">
-          <Clock className="h-4 w-4 text-[#c77a18]" />
-          <p className="text-sm font-semibold text-foreground">Em processamento</p>
+    <Link
+      href="/extrato"
+      className="flex items-center justify-between gap-3 rounded-2xl bg-[#fbf0df] px-4 py-3.5 transition-colors hover:bg-[#f7e8cf] dark:bg-[#c77a18]/15 dark:hover:bg-[#c77a18]/20"
+    >
+      <div className="flex items-center gap-2.5">
+        <span className="h-2 w-2 shrink-0 rounded-full bg-[#c77a18]" />
+        <div>
+          <p className="text-xs font-medium text-[#8a5310] dark:text-[#d79a3a]">
+            Em processamento
+          </p>
+          <p className="font-serif text-lg font-bold tabular-nums text-[#8a5310] dark:text-[#d79a3a]">
+            ≈ {formatMoney(total)}
+          </p>
         </div>
-        <ul className="space-y-3">
-          {rows.slice(0, 4).map((r) => (
-            <li key={r.id} className="flex items-center justify-between gap-2">
-              <span className="min-w-0 truncate text-sm text-foreground">
-                {r.counterparty || "Recebimento"}
-              </span>
-              <span className="shrink-0 text-sm font-medium tabular-nums text-[#0b6b4f] dark:text-[#7be0b0]">
-                ≈ {formatMoney(r.amountBrl)}
-              </span>
-            </li>
-          ))}
-        </ul>
-        <Link
-          href="/extrato"
-          className="mt-3 inline-block text-sm font-medium text-primary hover:underline"
-        >
-          Ver no extrato
-        </Link>
-      </CardContent>
-    </Card>
+      </div>
+      <ChevronRight className="h-4 w-4 shrink-0 text-[#c77a18]" />
+    </Link>
   );
 }
