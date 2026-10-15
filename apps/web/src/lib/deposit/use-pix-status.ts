@@ -1,25 +1,26 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ApiError } from "@/lib/client-api";
 import { getPixStatus } from "./api";
 import { depositUiStatus, isFinalStatus } from "./status";
 import type { DepositUiStatus } from "./types";
 
 /**
  * Polls GET /v1/pix/status/:txid every 5s, pausing while the tab is hidden, and
- * stops once the status is final or `stopped` is set (e.g. on expiry). No
- * external dependency. Starts from `initialStatus` so the first poll isn't
- * needed to show the initial state.
+ * stops once the status is final (paid/failed), `stopped` is set (client-side
+ * expiry), or the deposit is not found (404). No external dependency.
  */
 export function usePixStatus(
   txid: string | null,
   initialStatus: string,
   stopped: boolean,
-) {
+): { ui: DepositUiStatus; notFound: boolean } {
   const [ui, setUi] = useState<DepositUiStatus>(() => depositUiStatus(initialStatus));
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    if (!txid || stopped || isFinalStatus(ui)) return;
+    if (!txid || stopped || notFound || isFinalStatus(ui)) return;
     let active = true;
     let timer: ReturnType<typeof setInterval> | null = null;
 
@@ -27,8 +28,11 @@ export function usePixStatus(
       try {
         const r = await getPixStatus(txid as string);
         if (active) setUi(depositUiStatus(r.status));
-      } catch {
-        /* keep current UI state; next tick retries */
+      } catch (err) {
+        if (active && err instanceof ApiError && err.status === 404) {
+          setNotFound(true);
+        }
+        /* other errors: keep current UI state; next tick retries */
       }
     }
     function start() {
@@ -55,7 +59,7 @@ export function usePixStatus(
       stop();
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [txid, stopped, ui]);
+  }, [txid, stopped, ui, notFound]);
 
-  return ui;
+  return { ui, notFound };
 }

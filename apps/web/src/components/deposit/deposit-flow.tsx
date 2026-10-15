@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button";
 import { AmountInput } from "@/components/ui/amount-input";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { ApiError } from "@/lib/client-api";
 import { createPixQrCode } from "@/lib/deposit/api";
+import { mapCreateError } from "@/lib/deposit/errors";
 import { usePixStatus } from "@/lib/deposit/use-pix-status";
 import {
   remainingSeconds,
@@ -66,14 +66,7 @@ function DepositForm({ onGenerated }: { onGenerated: (qr: PixQrCode) => void }) 
       const qr = await createPixQrCode({ valor, descricao: desc }, keyFor(sig));
       onGenerated(qr);
     } catch (err) {
-      let msg = "Não foi possível gerar o PIX. Tente novamente.";
-      if (err instanceof ApiError) {
-        if (err.status === 400) msg = "Valor inválido. Confira e tente novamente.";
-        else if (err.status === 429) msg = "Muitas tentativas. Aguarde um momento.";
-        else if (err.status === 503 || err.status === 501)
-          msg = "Depósito por PIX indisponível no momento.";
-      }
-      setErrors({ form: msg });
+      setErrors({ form: mapCreateError(err) });
     } finally {
       setSubmitting(false);
     }
@@ -119,17 +112,18 @@ function DepositForm({ onGenerated }: { onGenerated: (qr: PixQrCode) => void }) 
 }
 
 function PixGenerated({ qr, onReset }: { qr: PixQrCode; onReset: () => void }) {
-  const [secs, setSecs] = useState(() => remainingSeconds(qr.expiresAt));
-  const expired = secs <= 0;
-  const ui = usePixStatus(qr.txid, qr.status, expired);
+  const [secs, setSecs] = useState<number | null>(() => remainingSeconds(qr.expiresAt));
   const [copied, setCopied] = useState(false);
+  // Client-side expiry: only when there's a valid expiresAt that has passed.
+  const expired = secs !== null && secs <= 0;
+  const { ui, notFound } = usePixStatus(qr.txid, qr.status, expired);
 
-  // Countdown tick.
+  // Countdown tick (only when there is an expiresAt and it hasn't passed).
   useEffect(() => {
-    if (expired) return;
+    if (secs === null || expired) return;
     const id = setInterval(() => setSecs(remainingSeconds(qr.expiresAt)), 1000);
     return () => clearInterval(id);
-  }, [qr.expiresAt, expired]);
+  }, [qr.expiresAt, secs, expired]);
 
   async function copy() {
     if (!qr.pixCopiaECola) return;
@@ -164,7 +158,14 @@ function PixGenerated({ qr, onReset }: { qr: PixQrCode; onReset: () => void }) {
       </Result>
     );
   }
-  if (expired || ui === "expired") {
+  if (notFound) {
+    return (
+      <Result tone="error" title="Depósito não encontrado" body="Não localizamos este depósito.">
+        <Button onClick={onReset}>Gerar novo PIX</Button>
+      </Result>
+    );
+  }
+  if (expired) {
     return (
       <Result tone="neutral" title="PIX expirado" body="O prazo para pagamento acabou.">
         <Button onClick={onReset}>Gerar novo PIX</Button>
@@ -210,15 +211,25 @@ function PixGenerated({ qr, onReset }: { qr: PixQrCode; onReset: () => void }) {
           </Button>
         </div>
 
-        <div
-          className="flex items-center justify-center gap-2 text-sm text-muted-foreground"
-          role="timer"
-          aria-live="polite"
-          aria-label={`Expira em ${formatCountdown(secs)}`}
-        >
-          <Clock className="h-4 w-4" />
-          Expira em <span className="font-medium tabular-nums text-foreground">{formatCountdown(secs)}</span>
-        </div>
+        {secs !== null ? (
+          <div
+            className="flex items-center justify-center gap-2 text-sm text-muted-foreground"
+            role="timer"
+            aria-live="polite"
+            aria-label={`Expira em ${formatCountdown(secs)}`}
+          >
+            <Clock className="h-4 w-4" />
+            Expira em{" "}
+            <span className="font-medium tabular-nums text-foreground">
+              {formatCountdown(secs)}
+            </span>
+          </div>
+        ) : (
+          <p className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+            <Clock className="h-4 w-4" />
+            Aguardando pagamento
+          </p>
+        )}
 
         <p className="text-center text-sm text-muted-foreground">
           Pague no app do seu banco. O saldo entra quando o pagamento for confirmado.
