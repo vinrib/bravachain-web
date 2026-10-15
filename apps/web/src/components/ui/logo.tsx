@@ -26,7 +26,8 @@ export function Logo({
       <span
         aria-hidden="true"
         className={cn(
-          "inline-flex items-center justify-center bg-primary text-primary-foreground shadow-sm",
+          // Dark square with the light mark, per the shell artboards.
+          "inline-flex items-center justify-center bg-[#011a0f] text-[#8fe3b8] shadow-sm dark:bg-primary dark:text-primary-foreground",
           s.box,
         )}
       >

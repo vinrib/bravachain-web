@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { cn } from "@/lib/utils";
 import { StatementView, type StatementScope } from "./statement-view";
 import { ReceiptsView } from "./receipts-view";
+import { TabsPill, type TabItem } from "@/components/ui/tabs-pill";
 
 type Tab = StatementScope | "comprovantes";
 
@@ -12,7 +12,7 @@ export function ExtratoTabs({ showReceipts = false }: { showReceipts?: boolean }
   const [tab, setTab] = useState<Tab>("andamento");
   const [counts, setCounts] = useState({ andamento: 0, historico: 0 });
 
-  const tabs: Array<{ value: Tab; label: string; badge?: number }> = [
+  const tabs: Array<TabItem<Tab>> = [
     { value: "andamento", label: "Em andamento", badge: counts.andamento },
     { value: "historico", label: "Histórico", badge: counts.historico },
     ...(showReceipts
@@ -29,36 +29,7 @@ export function ExtratoTabs({ showReceipts = false }: { showReceipts?: boolean }
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-1 border-b border-border">
-        {tabs.map((t) => {
-          const active = tab === t.value;
-          return (
-            <button
-              key={t.value}
-              type="button"
-              onClick={() => setTab(t.value)}
-              className={cn(
-                "-mb-px flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-medium transition-colors",
-                active
-                  ? "border-primary text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {t.label}
-              {t.badge !== undefined && t.badge > 0 && (
-                <span
-                  className={cn(
-                    "inline-flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-xs font-semibold",
-                    active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground",
-                  )}
-                >
-                  {t.badge}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
+      <TabsPill tabs={tabs} value={tab} onChange={setTab} />
 
       {tab === "comprovantes" ? (
         <ReceiptsView embedded />

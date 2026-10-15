@@ -3,7 +3,8 @@
 import { ArrowDownLeft, ArrowUpRight, FileText } from "lucide-react";
 import { formatMoney } from "@bravachain/shared";
 import { cn } from "@/lib/utils";
-import { statementStatusView, statusClasses } from "@/lib/statement/status";
+import { statementStatusView } from "@/lib/statement/status";
+import { StatusBadge } from "@/components/ui/status-badge";
 import {
   formatForeign,
   formatRowDate,
@@ -21,7 +22,6 @@ export function StatementTableRow({
 }) {
   const inbound = row.type === "INBOUND";
   const status = statementStatusView(row.status);
-  const { pill, dot } = statusClasses(status.tone);
   const { title, sub } = rowTitle(row);
   const { date, time } = formatRowDate(row.createdAt);
   // Incoming amounts are an estimate until the status is final (FX not settled).
@@ -91,15 +91,7 @@ export function StatementTableRow({
 
       {/* Status */}
       <div className="flex justify-start">
-        <span
-          className={cn(
-            "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium",
-            pill,
-          )}
-        >
-          <span className={cn("h-1.5 w-1.5 rounded-full", dot)} />
-          {status.label}
-        </span>
+        <StatusBadge label={status.label} tone={status.tone} />
       </div>
 
       {/* Comprovante shortcut (withdrawals only) */}
