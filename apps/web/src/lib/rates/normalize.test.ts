@@ -71,6 +71,32 @@ describe("normalizeHistory", () => {
     expect(out.empty).toBe(true);
     expect(out.points).toEqual([]);
   });
+
+  it("keeps a single real point (the chart shows it + 'Poucos dados')", () => {
+    const out = normalizeHistory({
+      pair: "USD_BRL",
+      period: "1D",
+      dataPoints: [{ timestamp: "2026-10-15T13:00:00Z", rate: "5.42" }],
+      stats: { min: "5.42", max: "5.42", open: "5.42", avg: "5.42" },
+    });
+    expect(out.points).toHaveLength(1);
+    expect(out.points[0]!.rate).toBe(5.42);
+  });
+
+  it("drops zero-rate points (e.g. gaps)", () => {
+    const out = normalizeHistory({
+      pair: "USD_BRL",
+      period: "1D",
+      dataPoints: [
+        { timestamp: "2026-10-15T10:00:00Z", rate: "0" },
+        { timestamp: "2026-10-15T11:00:00Z", rate: "5.40" },
+        { timestamp: "2026-10-15T12:00:00Z", rate: "5.41" },
+      ],
+      stats: { min: "5.40", max: "5.41", open: "5.40", avg: "5.405" },
+    });
+    expect(out.points).toHaveLength(2);
+    expect(out.empty).toBe(false);
+  });
 });
 
 describe("normalizeConvert", () => {

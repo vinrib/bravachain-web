@@ -28,10 +28,12 @@ import {
 const GRID = "color-mix(in srgb, var(--border) 60%, transparent)";
 const AXIS = { fontSize: 11, fill: "var(--muted-foreground)" };
 
-function dateLabel(iso: string): string {
+function axisLabel(iso: string, intraday: boolean): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
-  return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+  return intraday
+    ? d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
+    : d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
 }
 
 export function RatesChart() {
@@ -65,6 +67,13 @@ export function RatesChart() {
   const points = data?.points ?? [];
   const stats = data?.stats;
 
+  // Y domain from the actual point rates (numbers), with a little padding.
+  const rates = points.map((p) => p.rate);
+  const lo = rates.length ? Math.min(...rates) : 0;
+  const hi = rates.length ? Math.max(...rates) : 0;
+  const pad = hi > lo ? (hi - lo) * 0.1 : hi * 0.001 || 0.01;
+  const yDomain: [number, number] = [lo - pad, hi + pad];
+
   return (
     <Card>
       <CardContent className="pt-5">
@@ -82,11 +91,11 @@ export function RatesChart() {
         </div>
 
         {loading ? (
-          <Skeleton className="h-56 w-full" />
+          <Skeleton className="h-[300px] w-full" />
         ) : error ? (
           <ErrorState message="Não foi possível carregar o histórico." onRetry={() => setNonce((n) => n + 1)} />
-        ) : data?.empty || points.length < 2 ? (
-          <p className="py-16 text-center text-sm text-muted-foreground">
+        ) : points.length === 0 ? (
+          <p className="py-20 text-center text-sm text-muted-foreground">
             Histórico ainda sendo coletado.
           </p>
         ) : (
@@ -97,15 +106,15 @@ export function RatesChart() {
               {formatRate4(stats?.min ?? null)}, máximo {formatRate4(stats?.max ?? null)}, média{" "}
               {formatRate4(stats?.avg ?? null)}.
             </p>
-            <ResponsiveContainer width="100%" height={224}>
-              <LineChart data={points} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={points} margin={{ top: 8, right: 12, left: 8, bottom: 0 }}>
                 <CartesianGrid vertical={false} stroke={GRID} />
                 <XAxis
-                  dataKey="date"
+                  dataKey="timestamp"
                   tick={AXIS}
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={dateLabel}
+                  tickFormatter={(v) => axisLabel(String(v), period === "1D")}
                   minTickGap={32}
                 />
                 <YAxis
@@ -113,19 +122,33 @@ export function RatesChart() {
                   tickLine={false}
                   axisLine={false}
                   width={52}
-                  domain={["auto", "auto"]}
+                  domain={yDomain}
                   tickFormatter={(v) => formatRate4(Number(v))}
                 />
                 <Tooltip
-                  labelFormatter={(l) => new Date(String(l)).toLocaleDateString("pt-BR")}
+                  labelFormatter={(l) => new Date(String(l)).toLocaleString("pt-BR")}
                   formatter={(v) => [`R$ ${formatRate4(Number(v))}`, "Taxa"]}
                   contentStyle={{ fontSize: 12, borderRadius: 8 }}
                 />
-                <Line type="monotone" dataKey="rate" stroke="#12a46b" strokeWidth={2} dot={false} />
+                <Line
+                  type="monotone"
+                  dataKey="rate"
+                  stroke="#12a46b"
+                  strokeWidth={2}
+                  dot={points.length === 1 ? { r: 4, fill: "#12a46b" } : false}
+                  isAnimationActive={false}
+                />
               </LineChart>
             </ResponsiveContainer>
 
-            {stats && (
+            {points.length === 1 && (
+              <p className="mt-2 text-center text-sm text-muted-foreground">
+                Poucos dados neste período.
+              </p>
+            )}
+
+            {/* Period stats only make sense with 2+ points. */}
+            {stats && points.length >= 2 && (
               <>
                 <PeriodVariation open={stats.open} points={points} />
                 <div className="mt-3 grid grid-cols-3 gap-2 text-center">
