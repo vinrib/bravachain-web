@@ -107,6 +107,16 @@ export const endpoints = {
     renewToken: (id: string) => `/v1/receive/${id}/renew-token`,
   },
   /**
+   * Deposit via PIX. POST creates a QR (Idempotency-Key); GET polls status.
+   * Responses are not typed in the committed openapi.json.
+   */
+  deposit: {
+    /** POST (Idempotency-Key) { valor, descricao } -> { txid, pixCopiaECola, expiresAt, status, ... } */
+    pixQrCode: "/v1/pix/qrcode",
+    /** GET -> { txid, status, ... } */
+    pixStatus: (txid: string) => `/v1/pix/status/${txid}`,
+  },
+  /**
    * FX rates (Cotações). Responses are not typed in the committed openapi.json;
    * the frontend normalizers (apps/web/src/lib/rates) map the real keys.
    */

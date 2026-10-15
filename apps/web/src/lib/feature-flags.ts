@@ -22,4 +22,6 @@ export const featureFlags = {
   dashboard: process.env.NEXT_PUBLIC_FEATURE_DASHBOARD === "true",
   /** "Cotações" (FX rates) section. */
   cotacoes: process.env.NEXT_PUBLIC_FEATURE_COTACOES === "true",
+  /** "Depósito" (PIX deposit) section. */
+  deposito: process.env.NEXT_PUBLIC_FEATURE_DEPOSITO === "true",
 } as const;
