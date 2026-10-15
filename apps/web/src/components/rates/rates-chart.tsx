@@ -14,6 +14,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/ui/state";
 import { TabsPill } from "@/components/ui/tabs-pill";
+import { cn } from "@/lib/utils";
 import { getRateHistory } from "@/lib/rates/api";
 import { formatRate4 } from "./rates-live-cards";
 import {
@@ -84,7 +85,7 @@ export function RatesChart() {
           <Skeleton className="h-56 w-full" />
         ) : error ? (
           <ErrorState message="Não foi possível carregar o histórico." onRetry={() => setNonce((n) => n + 1)} />
-        ) : points.length < 2 ? (
+        ) : data?.empty || points.length < 2 ? (
           <p className="py-16 text-center text-sm text-muted-foreground">
             Histórico ainda sendo coletado.
           </p>
@@ -125,16 +126,46 @@ export function RatesChart() {
             </ResponsiveContainer>
 
             {stats && (
-              <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-                <Stat label="Mínimo" value={stats.min} />
-                <Stat label="Máximo" value={stats.max} />
-                <Stat label="Média" value={stats.avg} />
-              </div>
+              <>
+                <PeriodVariation open={stats.open} points={points} />
+                <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+                  <Stat label="Mínimo" value={stats.min} />
+                  <Stat label="Máximo" value={stats.max} />
+                  <Stat label="Média" value={stats.avg} />
+                </div>
+              </>
             )}
           </>
         )}
       </CardContent>
     </Card>
+  );
+}
+
+function PeriodVariation({
+  open,
+  points,
+}: {
+  open: number | null;
+  points: Array<{ rate: number }>;
+}) {
+  const last = points[points.length - 1]?.rate;
+  if (open === null || open === 0 || last === undefined) return null;
+  const pct = ((last - open) / open) * 100;
+  const dir = pct > 0.0001 ? "up" : pct < -0.0001 ? "down" : "stable";
+  const sign = dir === "up" ? "+" : dir === "down" ? "−" : "";
+  return (
+    <p
+      className={cn(
+        "mt-3 text-center text-sm font-medium tabular-nums",
+        dir === "up" && "text-[#0b6b4f] dark:text-[#7be0b0]",
+        dir === "down" && "text-[#b03030]",
+        dir === "stable" && "text-muted-foreground",
+      )}
+    >
+      {sign}
+      {Math.abs(pct).toFixed(2)}% no período
+    </p>
   );
 }
 

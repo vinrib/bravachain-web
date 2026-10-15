@@ -81,10 +81,10 @@ export function RatesCalculator() {
             <div className="mt-1 flex h-8 items-center">
               <Spinner size="sm" />
             </div>
-          ) : result && result.result !== null ? (
+          ) : result && result.outputAmount !== null ? (
             <>
               <p className="mt-0.5 font-serif text-2xl font-bold tabular-nums text-foreground">
-                {formatBRL(result.result)}
+                {formatBRL(result.outputAmount)}
               </p>
               {result.rate !== null && (
                 <p className="mt-0.5 text-xs text-muted-foreground tabular-nums">

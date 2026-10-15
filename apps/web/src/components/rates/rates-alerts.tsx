@@ -8,6 +8,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { AmountInput } from "@/components/ui/amount-input";
 import { ErrorState, EmptyState } from "@/components/ui/state";
 import { cn } from "@/lib/utils";
+import { ApiError } from "@/lib/client-api";
 import {
   listAlerts,
   createAlert,
@@ -73,11 +74,17 @@ export function RatesAlerts() {
     }
     setCreating(true);
     try {
+      // POST returns the alert without distance; re-fetch the list afterwards.
       await createAlert({ pair, condition, targetRate, channels: ["EMAIL"] });
       setTarget("");
       reload();
-    } catch {
-      setFormError("Não foi possível criar o alerta. Tente novamente.");
+    } catch (err) {
+      // Duplicate-alert 400 → short friendly message (never raw backend text).
+      setFormError(
+        err instanceof ApiError && err.status === 400
+          ? "Você já tem um alerta igual a este."
+          : "Não foi possível criar o alerta. Tente novamente.",
+      );
     } finally {
       setCreating(false);
     }
@@ -174,7 +181,12 @@ export function RatesAlerts() {
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {a.status === "ACTIVE" ? "Ativo" : "Pausado"}
-                      {a.distance !== null && ` · faltam R$ ${formatRate4(Math.abs(a.distance))}`}
+                      {a.distance !== null &&
+                        a.distanceDirection &&
+                        ` · ${Math.abs(a.distance).toLocaleString("pt-BR", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}% ${a.distanceDirection === "above" ? "acima" : "abaixo"} do alvo`}
                     </p>
                   </div>
                   <div className="flex shrink-0 gap-1">
