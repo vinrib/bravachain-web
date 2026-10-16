@@ -15,7 +15,7 @@ import {
 import { endpoints } from "@bravachain/api-client";
 import { apiFetch, ApiError } from "@/lib/client-api";
 import { useBalance, useKycState } from "@/lib/hooks";
-import { mapWithdrawError } from "@/lib/withdraw-errors";
+import { mapWithdrawError, GENERIC_WITHDRAW_ERROR } from "@/lib/withdraw-errors";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -50,6 +50,7 @@ export default function SaquePage() {
   const [pixKey, setPixKey] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [holdMessage, setHoldMessage] = useState<string | null>(null);
+  const [supportCode, setSupportCode] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const amount = useMemo(() => parseBRL(amountInput), [amountInput]);
@@ -74,9 +75,11 @@ export default function SaquePage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setHoldMessage(null);
+    setSupportCode(null);
     if (!validate() || amount === null || !pixKeyType) return;
     setSubmitting(true);
     try {
+      // Single attempt — the withdrawal is never retried automatically.
       await apiFetch(endpoints.withdrawals.createPix, {
         method: "POST",
         body: JSON.stringify({
@@ -93,7 +96,7 @@ export default function SaquePage() {
       router.refresh();
     } catch (err) {
       if (err instanceof ApiError) {
-        const view = mapWithdrawError(err.code, err.message);
+        const view = mapWithdrawError(err.code, err.message, err.status);
         if (view.hold) {
           setHoldMessage(view.message);
           setErrors({});
@@ -101,9 +104,10 @@ export default function SaquePage() {
           setErrors({ [view.field]: view.message });
         } else {
           setErrors({ form: view.message });
+          setSupportCode(view.supportCode ?? null);
         }
       } else {
-        setErrors({ form: "Não foi possível solicitar o saque." });
+        setErrors({ form: GENERIC_WITHDRAW_ERROR });
       }
     } finally {
       setSubmitting(false);
@@ -217,6 +221,11 @@ export default function SaquePage() {
               {errors.form && (
                 <div className="rounded-lg bg-destructive/10 px-3 py-2">
                   <p className="text-sm text-destructive">{errors.form}</p>
+                  {supportCode && (
+                    <p className="mt-1 text-xs text-destructive/80">
+                      Código de suporte: {supportCode}
+                    </p>
+                  )}
                 </div>
               )}
 
