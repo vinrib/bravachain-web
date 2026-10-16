@@ -88,6 +88,11 @@ export const endpoints = {
    * not type these request/response bodies; see apps/web/src/lib/receive/types.ts
    * for the manually-typed shapes. Do not hand-edit openapi.json.
    */
+  profile: {
+    /** GET -> { companyDisplayName, companyLogoUrl (signed 24h) };
+     *  POST multipart (logo + companyDisplayName) to update. */
+    branding: "/v1/profile/branding",
+  },
   receive: {
     /** GET (Bearer + KYB) -> { accounts: DedicatedAccount[], pendingCurrencies } */
     accounts: "/v1/receive/accounts",
