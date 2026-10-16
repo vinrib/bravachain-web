@@ -151,8 +151,8 @@ export function DashboardFinanceiro() {
               Os indicadores aparecem aqui assim que o primeiro pagamento for recebido.
             </p>
             <Button asChild className="mt-1 gap-2">
-              <Link href="/recebimentos">
-                Ir para Recebimentos
+              <Link href="/instrucoes-de-recebimento">
+                Ver instruções de recebimento
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>

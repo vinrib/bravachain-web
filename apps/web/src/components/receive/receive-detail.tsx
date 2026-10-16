@@ -60,11 +60,11 @@ export function ReceiveDetail({ ticketId }: { ticketId: string }) {
   return (
     <div className="mx-auto max-w-xl space-y-5">
       <Link
-        href="/recebimentos"
+        href="/instrucoes-de-recebimento"
         className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" />
-        Recebimentos
+        Instruções de recebimento
       </Link>
 
       {loading ? (
