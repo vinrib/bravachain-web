@@ -46,6 +46,16 @@ export function compactBrl(value: number): string {
 }
 
 /** R$ per unit of currency, e.g. "5,0421". */
+import { PERIODS, type DashboardPeriod } from "./types";
+
+/** Parses a ?period= value, falling back to "30d" for anything invalid. */
+export function parsePeriodParam(value: string | null | undefined): DashboardPeriod {
+  const valid = PERIODS.map((p) => p.value);
+  return value && (valid as string[]).includes(value)
+    ? (value as DashboardPeriod)
+    : "30d";
+}
+
 export function formatRate(v: number | null): string {
   if (v === null) return "—";
   return v.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 4 });
