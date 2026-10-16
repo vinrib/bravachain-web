@@ -36,11 +36,13 @@ export async function apiFetch<T>(
   path: string,
   init: RequestInit = {},
 ): Promise<T> {
+  // For FormData (multipart) let the browser set Content-Type with the boundary.
+  const isMultipart = typeof FormData !== "undefined" && init.body instanceof FormData;
   const res = await fetch(`/api/backend${path}`, {
     ...init,
     headers: {
       Accept: "application/json",
-      ...(init.body ? { "Content-Type": "application/json" } : {}),
+      ...(init.body && !isMultipart ? { "Content-Type": "application/json" } : {}),
       ...init.headers,
     },
   });

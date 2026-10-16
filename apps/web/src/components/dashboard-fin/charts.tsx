@@ -170,6 +170,12 @@ export function RailsChart({ data }: { data: RailSlice[] }) {
 
 export function RatesChart({ data }: { data: RatePoint[] }) {
   const last = data[data.length - 1];
+  // Y domain from the real numbers (both series), with small padding.
+  const vals = data.flatMap((d) => [d.usd, d.eur]).filter((v): v is number => v !== null && v > 0);
+  const lo = vals.length ? Math.min(...vals) : 0;
+  const hi = vals.length ? Math.max(...vals) : 0;
+  const pad = hi > lo ? (hi - lo) * 0.1 : hi * 0.001 || 0.01;
+  const yDomain: [number, number] = [lo - pad, hi + pad];
   return (
     <ChartCard
       title="Taxas de câmbio aplicadas por mês"
@@ -191,7 +197,7 @@ export function RatesChart({ data }: { data: RatePoint[] }) {
             tickLine={false}
             axisLine={false}
             width={44}
-            domain={["auto", "auto"]}
+            domain={yDomain}
             tickFormatter={(v) => formatRate(Number(v))}
           />
           <Tooltip

@@ -5,7 +5,8 @@ import { formatVariation } from "@/lib/dashboard/chart";
 
 export function MetricDelta({ variation }: { variation: number | null }) {
   const v = formatVariation(variation);
-  if (!v) return null;
+  // No previous period to compare against → show a muted em dash, not nothing.
+  if (!v) return <span className="text-xs text-muted-foreground">—</span>;
   if (v.kind === "new") {
     return (
       <span className="inline-flex items-center rounded-full bg-success/10 px-1.5 py-0.5 text-xs font-medium text-success">
@@ -41,7 +42,7 @@ export function KpiCard({ label, value, variation, caption }: KpiCardProps) {
     <Card>
       <CardContent className="pt-5">
         <p className="text-xs text-muted-foreground">{label}</p>
-        <p className="mt-1 text-xl font-bold tabular-nums text-foreground">{value}</p>
+        <p className="mt-1 font-serif text-2xl font-bold tabular-nums text-foreground">{value}</p>
         {(variation !== undefined || caption) && (
           <div className="mt-1 flex flex-wrap items-center gap-1.5">
             {variation !== undefined && <MetricDelta variation={variation ?? null} />}

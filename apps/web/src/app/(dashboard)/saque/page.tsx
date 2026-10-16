@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Banknote, ShieldAlert, ArrowRight, Clock } from "lucide-react";
+import { ShieldAlert, ArrowRight, Clock } from "lucide-react";
 import {
   parseBRL,
   formatMoney,
@@ -15,13 +15,15 @@ import { endpoints } from "@bravachain/api-client";
 import { apiFetch, ApiError } from "@/lib/client-api";
 import { useBalance, useKycState } from "@/lib/hooks";
 import { mapWithdrawError } from "@/lib/withdraw-errors";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/components/toast-provider";
+import { AmountInput } from "@/components/ui/amount-input";
 import { InfoAlert } from "@/components/ui/info-alert";
+import { WithdrawHistory } from "@/components/dashboard/withdraw-history";
+import { useToast } from "@/components/toast-provider";
 import { PIX_RETURN_WARNING_FULL, PIX_RETURN_WARNING_SHORT } from "@/lib/pix-warning";
 
 const PIX_KEY_LABELS: Record<string, string> = {
@@ -38,10 +40,14 @@ export default function SaquePage() {
   const balance = useBalance();
   const kyc = useKycState();
 
-  const [amountInput, setAmountInput] = useState("");
+  // Prefill the amount from a ?valor= query (e.g. the Início "Saque rápido"
+  // card). Read once on mount; no money moves without the user submitting here.
+  const [amountInput, setAmountInput] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return new URLSearchParams(window.location.search).get("valor") ?? "";
+  });
   const [pixKey, setPixKey] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
-  // 24h security-hold banner (set only by WITHDRAW_DESTINATION_ON_HOLD).
   const [holdMessage, setHoldMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -50,7 +56,7 @@ export default function SaquePage() {
   const available = balance.data?.available ?? 0;
 
   const kybApproved = kyc.data?.status === "approved";
-  const kybResolved = Boolean(kyc.data); // finished loading kyc
+  const kybResolved = Boolean(kyc.data);
 
   function validate(): boolean {
     const next: Record<string, string> = {};
@@ -86,8 +92,6 @@ export default function SaquePage() {
       router.refresh();
     } catch (err) {
       if (err instanceof ApiError) {
-        // Regra A: map the backend { code, message } to field/banner. The
-        // message is shown verbatim; the code only drives presentation.
         const view = mapWithdrawError(err.code, err.message);
         if (view.hold) {
           setHoldMessage(view.message);
@@ -111,7 +115,7 @@ export default function SaquePage() {
       <div className="mx-auto max-w-lg">
         <Card>
           <CardContent className="flex flex-col items-center gap-4 py-10 text-center">
-            <ShieldAlert className="h-10 w-10 text-amber-500" />
+            <ShieldAlert className="h-10 w-10 text-[#c77a18]" />
             <div>
               <h1 className="text-lg font-semibold text-foreground">
                 Verificação necessária
@@ -133,54 +137,55 @@ export default function SaquePage() {
   }
 
   return (
-    <div className="mx-auto max-w-lg space-y-6">
+    <div className="mx-auto max-w-5xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Saque via PIX</h1>
+        <h1 className="font-serif text-[30px] font-bold text-foreground">Saques via PIX</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Transfira o saldo da sua empresa para uma chave PIX
+          Pague contas no Brasil a partir do saldo em reais da sua empresa.
         </p>
       </div>
 
-      <Card>
-        <CardContent className="pt-6">
-          <p className="text-sm text-muted-foreground">Saldo disponível</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">
-            {balance.loading ? "…" : formatMoney(available, { currency: balance.data?.currency ?? "BRL" })}
-          </p>
-        </CardContent>
-      </Card>
+      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+        {/* Form column */}
+        <Card>
+          <CardContent className="pt-6">
+            <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+              {/* Valor */}
+              <div>
+                <label className="text-[13.5px] font-semibold text-foreground">Valor</label>
+                <AmountInput
+                  value={amountInput}
+                  onChange={(v) => {
+                    setAmountInput(v);
+                    setErrors((p) => ({ ...p, amount: "" }));
+                  }}
+                  error={errors.amount}
+                  className="mt-1.5"
+                />
+                <div className="mt-2 flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">
+                    Disponível{" "}
+                    <span className="font-medium text-foreground tabular-nums">
+                      {balance.loading
+                        ? "…"
+                        : formatMoney(available, {
+                            currency: balance.data?.currency ?? "BRL",
+                          })}
+                    </span>
+                  </span>
+                  {available > 0 && (
+                    <button
+                      type="button"
+                      className="font-medium text-primary hover:underline"
+                      onClick={() => setAmountInput(available.toFixed(2).replace(".", ","))}
+                    >
+                      Usar saldo total
+                    </button>
+                  )}
+                </div>
+              </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Dados do saque</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-            <div>
-              <Input
-                label="Valor"
-                value={amountInput}
-                onChange={(e) => {
-                  setAmountInput(e.target.value);
-                  setErrors((p) => ({ ...p, amount: "" }));
-                }}
-                inputMode="decimal"
-                placeholder="0,00"
-                prefix="R$"
-                error={errors.amount}
-              />
-              {available > 0 && (
-                <button
-                  type="button"
-                  className="mt-1.5 text-xs font-medium text-primary hover:underline"
-                  onClick={() => setAmountInput(available.toFixed(2).replace(".", ","))}
-                >
-                  Usar saldo total
-                </button>
-              )}
-            </div>
-
-            <div>
+              {/* Chave PIX de destino */}
               <Input
                 label="Chave PIX de destino"
                 value={pixKey}
@@ -197,43 +202,39 @@ export default function SaquePage() {
                   ) : undefined
                 }
               />
-            </div>
 
-            {holdMessage && (
-              <div className="flex items-start gap-2 rounded-lg bg-amber-500/10 px-3 py-2.5">
-                <Clock className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
-                <p className="text-sm text-amber-700 dark:text-amber-400">
-                  {holdMessage}
-                </p>
-              </div>
-            )}
-
-            {errors.form && (
-              <div className="rounded-lg bg-destructive/10 px-3 py-2">
-                <p className="text-sm text-destructive">{errors.form}</p>
-              </div>
-            )}
-
-            <InfoAlert>{PIX_RETURN_WARNING_FULL}</InfoAlert>
-
-            <Button
-              type="submit"
-              size="lg"
-              className="w-full gap-2"
-              disabled={submitting || balance.loading}
-            >
-              {submitting ? (
-                <Spinner size="sm" />
-              ) : (
-                <>
-                  <Banknote className="h-4 w-4" />
-                  Solicitar saque
-                </>
+              {holdMessage && (
+                <div className="flex items-start gap-2 rounded-lg bg-[#c77a18]/10 px-3 py-2.5">
+                  <Clock className="mt-0.5 h-4 w-4 shrink-0 text-[#c77a18]" />
+                  <p className="text-sm text-[#8a5310] dark:text-[#d79a3a]">{holdMessage}</p>
+                </div>
               )}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+
+              {errors.form && (
+                <div className="rounded-lg bg-destructive/10 px-3 py-2">
+                  <p className="text-sm text-destructive">{errors.form}</p>
+                </div>
+              )}
+
+              <InfoAlert>{PIX_RETURN_WARNING_FULL}</InfoAlert>
+
+              <Button
+                type="submit"
+                size="lg"
+                className="w-full"
+                disabled={submitting || balance.loading}
+              >
+                {submitting ? <Spinner size="sm" /> : "Solicitar saque"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+
+        {/* History column */}
+        <aside>
+          <WithdrawHistory />
+        </aside>
+      </div>
     </div>
   );
 }

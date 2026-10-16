@@ -2,16 +2,18 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, LineChart as LineChartIcon, Star } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowRight, LineChart as LineChartIcon, Star, ShieldAlert } from "lucide-react";
 import { formatMoney } from "@bravachain/shared";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { cn } from "@/lib/utils";
-import { KpiCard, MetricDelta } from "./kpi-card";
+import { TabsPill } from "@/components/ui/tabs-pill";
+import { ApiError } from "@/lib/client-api";
+import { KpiCard } from "./kpi-card";
 import { TpvChart, RailsChart, RatesChart } from "./charts";
 import { getDashboard } from "@/lib/dashboard/api";
-import { formatRate } from "@/lib/dashboard/chart";
+import { parsePeriodParam, rateOrDash, avgRateDeltaText } from "@/lib/dashboard/chart";
 import {
   PERIODS,
   type DashboardData,
@@ -20,24 +22,47 @@ import {
 
 const CAPTION = "vs. período anterior";
 
+function AvgRateDelta({ rate, variation }: { rate: number | null; variation: number | null }) {
+  const v = avgRateDeltaText(rate, variation);
+  if (!v) return null;
+  const cls =
+    v.dir > 0 ? "text-success" : v.dir < 0 ? "text-destructive" : "text-muted-foreground";
+  return <span className={`text-xs font-medium ${cls}`}>{v.text}</span>;
+}
+
+function periodFromUrl(): DashboardPeriod {
+  if (typeof window === "undefined") return "30d";
+  return parsePeriodParam(new URLSearchParams(window.location.search).get("period"));
+}
+
 export function DashboardFinanceiro() {
-  const [period, setPeriod] = useState<DashboardPeriod>("30d");
+  const router = useRouter();
+  const [period, setPeriodState] = useState<DashboardPeriod>(periodFromUrl);
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [forbidden, setForbidden] = useState(false);
   const [nonce, setNonce] = useState(0);
+
+  function setPeriod(p: DashboardPeriod) {
+    setPeriodState(p);
+    router.replace(`/financeiro?period=${p}`, { scroll: false });
+  }
 
   useEffect(() => {
     let active = true;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     setError(false);
+    setForbidden(false);
     getDashboard(period)
       .then((d) => {
         if (active) setData(d);
       })
-      .catch(() => {
-        if (active) setError(true);
+      .catch((err) => {
+        if (!active) return;
+        if (err instanceof ApiError && err.status === 403) setForbidden(true);
+        else setError(true);
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -46,6 +71,30 @@ export function DashboardFinanceiro() {
       active = false;
     };
   }, [period, nonce]);
+
+  if (forbidden) {
+    return (
+      <div className="mx-auto max-w-lg">
+        <Card>
+          <CardContent className="flex flex-col items-center gap-4 py-10 text-center">
+            <ShieldAlert className="h-10 w-10 text-[#c77a18]" />
+            <div>
+              <h1 className="text-lg font-semibold text-foreground">Verificação necessária</h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Conclua a verificação (KYB) da empresa para ver o dashboard.
+              </p>
+            </div>
+            <Button asChild className="gap-2">
+              <Link href="/cadastro">
+                Concluir verificação
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const s = data?.summary;
   const hasData =
@@ -60,29 +109,17 @@ export function DashboardFinanceiro() {
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Dashboard financeiro</h1>
+        <h1 className="font-serif text-[30px] font-bold text-foreground">Dashboard financeiro</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Acompanhe volume, câmbio e taxas do período
         </p>
       </div>
 
-      <div className="inline-flex flex-wrap gap-1 rounded-xl border border-border p-1">
-        {PERIODS.map((p) => (
-          <button
-            key={p.value}
-            type="button"
-            onClick={() => setPeriod(p.value)}
-            className={cn(
-              "rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
-              period === p.value
-                ? "bg-primary/10 text-primary"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {p.label}
-          </button>
-        ))}
-      </div>
+      <TabsPill
+        tabs={PERIODS.map((p) => ({ value: p.value, label: p.label }))}
+        value={period}
+        onChange={setPeriod}
+      />
 
       {loading ? (
         <div className="flex justify-center py-20">
@@ -108,7 +145,7 @@ export function DashboardFinanceiro() {
           <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
             <LineChartIcon className="h-10 w-10 text-muted-foreground" />
             <h2 className="text-lg font-semibold text-foreground">
-              Você ainda não tem movimentações no período
+              Ainda sem recebimentos no período
             </h2>
             <p className="max-w-sm text-sm text-muted-foreground">
               Os indicadores aparecem aqui assim que o primeiro pagamento for recebido.
@@ -142,19 +179,17 @@ export function DashboardFinanceiro() {
                     <p className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Star className="h-3 w-3 fill-current text-amber-500" /> USD
                     </p>
-                    <p className="text-lg font-bold tabular-nums text-foreground">
-                      R$ {formatRate(s.avgRateUsd)}
+                    <p className="font-serif text-xl font-bold tabular-nums text-foreground">
+                      {rateOrDash(s.avgRateUsd)}
                     </p>
-                    {/* Variation is computed from USD on the backend — show it only
-                        next to USD, and only when there's a USD rate. */}
-                    {s.avgRateUsd !== null && s.avgRateUsd !== 0 && (
-                      <MetricDelta variation={s.avgRateVariation} />
-                    )}
+                    {/* Variation (computed from USD) only with a USD rate and a
+                        previous period with rate — no "Novo" selo here. */}
+                    <AvgRateDelta rate={s.avgRateUsd} variation={s.avgRateVariation} />
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">EUR</p>
-                    <p className="text-lg font-bold tabular-nums text-foreground">
-                      R$ {formatRate(s.avgRateEur)}
+                    <p className="font-serif text-xl font-bold tabular-nums text-foreground">
+                      {rateOrDash(s.avgRateEur)}
                     </p>
                   </div>
                 </div>
@@ -164,12 +199,9 @@ export function DashboardFinanceiro() {
               </CardContent>
             </Card>
 
-            <KpiCard
-              label="Taxas pagas à Bravachain"
-              value={s.feesPaid !== null ? formatMoney(s.feesPaid) : "—"}
-              variation={s.feesPaidVariation}
-              caption={CAPTION}
-            />
+            {/* "Taxas pagas à Bravachain" (bravaChainRevenue) intentionally
+                removed: it is Bravachain's revenue and must be confirmed with
+                product before being shown to the client (then as "Tarifas pagas"). */}
             <KpiCard
               label="Saques realizados"
               value={s.withdrawalsTotal !== null ? formatMoney(s.withdrawalsTotal) : "—"}
@@ -184,6 +216,10 @@ export function DashboardFinanceiro() {
           <TpvChart data={data.tpv} />
           <RailsChart data={data.rails} />
           <RatesChart data={data.rates} />
+
+          <p className="text-xs text-muted-foreground">
+            Considera recebimentos internacionais concluídos. Depósitos PIX não entram.
+          </p>
         </>
       )}
     </div>

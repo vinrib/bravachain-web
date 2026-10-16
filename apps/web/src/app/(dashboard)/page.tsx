@@ -1,115 +1,57 @@
 "use client";
 
-import Link from "next/link";
-import { Banknote, Receipt, Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
-import { formatMoney } from "@bravachain/shared";
-import { useBalance, useTransactions, useKycState } from "@/lib/hooks";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton, TransactionRowSkeleton } from "@/components/ui/skeleton";
-import { ErrorState, EmptyState } from "@/components/ui/state";
-import { TransactionRow } from "@/components/dashboard/transaction-row";
+import { CheckCircle2 } from "lucide-react";
+import { useKycState } from "@/lib/hooks";
 import { KycBanner } from "@/components/dashboard/kyc-banner";
+import { MyAccounts } from "@/components/dashboard/my-accounts";
+import { WelcomeBalanceCard } from "@/components/dashboard/welcome-balance-card";
+import { RecentPayments } from "@/components/dashboard/recent-payments";
+import { EmProcessamento } from "@/components/dashboard/em-processamento";
+import { SaqueRapido } from "@/components/dashboard/saque-rapido";
+
+function todayLabel(): string {
+  return new Date().toLocaleDateString("pt-BR", {
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+}
 
 export default function DashboardPage() {
-  const balance = useBalance();
-  const transactions = useTransactions();
   const kyc = useKycState();
-  const [hidden, setHidden] = useState(false);
-
-  const recent = transactions.data?.slice(0, 5) ?? [];
+  const approved = kyc.data?.status === "approved";
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Início</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Acompanhe o saldo e as movimentações da sua empresa
-        </p>
+    <div className="mx-auto max-w-5xl space-y-6">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="font-serif text-[30px] font-bold text-foreground">Início</h1>
+          <p className="mt-1 text-sm capitalize text-muted-foreground">{todayLabel()}</p>
+        </div>
+        {approved && (
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-[#12a46b]/30 bg-[#12a46b]/10 px-3 py-1.5 text-sm font-medium text-[#0b6b4f] dark:text-[#7be0b0]">
+            <CheckCircle2 className="h-4 w-4" />
+            Empresa verificada
+          </span>
+        )}
       </div>
 
-      {kyc.data && <KycBanner status={kyc.data.status} />}
+      {/* KYB prompt when not approved (real status) */}
+      {kyc.data && !approved && <KycBanner status={kyc.data.status} />}
 
-      {/* Saldo */}
-      <Card className="overflow-hidden">
-        <CardContent className="pt-6">
-          {balance.loading ? (
-            <div className="space-y-3">
-              <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-9 w-48" />
-            </div>
-          ) : balance.error ? (
-            <ErrorState message={balance.error} onRetry={balance.reload} />
-          ) : (
-            <>
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">Saldo disponível</p>
-                <button
-                  onClick={() => setHidden((h) => !h)}
-                  className="text-muted-foreground transition-colors hover:text-foreground"
-                  aria-label={hidden ? "Mostrar saldo" : "Ocultar saldo"}
-                >
-                  {hidden ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-              <p className="mt-1 text-3xl font-bold tabular-nums text-foreground">
-                {hidden
-                  ? "••••••"
-                  : formatMoney(balance.data?.available ?? 0, {
-                      currency: balance.data?.currency ?? "BRL",
-                    })}
-              </p>
-
-              <div className="mt-5 flex gap-3">
-                <Button asChild size="lg" className="flex-1 gap-2">
-                  <Link href="/saque">
-                    <Banknote className="h-4 w-4" />
-                    Sacar via PIX
-                  </Link>
-                </Button>
-                <Button asChild variant="secondary" size="lg" className="flex-1 gap-2">
-                  <Link href="/extrato">
-                    <Receipt className="h-4 w-4" />
-                    Ver extrato
-                  </Link>
-                </Button>
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Extrato recente */}
-      <div>
-        <div className="mb-2 flex items-center justify-between px-1">
-          <h2 className="text-base font-semibold text-foreground">Movimentações recentes</h2>
-          <Link href="/extrato" className="text-sm font-medium text-primary hover:underline">
-            Ver tudo
-          </Link>
+      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+        <div className="space-y-6">
+          <WelcomeBalanceCard />
+          <MyAccounts />
+          <RecentPayments />
         </div>
 
-        <Card className="divide-y divide-border overflow-hidden">
-          {transactions.loading ? (
-            <>
-              <TransactionRowSkeleton />
-              <TransactionRowSkeleton />
-              <TransactionRowSkeleton />
-            </>
-          ) : transactions.error ? (
-            <div className="p-4">
-              <ErrorState message={transactions.error} onRetry={transactions.reload} />
-            </div>
-          ) : recent.length === 0 ? (
-            <EmptyState
-              title="Nenhuma movimentação ainda"
-              description="Os créditos das suas exportações aparecerão aqui."
-              icon={Receipt}
-            />
-          ) : (
-            recent.map((tx) => <TransactionRow key={tx.id} tx={tx} />)
-          )}
-        </Card>
+        <aside className="space-y-6">
+          <EmProcessamento />
+          <SaqueRapido />
+        </aside>
       </div>
     </div>
   );

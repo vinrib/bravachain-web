@@ -6,6 +6,9 @@ import {
   ArrowDownToLine,
   Landmark,
   LineChart,
+  FileText,
+  ArrowLeftRight,
+  ArrowDownToDot,
   type LucideIcon,
 } from "lucide-react";
 import { featureFlags } from "@/lib/feature-flags";
@@ -19,6 +22,10 @@ export interface NavItem {
 /** Single source of truth for the dashboard navigation. */
 export const navItems: NavItem[] = [
   { href: "/", label: "Início", icon: LayoutDashboard },
+  // Behind NEXT_PUBLIC_FEATURE_DEPOSITO (default off).
+  ...(featureFlags.deposito
+    ? [{ href: "/deposito", label: "Depósito", icon: ArrowDownToDot }]
+    : []),
   // Behind NEXT_PUBLIC_FEATURE_DASHBOARD (default off).
   ...(featureFlags.dashboard
     ? [{ href: "/financeiro", label: "Dashboard financeiro", icon: LineChart }]
@@ -26,11 +33,22 @@ export const navItems: NavItem[] = [
   { href: "/extrato", label: "Extrato", icon: Receipt },
   // Behind NEXT_PUBLIC_FEATURE_RECEBIMENTOS (default off).
   ...(featureFlags.recebimentos
-    ? [{ href: "/recebimentos", label: "Recebimentos", icon: ArrowDownToLine }]
+    ? [
+        { href: "/recebimentos", label: "Recebimentos", icon: ArrowDownToLine },
+        {
+          href: "/instrucoes-de-recebimento",
+          label: "Instruções de recebimento",
+          icon: FileText,
+        },
+      ]
     : []),
   // Behind NEXT_PUBLIC_FEATURE_DADOS_CONTA (default off).
   ...(featureFlags.dadosConta
     ? [{ href: "/dados-de-conta", label: "Dados de conta", icon: Landmark }]
+    : []),
+  // Behind NEXT_PUBLIC_FEATURE_COTACOES (default off).
+  ...(featureFlags.cotacoes
+    ? [{ href: "/cotacoes", label: "Cotações", icon: ArrowLeftRight }]
     : []),
   { href: "/saque", label: "Saque PIX", icon: Banknote },
   { href: "/cadastro", label: "Verificação", icon: ShieldCheck },

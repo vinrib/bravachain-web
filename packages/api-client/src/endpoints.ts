@@ -88,6 +88,11 @@ export const endpoints = {
    * not type these request/response bodies; see apps/web/src/lib/receive/types.ts
    * for the manually-typed shapes. Do not hand-edit openapi.json.
    */
+  profile: {
+    /** GET -> { companyDisplayName, companyLogoUrl (signed 24h) };
+     *  POST multipart (logo + companyDisplayName) to update. */
+    branding: "/v1/profile/branding",
+  },
   receive: {
     /** GET (Bearer + KYB) -> { accounts: DedicatedAccount[], pendingCurrencies } */
     accounts: "/v1/receive/accounts",
@@ -105,6 +110,31 @@ export const endpoints = {
     payPdf: (shareToken: string) => `/v1/receive/pay/${shareToken}/pdf`,
     /** POST -> renews the share link (+30d). Uses InboundRemittance.id, NOT ticketId. */
     renewToken: (id: string) => `/v1/receive/${id}/renew-token`,
+  },
+  /**
+   * Deposit via PIX. POST creates a QR (Idempotency-Key); GET polls status.
+   * Responses are not typed in the committed openapi.json.
+   */
+  deposit: {
+    /** POST (Idempotency-Key) { valor, descricao } -> { txid, pixCopiaECola, expiresAt, status, ... } */
+    pixQrCode: "/v1/pix/qrcode",
+    /** GET -> { txid, status, ... } */
+    pixStatus: (txid: string) => `/v1/pix/status/${txid}`,
+  },
+  /**
+   * FX rates (Cotações). Responses are not typed in the committed openapi.json;
+   * the frontend normalizers (apps/web/src/lib/rates) map the real keys.
+   */
+  rates: {
+    /** GET -> { USD_BRL, EUR_BRL } live rates (no pair param). */
+    live: "/v1/rates/live",
+    /** GET ?pair=USD_BRL|EUR_BRL&period=1D|1W|1M|3M|1Y -> { pair, period, dataPoints, stats } */
+    history: "/v1/rates/history",
+    /** GET ?pair&amount -> { pair, amount, result, rate } */
+    convert: "/v1/rates/convert",
+    /** GET list; POST create; PATCH {id}; DELETE {id} — rate alerts (Bearer). */
+    alerts: "/v1/rates/alerts",
+    alert: (id: string) => `/v1/rates/alerts/${id}`,
   },
   /**
    * Financial dashboard. All GET (Bearer) with ?period=30d|90d|12m|ytd.

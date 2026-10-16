@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { ThemeToggle } from "@/components/theme-provider";
 import { LangToggle } from "@/components/i18n-provider";
+import { Logo } from "@/components/ui/logo";
 
 export function Navbar() {
   const router = useRouter();
@@ -26,11 +27,8 @@ export function Navbar() {
 
   return (
     <header className="flex h-16 items-center justify-between border-b border-border bg-card px-4 md:px-6">
-      <div className="flex items-center gap-2 md:hidden">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary">
-          <span className="text-xs font-bold text-primary-foreground">B</span>
-        </div>
-        <span className="text-sm font-bold text-foreground">Bravachain</span>
+      <div className="flex items-center md:hidden">
+        <Logo size="sm" />
       </div>
 
       <div className="ml-auto flex items-center gap-1">

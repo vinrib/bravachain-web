@@ -8,8 +8,11 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
+        // Primary CTA is the design's dark green (#011A0F); Verde Ação is kept
+        // for accents/links. Dark mode lifts to the green so the CTA stays
+        // visible on the dark surface.
         primary:
-          "bg-primary text-primary-foreground hover:opacity-90 active:opacity-80 shadow-sm",
+          "bg-[#011a0f] text-white hover:bg-[#0b3b2e] active:bg-[#0b3b2e] shadow-sm dark:bg-primary dark:text-primary-foreground dark:hover:opacity-90",
         secondary:
           "bg-card border border-border text-foreground hover:bg-muted active:bg-muted shadow-sm",
         ghost:
@@ -18,6 +21,8 @@ const buttonVariants = cva(
           "bg-destructive text-white hover:opacity-90 active:opacity-80 shadow-sm",
         outline:
           "border border-primary text-primary hover:bg-primary/5 active:bg-primary/10",
+        accent:
+          "bg-primary text-primary-foreground hover:opacity-90 active:opacity-80 shadow-sm",
       },
       size: {
         // min-h-[44px] ensures touch-friendly target on all interactive sizes

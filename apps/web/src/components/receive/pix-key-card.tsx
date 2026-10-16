@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { KeyRound, Pencil, Trash2 } from "lucide-react";
+import { Eye, EyeOff, KeyRound, Pencil, Trash2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/components/toast-provider";
 import { ApiError } from "@/lib/client-api";
 import { getPixKey, savePixKey, deletePixKey } from "@/lib/receive/api";
+import { maskPixKey } from "@/lib/receive/mask";
 
 /**
  * Manages the standing PIX key used to deliver the converted BRL. Notifies the
@@ -22,6 +23,7 @@ export function PixKeyCard({ onChange }: { onChange?: (pixKey: string | null) =>
   const [draft, setDraft] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [revealed, setRevealed] = useState(false);
 
   function apply(key: string | null) {
     setPixKey(key);
@@ -126,7 +128,20 @@ export function PixKeyCard({ onChange }: { onChange?: (pixKey: string | null) =>
           </div>
         ) : (
           <div className="flex items-center justify-between gap-3">
-            <p className="truncate text-sm font-medium text-foreground">{pixKey}</p>
+            <div className="flex min-w-0 items-center gap-2">
+              <p className="truncate text-sm font-medium text-foreground">
+                {revealed ? pixKey : maskPixKey(pixKey)}
+              </p>
+              <button
+                type="button"
+                onClick={() => setRevealed((r) => !r)}
+                aria-label={revealed ? "Ocultar chave PIX" : "Mostrar chave PIX"}
+                aria-pressed={revealed}
+                className="shrink-0 text-muted-foreground hover:text-foreground"
+              >
+                {revealed ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
             <div className="flex shrink-0 gap-1">
               <Button
                 type="button"
@@ -135,6 +150,7 @@ export function PixKeyCard({ onChange }: { onChange?: (pixKey: string | null) =>
                 onClick={() => {
                   setEditing(true);
                   setDraft(pixKey);
+                  setRevealed(false);
                 }}
                 className="gap-1.5"
               >
@@ -145,7 +161,9 @@ export function PixKeyCard({ onChange }: { onChange?: (pixKey: string | null) =>
                 type="button"
                 size="sm"
                 variant="ghost"
-                onClick={remove}
+                onClick={() => {
+                  if (window.confirm("Remover a chave PIX de recebimento?")) void remove();
+                }}
                 disabled={saving}
                 className="gap-1.5 text-destructive"
               >
