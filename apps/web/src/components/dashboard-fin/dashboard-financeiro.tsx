@@ -10,10 +10,10 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { TabsPill } from "@/components/ui/tabs-pill";
 import { ApiError } from "@/lib/client-api";
-import { KpiCard, MetricDelta } from "./kpi-card";
+import { KpiCard } from "./kpi-card";
 import { TpvChart, RailsChart, RatesChart } from "./charts";
 import { getDashboard } from "@/lib/dashboard/api";
-import { formatRate, parsePeriodParam } from "@/lib/dashboard/chart";
+import { parsePeriodParam, rateOrDash, avgRateDeltaText } from "@/lib/dashboard/chart";
 import {
   PERIODS,
   type DashboardData,
@@ -21,6 +21,14 @@ import {
 } from "@/lib/dashboard/types";
 
 const CAPTION = "vs. período anterior";
+
+function AvgRateDelta({ rate, variation }: { rate: number | null; variation: number | null }) {
+  const v = avgRateDeltaText(rate, variation);
+  if (!v) return null;
+  const cls =
+    v.dir > 0 ? "text-success" : v.dir < 0 ? "text-destructive" : "text-muted-foreground";
+  return <span className={`text-xs font-medium ${cls}`}>{v.text}</span>;
+}
 
 function periodFromUrl(): DashboardPeriod {
   if (typeof window === "undefined") return "30d";
@@ -171,19 +179,17 @@ export function DashboardFinanceiro() {
                     <p className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Star className="h-3 w-3 fill-current text-amber-500" /> USD
                     </p>
-                    <p className="text-lg font-bold tabular-nums text-foreground">
-                      R$ {formatRate(s.avgRateUsd)}
+                    <p className="font-serif text-xl font-bold tabular-nums text-foreground">
+                      {rateOrDash(s.avgRateUsd)}
                     </p>
-                    {/* Variation is computed from USD on the backend — show it only
-                        next to USD, and only when there's a USD rate. */}
-                    {s.avgRateUsd !== null && s.avgRateUsd !== 0 && (
-                      <MetricDelta variation={s.avgRateVariation} />
-                    )}
+                    {/* Variation (computed from USD) only with a USD rate and a
+                        previous period with rate — no "Novo" selo here. */}
+                    <AvgRateDelta rate={s.avgRateUsd} variation={s.avgRateVariation} />
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">EUR</p>
-                    <p className="text-lg font-bold tabular-nums text-foreground">
-                      R$ {formatRate(s.avgRateEur)}
+                    <p className="font-serif text-xl font-bold tabular-nums text-foreground">
+                      {rateOrDash(s.avgRateEur)}
                     </p>
                   </div>
                 </div>

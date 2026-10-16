@@ -56,6 +56,28 @@ export function parsePeriodParam(value: string | null | undefined): DashboardPer
     : "30d";
 }
 
+/** Average rate for display: "—" when absent or zero, never "R$ 0,00". */
+export function rateOrDash(v: number | null): string {
+  return v !== null && v > 0 ? `R$ ${formatRate(v)}` : "—";
+}
+
+/**
+ * Average-rate variation text, or null to hide it. Shown only with a current
+ * rate (> 0) and a real previous period with a rate (variation present and not
+ * the 100 "new" sentinel). No "Novo" badge.
+ */
+export function avgRateDeltaText(
+  rate: number | null,
+  variation: number | null,
+): { text: string; dir: -1 | 0 | 1 } | null {
+  if (rate === null || rate <= 0) return null;
+  if (variation === null || variation === 100) return null;
+  const dir = variation > 0 ? 1 : variation < 0 ? -1 : 0;
+  const sign = dir > 0 ? "+" : dir < 0 ? "−" : "";
+  const text = `${sign}${Math.abs(variation).toFixed(Number.isInteger(variation) ? 0 : 1)}%`;
+  return { text, dir };
+}
+
 export function formatRate(v: number | null): string {
   if (v === null) return "—";
   return v.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 4 });
