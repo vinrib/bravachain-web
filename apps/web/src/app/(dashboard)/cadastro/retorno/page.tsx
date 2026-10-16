@@ -101,7 +101,7 @@ export default function KycRetornoPage() {
 
             {status === "rejected" && (
               <Button asChild size="lg" className="w-full gap-2">
-                <Link href="/cadastro">
+                <Link href="/configuracoes/verificacao">
                   <RefreshCw className="h-4 w-4" />
                   Refazer verificação
                 </Link>
@@ -110,7 +110,7 @@ export default function KycRetornoPage() {
 
             {status === "pending" && (
               <Button asChild size="lg" className="w-full gap-2">
-                <Link href="/cadastro">
+                <Link href="/configuracoes/verificacao">
                   Voltar à verificação
                   <ArrowRight className="h-4 w-4" />
                 </Link>

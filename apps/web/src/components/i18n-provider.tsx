@@ -76,7 +76,7 @@ export function LangToggle() {
       aria-label="Alternar idioma"
       title={locale === "pt" ? "Switch to English" : "Mudar para Português"}
     >
-      {locale === "pt" ? "🇧🇷" : "🇺🇸"}
+      {locale === "pt" ? "PT" : "EN"}
     </button>
   );
 }

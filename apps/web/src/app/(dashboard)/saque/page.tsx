@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ShieldAlert, ArrowRight, Clock } from "lucide-react";
+import { PixIcon } from "@/components/icons/pix-icon";
 import {
   parseBRL,
   formatMoney,
@@ -125,7 +126,7 @@ export default function SaquePage() {
               </p>
             </div>
             <Button asChild className="gap-2">
-              <Link href="/cadastro">
+              <Link href="/configuracoes/verificacao">
                 Concluir verificação
                 <ArrowRight className="h-4 w-4" />
               </Link>
@@ -139,7 +140,10 @@ export default function SaquePage() {
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <div>
-        <h1 className="font-serif text-[30px] font-bold text-foreground">Saques via PIX</h1>
+        <h1 className="flex items-center gap-2 font-serif text-[30px] font-bold text-foreground">
+          <PixIcon className="h-6 w-6 shrink-0 text-primary" />
+          Saques via PIX
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Pague contas no Brasil a partir do saldo em reais da sua empresa.
         </p>

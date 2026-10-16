@@ -93,6 +93,10 @@ export const endpoints = {
      *  POST multipart (logo + companyDisplayName) to update. */
     branding: "/v1/profile/branding",
   },
+  onboarding: {
+    /** GET (OnboardingController) -> KYB status + documents sent/pending. */
+    status: "/v1/onboarding/status",
+  },
   receive: {
     /** GET (Bearer + KYB) -> { accounts: DedicatedAccount[], pendingCurrencies } */
     accounts: "/v1/receive/accounts",

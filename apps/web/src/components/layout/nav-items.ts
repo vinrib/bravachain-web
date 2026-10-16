@@ -1,22 +1,21 @@
 import {
   LayoutDashboard,
   Receipt,
-  Banknote,
-  ShieldCheck,
   ArrowDownToLine,
   Landmark,
   LineChart,
   FileText,
   ArrowLeftRight,
   ArrowDownToDot,
-  type LucideIcon,
+  Settings,
 } from "lucide-react";
 import { featureFlags } from "@/lib/feature-flags";
+import { PixIcon } from "@/components/icons/pix-icon";
 
 export interface NavItem {
   href: string;
   label: string;
-  icon: LucideIcon;
+  icon: React.ComponentType<{ className?: string }>;
 }
 
 /** Single source of truth for the dashboard navigation. */
@@ -50,8 +49,9 @@ export const navItems: NavItem[] = [
   ...(featureFlags.cotacoes
     ? [{ href: "/cotacoes", label: "Cotações", icon: ArrowLeftRight }]
     : []),
-  { href: "/saque", label: "Saque PIX", icon: Banknote },
-  { href: "/cadastro", label: "Verificação", icon: ShieldCheck },
+  { href: "/saque", label: "Saque PIX", icon: PixIcon },
+  // Settings lives in the sidebar footer; also surfaced in the mobile "Mais" sheet.
+  { href: "/configuracoes", label: "Configurações", icon: Settings },
 ];
 
 export function isActive(pathname: string, href: string): boolean {

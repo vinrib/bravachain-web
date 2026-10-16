@@ -77,7 +77,7 @@ export default function RecebimentosPage() {
               </p>
             </div>
             <Button asChild className="gap-2">
-              <Link href="/cadastro">
+              <Link href="/configuracoes/verificacao">
                 Concluir verificação
                 <ArrowRight className="h-4 w-4" />
               </Link>
