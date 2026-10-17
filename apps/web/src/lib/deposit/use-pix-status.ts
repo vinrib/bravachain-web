@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { ApiError } from "@/lib/client-api";
 import { getPixStatus } from "./api";
 import { depositUiStatus, isFinalStatus } from "./status";
-import type { DepositUiStatus } from "./types";
+import type { DepositUiStatus, PixStatus } from "./types";
 
 /**
  * Polls GET /v1/pix/status/:txid every 5s, pausing while the tab is hidden, and
@@ -15,9 +15,10 @@ export function usePixStatus(
   txid: string | null,
   initialStatus: string,
   stopped: boolean,
-): { ui: DepositUiStatus; notFound: boolean } {
+): { ui: DepositUiStatus; notFound: boolean; data: PixStatus | null } {
   const [ui, setUi] = useState<DepositUiStatus>(() => depositUiStatus(initialStatus));
   const [notFound, setNotFound] = useState(false);
+  const [data, setData] = useState<PixStatus | null>(null);
 
   useEffect(() => {
     if (!txid || stopped || notFound || isFinalStatus(ui)) return;
@@ -27,7 +28,10 @@ export function usePixStatus(
     async function poll() {
       try {
         const r = await getPixStatus(txid as string);
-        if (active) setUi(depositUiStatus(r.status));
+        if (active) {
+          setData(r);
+          setUi(depositUiStatus(r.status));
+        }
       } catch (err) {
         if (active && err instanceof ApiError && err.status === 404) {
           setNotFound(true);
@@ -61,5 +65,5 @@ export function usePixStatus(
     };
   }, [txid, stopped, ui, notFound]);
 
-  return { ui, notFound };
+  return { ui, notFound, data };
 }

@@ -193,5 +193,16 @@
       "deleteConfirmPlaceholder": "Digite DELETE",
       "deleteConfirmButton": "Excluir permanentemente"
     }
+  },
+  "depositPix": {
+    "estimate": {
+      "fee": "Tarifa do depósito",
+      "youReceive": "Você recebe"
+    },
+    "settled": {
+      "paid": "Pago",
+      "fee": "Tarifa",
+      "credited": "Creditado"
+    }
   }
 }

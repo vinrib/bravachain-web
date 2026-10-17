@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { QRCodeSVG } from "qrcode.react";
 import { Check, Clock, Copy, Home, Receipt } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +17,7 @@ import {
   remainingSeconds,
   formatCountdown,
 } from "@/lib/deposit/status";
+import { formatBrlDecimal } from "@/lib/deposit/money";
 import type { PixQrCode } from "@/lib/deposit/types";
 
 const DEFAULT_DESC = "Depósito Bravachain";
@@ -112,11 +114,32 @@ function DepositForm({ onGenerated }: { onGenerated: (qr: PixQrCode) => void }) 
 }
 
 function PixGenerated({ qr, onReset }: { qr: PixQrCode; onReset: () => void }) {
+  const t = useTranslations("depositPix");
   const [secs, setSecs] = useState<number | null>(() => remainingSeconds(qr.expiresAt));
   const [copied, setCopied] = useState(false);
   // Client-side expiry: only when there's a valid expiresAt that has passed.
   const expired = secs !== null && secs <= 0;
-  const { ui, notFound } = usePixStatus(qr.txid, qr.status, expired);
+  const { ui, notFound, data } = usePixStatus(qr.txid, qr.status, expired);
+
+  // NEW optional estimate (before payment): shown only when BOTH fields come.
+  const estFee = formatBrlDecimal(qr.estimatedFee);
+  const estNet = formatBrlDecimal(qr.estimatedNetAmount);
+  const estimateLine =
+    estFee && estNet
+      ? `${t("estimate.fee")}: ${estFee} · ${t("estimate.youReceive")}: ${estNet}`
+      : null;
+
+  // NEW optional settlement breakdown (on confirmation): only present parts.
+  const paidFmt = formatBrlDecimal(data?.requestedAmount);
+  const feeFmt = formatBrlDecimal(data?.feeBrl);
+  const creditedFmt = formatBrlDecimal(data?.creditedAmount);
+  const settledLine = [
+    paidFmt && `${t("settled.paid")} ${paidFmt}`,
+    feeFmt && `${t("settled.fee")} ${feeFmt}`,
+    creditedFmt && `${t("settled.credited")} ${creditedFmt}`,
+  ]
+    .filter((p): p is string => Boolean(p))
+    .join(" · ");
 
   // Countdown tick (only when there is an expiresAt and it hasn't passed).
   useEffect(() => {
@@ -144,6 +167,9 @@ function PixGenerated({ qr, onReset }: { qr: PixQrCode; onReset: () => void }) {
         title="Pagamento confirmado!"
         body="O saldo já está disponível na sua conta."
       >
+        {settledLine && (
+          <p className="text-sm font-medium tabular-nums text-foreground">{settledLine}</p>
+        )}
         <div className="flex flex-wrap justify-center gap-3">
           <Button asChild><Link href="/extrato"><Receipt className="h-4 w-4" />Ver extrato</Link></Button>
           <Button asChild variant="secondary"><Link href="/"><Home className="h-4 w-4" />Ir para o início</Link></Button>
@@ -187,6 +213,9 @@ function PixGenerated({ qr, onReset }: { qr: PixQrCode; onReset: () => void }) {
                 })
               : "—"}
           </p>
+          {estimateLine && (
+            <p className="mt-1 text-xs text-muted-foreground">{estimateLine}</p>
+          )}
         </div>
 
         <div className="flex flex-col items-center gap-4">
