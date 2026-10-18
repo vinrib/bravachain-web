@@ -61,4 +61,33 @@ describe("normalizeStatement", () => {
     expect(normalizeStatement({}).pagination.page).toBe(1);
     expect(normalizeStatement({ transactions: "nope" }).transactions).toEqual([]);
   });
+
+  it("parses the new row category when present; null otherwise (PR #56)", () => {
+    const out = normalizeStatement({
+      transactions: [
+        { id: "a", type: "INBOUND", category: "DEPOSIT" },
+        { id: "b", type: "WITHDRAWAL", category: "REVERSAL" },
+        { id: "c", type: "INBOUND", category: "UNKNOWN_CAT" },
+        { id: "d", type: "INBOUND" },
+      ],
+    });
+    expect(out.transactions.map((r) => r.category)).toEqual([
+      "DEPOSIT",
+      "REVERSAL",
+      null,
+      null,
+    ]);
+  });
+
+  it("keeps the new summary fields nullable (null until the backend sends them)", () => {
+    const absent = normalizeStatement({ summary: {} }).summary;
+    expect(absent.ajustesEEstornos).toBeNull();
+    expect(absent.averageRate).toBeNull();
+
+    const present = normalizeStatement({
+      summary: { ajustesEEstornos: "-12.50", averageRate: "5.1234" },
+    }).summary;
+    expect(present.ajustesEEstornos).toBe(-12.5);
+    expect(present.averageRate).toBe(5.1234);
+  });
 });

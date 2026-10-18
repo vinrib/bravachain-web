@@ -241,7 +241,7 @@ export function StatementView({
 
       {/* Period summary */}
       {summary && (
-        <Card className="grid grid-cols-2 gap-4 p-4 sm:grid-cols-3">
+        <Card className="grid grid-cols-2 gap-4 p-4 sm:grid-cols-4">
           <div>
             <p className="text-xs text-muted-foreground">Recebido</p>
             <p className="mt-0.5 font-serif text-lg font-bold tabular-nums text-[#0b6b4f] dark:text-[#7be0b0]">
@@ -254,14 +254,24 @@ export function StatementView({
               {formatMoneyBRL(summary.totalWithdrawn)}
             </p>
           </div>
-          {summary.averageRate > 0 && (
+          {/* NEW (PR #56): só aparece quando o backend envia o campo. */}
+          {summary.ajustesEEstornos !== null && (
             <div>
-              <p className="text-xs text-muted-foreground">Taxa média USD/BRL</p>
-              <p className="mt-0.5 font-serif text-lg font-bold tabular-nums text-foreground">
-                R$ {formatRate(summary.averageRate)}
+              <p className="text-xs text-muted-foreground">Ajustes e estornos</p>
+              <p className="mt-0.5 font-serif text-lg font-bold tabular-nums text-muted-foreground">
+                {formatMoneyBRL(summary.ajustesEEstornos)}
               </p>
             </div>
           )}
+          <div>
+            <p className="text-xs text-muted-foreground">Taxa média USD/BRL</p>
+            <p className="mt-0.5 font-serif text-lg font-bold tabular-nums text-foreground">
+              {/* Vem do backend (summary.averageRate); null → "—". Nunca recalculada. */}
+              {summary.averageRate !== null && summary.averageRate > 0
+                ? `R$ ${formatRate(summary.averageRate)}`
+                : "—"}
+            </p>
+          </div>
         </Card>
       )}
 

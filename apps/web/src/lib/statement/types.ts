@@ -4,12 +4,16 @@
  * the normalizer coerces them. Only fields that exist in the contract are
  * mapped (null-tolerant), nothing invented.
  */
+import type { StatementCategory } from "./category";
+
 export type StatementFilterType = "ALL" | "INBOUND" | "WITHDRAWAL";
 export type StatementRowType = "INBOUND" | "WITHDRAWAL";
 
 export interface StatementRow {
   id: string;
   type: StatementRowType;
+  /** NEW (PR #56): DEPOSIT|WITHDRAWAL|REVERSAL|ADJUSTMENT. null until it ships. */
+  category: StatementCategory | null;
   rail: string | null;
   description: string;
   amountBrl: number;
@@ -30,8 +34,16 @@ export interface StatementRow {
 export interface StatementSummary {
   totalInbound: number;
   totalWithdrawn: number;
-  /** 0 when there are no inbound rows with a rate. */
-  averageRate: number;
+  /**
+   * NEW (PR #56): soma líquida de ajustes e estornos do período. null até o
+   * backend enviar — o cartão só aparece quando presente.
+   */
+  ajustesEEstornos: number | null;
+  /**
+   * Taxa média enviada pelo backend. null quando não aplicável — exibir "—".
+   * Nunca recalculada no front, nunca derivada de rateApplied.
+   */
+  averageRate: number | null;
   periodStart: string;
   periodEnd: string;
 }

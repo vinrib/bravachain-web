@@ -5,6 +5,7 @@ import type {
   StatementSummary,
   StatementPagination,
 } from "./types";
+import { parseCategory } from "./category";
 
 /** Coerce a Decimal-as-string | number | null into a number (0 fallback). */
 function num(value: unknown): number {
@@ -33,6 +34,7 @@ function normalizeRow(raw: unknown): StatementRow {
   return {
     id: str(r.id),
     type,
+    category: parseCategory(r.category),
     rail: strN(r.rail),
     description: str(r.description),
     amountBrl: num(r.amountBrl),
@@ -56,7 +58,9 @@ function normalizeSummary(raw: unknown): StatementSummary {
   return {
     totalInbound: num(s.totalInbound),
     totalWithdrawn: num(s.totalWithdrawn),
-    averageRate: num(s.averageRate),
+    // NEW optional fields — null until the backend sends them (PR #56).
+    ajustesEEstornos: numN(s.ajustesEEstornos),
+    averageRate: numN(s.averageRate),
     periodStart: str(s.periodStart),
     periodEnd: str(s.periodEnd),
   };

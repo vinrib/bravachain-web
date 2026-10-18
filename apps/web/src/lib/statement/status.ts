@@ -1,9 +1,12 @@
 /**
- * Maps a statement row's raw `status` to the design's four etiquetas and a tone,
- * and decides which tab it belongs to (Em andamento vs Histórico). The exact
- * backend status strings for /v1/statement aren't enumerated in the contract we
- * have, so this matches by substring (uppercased) — tolerant, never inventing a
- * value. Unknown statuses fall back to a neutral pill in "Em andamento".
+ * Maps a statement row's raw `status` to a label + tone, and decides which tab
+ * it belongs to. PR #56 defines an exact enum (COMPLETED | PROCESSING | PENDING
+ * | FAILED): only PROCESSING/PENDING stay in "Em andamento"; everything else
+ * (incl. COMPLETED/FAILED) goes to "Histórico". We still accept the older,
+ * pre-PR#56 status strings by substring so nothing breaks before it ships.
+ *
+ * A concluded row must never show an empty status ("—"): an empty/unknown
+ * status falls back to the generic "Concluído" label in Histórico.
  */
 export type StatusTone = "processing" | "success" | "error" | "review" | "neutral";
 
@@ -17,20 +20,34 @@ export interface StatusView {
 export function statementStatusView(raw: string): StatusView {
   const s = (raw || "").toUpperCase();
 
+  // Exact enum (PR #56).
+  switch (s) {
+    case "COMPLETED":
+      return { label: "Concluído", tone: "success", final: true };
+    case "FAILED":
+      return { label: "Falhou", tone: "error", final: true };
+    case "PROCESSING":
+      return { label: "Em processamento", tone: "processing", final: false };
+    case "PENDING":
+      return { label: "Em análise", tone: "review", final: false };
+  }
+
+  // Backward-compatible substring handling for pre-PR#56 statuses.
   if (/FAIL|EXPIR|CANCEL|REJECT|ERROR/.test(s)) {
     return { label: "Falhou", tone: "error", final: true };
   }
   if (/COMPLET|CONCLU|SETTLED|DONE|PAID|SUCCESS/.test(s)) {
     return { label: "Concluído", tone: "success", final: true };
   }
-  if (/HOLD|VERIF|REVIEW|HELD|PENDING_REVIEW|ANALYS/.test(s)) {
-    return { label: "Em verificação", tone: "review", final: false };
+  if (/HOLD|VERIF|REVIEW|HELD|ANALYS/.test(s)) {
+    return { label: "Em análise", tone: "review", final: false };
   }
-  if (/PEND|PROC|CONFIRM|DELIVER|HOP|PROCESSING|DEPOSIT/.test(s)) {
+  if (/PEND|PROC|CONFIRM|DELIVER|HOP|DEPOSIT/.test(s)) {
     return { label: "Em processamento", tone: "processing", final: false };
   }
-  // Unknown → show the raw value, keep it in "Em andamento".
-  return { label: raw || "—", tone: "neutral", final: false };
+
+  // Empty/unknown → generic concluded label, never "—"; keep it in Histórico.
+  return { label: "Concluído", tone: "neutral", final: true };
 }
 
 const TONE_CLASS: Record<StatusTone, string> = {
