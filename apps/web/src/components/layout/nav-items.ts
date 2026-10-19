@@ -2,7 +2,7 @@ import {
   LayoutDashboard,
   Receipt,
   LineChart,
-  FileText,
+  Landmark,
   ArrowLeftRight,
   ArrowDownToDot,
   Settings,
@@ -31,7 +31,7 @@ export const navItems: NavItem[] = [
   // Behind NEXT_PUBLIC_FEATURE_RECEBIMENTOS (default off). Tela única que reúne
   // contas no exterior (USD/EUR) e a chave PIX para saques.
   ...(featureFlags.recebimentos
-    ? [{ href: "/recebimentos", label: "Recebimentos", icon: FileText }]
+    ? [{ href: "/recebimentos", label: "Recebimentos", icon: Landmark }]
     : []),
   { href: "/saque", label: "Saque PIX", icon: PixIcon },
   { href: "/extrato", label: "Extrato", icon: Receipt },
