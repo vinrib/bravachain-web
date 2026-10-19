@@ -3,7 +3,6 @@ import {
   Receipt,
   Landmark,
   LineChart,
-  FileText,
   ArrowLeftRight,
   ArrowDownToDot,
   Settings,
@@ -36,7 +35,7 @@ export const navItems: NavItem[] = [
         {
           href: "/instrucoes-de-recebimento",
           label: "Instruções de recebimento",
-          icon: FileText,
+          icon: Landmark,
         },
       ]
     : []),
