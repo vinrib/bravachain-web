@@ -22,6 +22,13 @@ export const featureFlags = {
   dashboard: process.env.NEXT_PUBLIC_FEATURE_DASHBOARD === "true",
   /** "Cotações" (FX rates) section. */
   cotacoes: process.env.NEXT_PUBLIC_FEATURE_COTACOES === "true",
+  /**
+   * History chart + Mín/Máx/Média/% on Cotações. Default OFF: the backend only
+   * has ~2 weeks of real daily data, the plotted dataPoints are downsampled
+   * (3M → 2 points, 1Y → 1), stats don't match the plotted series, and future
+   * dates are carried forward. Keep off until the history series is complete.
+   */
+  cotacoesChart: process.env.NEXT_PUBLIC_FEATURE_COTACOES_CHART === "true",
   /** "Depósito" (PIX deposit) section. */
   deposito: process.env.NEXT_PUBLIC_FEATURE_DEPOSITO === "true",
 } as const;

@@ -17,7 +17,14 @@ function updatedLabel(iso: string | null): string | null {
   if (!iso) return null;
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return null;
-  return d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  // Date + time: a reference rate can be a day or two old, so showing only the
+  // time would make a stale quote look fresh.
+  return d.toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function Change({ rate }: { rate: LiveRate }) {
@@ -58,7 +65,7 @@ function LiveCard({ pair, rate }: { pair: (typeof PAIRS)[number]; rate: LiveRate
           {rate && <Change rate={rate} />}
         </div>
         {updated && (
-          <p className="mt-1.5 text-xs text-muted-foreground">Atualizado às {updated}</p>
+          <p className="mt-1.5 text-xs text-muted-foreground">Atualizado em {updated}</p>
         )}
       </CardContent>
     </Card>
