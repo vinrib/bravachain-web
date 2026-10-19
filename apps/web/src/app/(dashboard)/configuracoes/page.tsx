@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronRight, Landmark, Languages, LogOut, ShieldCheck } from "lucide-react";
+import { Building2, ChevronRight, Languages, LogOut, ShieldCheck } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
@@ -17,10 +17,10 @@ const SECTIONS = [
     icon: ShieldCheck,
   },
   {
-    href: "/configuracoes/dados",
-    label: "Dados da conta",
-    description: "Identidade da empresa e chave PIX",
-    icon: Landmark,
+    href: "/configuracoes/perfil",
+    label: "Perfil",
+    description: "Identidade da empresa (nome público e logo)",
+    icon: Building2,
   },
   {
     href: "/configuracoes/preferencias",

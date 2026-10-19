@@ -23,7 +23,7 @@ export function pendingAccountText(currency: string): string {
 /** Settlement times the backend affirms, per currency/method (approved text). */
 export const SETTLEMENT: Record<string, Array<{ method: string; time: string }>> = {
   USD: [
-    { method: "Wire", time: "em poucas horas" },
+    { method: "Wire", time: "geralmente no mesmo dia útil, sujeito ao banco" },
     { method: "ACH", time: "1 a 3 dias úteis" },
   ],
   EUR: [{ method: "SEPA", time: "1 a 2 dias úteis" }],

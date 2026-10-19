@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { navItems, isActive, type NavItem } from "./nav-items";
 
 // The four primary slots (in order); the rest go under "Mais".
-const PRIMARY_HREFS = ["/", "/instrucoes-de-recebimento", "/saque", "/extrato"] as const;
+const PRIMARY_HREFS = ["/", "/recebimentos", "/saque", "/extrato"] as const;
 
 export function BottomNav() {
   const pathname = usePathname();

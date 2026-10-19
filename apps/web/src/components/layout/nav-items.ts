@@ -1,9 +1,8 @@
 import {
   LayoutDashboard,
   Receipt,
-  Landmark,
   LineChart,
-  FileText,
+  Landmark,
   ArrowLeftRight,
   ArrowDownToDot,
   Settings,
@@ -19,9 +18,9 @@ export interface NavItem {
 
 /**
  * Single source of truth for the dashboard navigation.
- * Order (flags on): Início, Depósito, Instruções de recebimento, Saque PIX,
- * Extrato, Cotações, Dashboard financeiro, Dados de conta. Configurações lives
- * in the sidebar footer (filtered out of the main loop there).
+ * Order (flags on): Início, Depósito, Recebimentos, Saque PIX, Extrato,
+ * Cotações, Dashboard financeiro. Configurações lives in the sidebar footer
+ * (filtered out of the main loop there).
  */
 export const navItems: NavItem[] = [
   { href: "/", label: "Início", icon: LayoutDashboard },
@@ -29,16 +28,10 @@ export const navItems: NavItem[] = [
   ...(featureFlags.deposito
     ? [{ href: "/deposito", label: "Depósito", icon: ArrowDownToDot }]
     : []),
-  // Behind NEXT_PUBLIC_FEATURE_RECEBIMENTOS (default off). "Recebimentos" foi
-  // removido; o recebimento acontece via "Instruções de recebimento".
+  // Behind NEXT_PUBLIC_FEATURE_RECEBIMENTOS (default off). Tela única que reúne
+  // contas no exterior (USD/EUR) e a chave PIX para saques.
   ...(featureFlags.recebimentos
-    ? [
-        {
-          href: "/instrucoes-de-recebimento",
-          label: "Instruções de recebimento",
-          icon: FileText,
-        },
-      ]
+    ? [{ href: "/recebimentos", label: "Recebimentos", icon: Landmark }]
     : []),
   { href: "/saque", label: "Saque PIX", icon: PixIcon },
   { href: "/extrato", label: "Extrato", icon: Receipt },
@@ -49,10 +42,6 @@ export const navItems: NavItem[] = [
   // Behind NEXT_PUBLIC_FEATURE_DASHBOARD (default off).
   ...(featureFlags.dashboard
     ? [{ href: "/financeiro", label: "Dashboard financeiro", icon: LineChart }]
-    : []),
-  // Behind NEXT_PUBLIC_FEATURE_DADOS_CONTA (default off).
-  ...(featureFlags.dadosConta
-    ? [{ href: "/dados-de-conta", label: "Dados de conta", icon: Landmark }]
     : []),
   // Settings lives in the sidebar footer; also surfaced in the mobile "Mais" sheet.
   { href: "/configuracoes", label: "Configurações", icon: Settings },

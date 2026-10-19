@@ -15,7 +15,13 @@ import { maskPixKey } from "@/lib/receive/mask";
  * Manages the standing PIX key used to deliver the converted BRL. Notifies the
  * parent when the key changes so the create form knows whether a default exists.
  */
-export function PixKeyCard({ onChange }: { onChange?: (pixKey: string | null) => void }) {
+export function PixKeyCard({
+  onChange,
+  label = "Chave PIX de recebimento",
+}: {
+  onChange?: (pixKey: string | null) => void;
+  label?: string;
+}) {
   const { success } = useToast();
   const [pixKey, setPixKey] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -88,7 +94,7 @@ export function PixKeyCard({ onChange }: { onChange?: (pixKey: string | null) =>
       <CardContent className="pt-6">
         <div className="mb-3 flex items-center gap-2">
           <KeyRound className="h-4 w-4 text-muted-foreground" />
-          <p className="text-sm font-semibold text-foreground">Chave PIX de recebimento</p>
+          <p className="text-sm font-semibold text-foreground">{label}</p>
         </div>
 
         {loading ? (

@@ -23,8 +23,8 @@ function ForeignCard({ account }: { account: DedicatedAccount }) {
     <Card className="relative">
       {featureFlags.recebimentos && (
         <Link
-          href="/instrucoes-de-recebimento"
-          aria-label="Ver instruções de recebimento"
+          href="/recebimentos"
+          aria-label="Ver dados de recebimento"
           className="absolute right-3 top-3 text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowUpRight className="h-4 w-4" />
@@ -81,8 +81,8 @@ export function MyAccounts() {
     <div>
       <div className="mb-2 flex items-center justify-between px-1">
         <h2 className="text-base font-semibold text-foreground">Minhas contas</h2>
-        {featureFlags.dadosConta && (
-          <Link href="/dados-de-conta" className="text-sm font-medium text-primary hover:underline">
+        {featureFlags.recebimentos && (
+          <Link href="/recebimentos" className="text-sm font-medium text-primary hover:underline">
             Ver todas
           </Link>
         )}
