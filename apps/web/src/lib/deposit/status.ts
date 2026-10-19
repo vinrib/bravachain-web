@@ -57,10 +57,23 @@ export function remainingSeconds(
   return Math.max(0, Math.round((end - now) / 1000));
 }
 
-/** mm:ss countdown label. */
+/**
+ * Countdown label that scales to the QR's real validity (~72h), instead of
+ * overflowing minutes (the old mm:ss turned 72h into "4319:52"):
+ *   >= 24h -> "2d 23h"
+ *   >= 1h  -> "1h 05min"
+ *   <  1h  -> "05:30" (mm:ss)
+ * Clamped at zero; non-finite input (NaN) -> "00:00", so it never shows a
+ * negative or NaN value. The unit abbreviations (d/h/min) read the same in
+ * PT/EN/ES, so no new i18n keys are needed.
+ */
 export function formatCountdown(totalSeconds: number): string {
-  const s = Math.max(0, Math.floor(totalSeconds));
-  const m = Math.floor(s / 60);
-  const r = s % 60;
-  return `${String(m).padStart(2, "0")}:${String(r).padStart(2, "0")}`;
+  const s = Number.isFinite(totalSeconds) ? Math.max(0, Math.floor(totalSeconds)) : 0;
+  const days = Math.floor(s / 86_400);
+  const hours = Math.floor((s % 86_400) / 3_600);
+  const mins = Math.floor((s % 3_600) / 60);
+  const secs = s % 60;
+  if (days > 0) return `${days}d ${hours}h`;
+  if (hours > 0) return `${hours}h ${String(mins).padStart(2, "0")}min`;
+  return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 }
