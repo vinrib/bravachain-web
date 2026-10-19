@@ -7,6 +7,7 @@ import { RatesLiveCards } from "@/components/rates/rates-live-cards";
 import { RatesChart } from "@/components/rates/rates-chart";
 import { RatesCalculator } from "@/components/rates/rates-calculator";
 import { RatesAlerts } from "@/components/rates/rates-alerts";
+import { featureFlags } from "@/lib/feature-flags";
 
 type Tool = "calc" | "alerts";
 
@@ -30,7 +31,9 @@ export default function CotacoesPage() {
         onRetry={live.reload}
       />
 
-      <RatesChart />
+      {/* History chart gated by NEXT_PUBLIC_FEATURE_COTACOES_CHART (default OFF)
+          until the backend history series is complete — see feature-flags.ts. */}
+      {featureFlags.cotacoesChart && <RatesChart />}
 
       {/* Calculator + Alerts: side by side on desktop, tabs on mobile */}
       <div className="lg:hidden">
