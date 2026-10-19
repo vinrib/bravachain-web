@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { navItems, isActive } from "./nav-items";
+import { SettingsIcon } from "@/components/icons/nav-icons";
 import { Logo } from "@/components/ui/logo";
 import { useMe } from "@/lib/hooks";
 
@@ -60,7 +60,7 @@ export function Sidebar() {
               : "text-muted-foreground hover:bg-muted hover:text-foreground",
           )}
         >
-          <Settings className="h-4 w-4 shrink-0" />
+          <SettingsIcon className="h-4 w-4 shrink-0" />
           Configurações
         </Link>
 
