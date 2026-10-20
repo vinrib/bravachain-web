@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ShieldAlert, ArrowRight, Clock } from "lucide-react";
+import { PixIcon } from "@/components/icons/pix-icon";
 import {
   parseBRL,
   formatMoney,
@@ -14,7 +15,7 @@ import {
 import { endpoints } from "@bravachain/api-client";
 import { apiFetch, ApiError } from "@/lib/client-api";
 import { useBalance, useKycState } from "@/lib/hooks";
-import { mapWithdrawError } from "@/lib/withdraw-errors";
+import { mapWithdrawError, GENERIC_WITHDRAW_ERROR } from "@/lib/withdraw-errors";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -49,6 +50,7 @@ export default function SaquePage() {
   const [pixKey, setPixKey] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [holdMessage, setHoldMessage] = useState<string | null>(null);
+  const [supportCode, setSupportCode] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const amount = useMemo(() => parseBRL(amountInput), [amountInput]);
@@ -73,9 +75,11 @@ export default function SaquePage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setHoldMessage(null);
+    setSupportCode(null);
     if (!validate() || amount === null || !pixKeyType) return;
     setSubmitting(true);
     try {
+      // Single attempt — the withdrawal is never retried automatically.
       await apiFetch(endpoints.withdrawals.createPix, {
         method: "POST",
         body: JSON.stringify({
@@ -92,7 +96,7 @@ export default function SaquePage() {
       router.refresh();
     } catch (err) {
       if (err instanceof ApiError) {
-        const view = mapWithdrawError(err.code, err.message);
+        const view = mapWithdrawError(err.code, err.message, err.status);
         if (view.hold) {
           setHoldMessage(view.message);
           setErrors({});
@@ -100,9 +104,10 @@ export default function SaquePage() {
           setErrors({ [view.field]: view.message });
         } else {
           setErrors({ form: view.message });
+          setSupportCode(view.supportCode ?? null);
         }
       } else {
-        setErrors({ form: "Não foi possível solicitar o saque." });
+        setErrors({ form: GENERIC_WITHDRAW_ERROR });
       }
     } finally {
       setSubmitting(false);
@@ -125,7 +130,7 @@ export default function SaquePage() {
               </p>
             </div>
             <Button asChild className="gap-2">
-              <Link href="/cadastro">
+              <Link href="/configuracoes/verificacao">
                 Concluir verificação
                 <ArrowRight className="h-4 w-4" />
               </Link>
@@ -139,7 +144,10 @@ export default function SaquePage() {
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <div>
-        <h1 className="font-serif text-[30px] font-bold text-foreground">Saques via PIX</h1>
+        <h1 className="flex items-center gap-2 font-serif text-[30px] font-bold text-foreground">
+          <PixIcon className="h-6 w-6 shrink-0 text-primary" />
+          Saques via PIX
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Pague contas no Brasil a partir do saldo em reais da sua empresa.
         </p>
@@ -213,6 +221,11 @@ export default function SaquePage() {
               {errors.form && (
                 <div className="rounded-lg bg-destructive/10 px-3 py-2">
                   <p className="text-sm text-destructive">{errors.form}</p>
+                  {supportCode && (
+                    <p className="mt-1 text-xs text-destructive/80">
+                      Código de suporte: {supportCode}
+                    </p>
+                  )}
                 </div>
               )}
 

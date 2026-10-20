@@ -193,5 +193,16 @@
       "deleteConfirmPlaceholder": "Type DELETE",
       "deleteConfirmButton": "Delete permanently"
     }
+  },
+  "depositPix": {
+    "estimate": {
+      "fee": "Deposit fee",
+      "youReceive": "You receive"
+    },
+    "settled": {
+      "paid": "Paid",
+      "fee": "Fee",
+      "credited": "Credited"
+    }
   }
 }

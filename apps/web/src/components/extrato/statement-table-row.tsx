@@ -1,10 +1,12 @@
 "use client";
 
-import { ArrowDownLeft, ArrowUpRight, FileText } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, FileText, RefreshCw, SlidersHorizontal } from "lucide-react";
 import { formatMoney } from "@bravachain/shared";
 import { cn } from "@/lib/utils";
 import { statementStatusView } from "@/lib/statement/status";
+import { categoryDirection, categoryLabel } from "@/lib/statement/category";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { useLocale } from "@/components/i18n-provider";
 import {
   formatForeign,
   formatRowDate,
@@ -20,12 +22,21 @@ export function StatementTableRow({
   row: StatementRow;
   onViewReceipts?: () => void;
 }) {
-  const inbound = row.type === "INBOUND";
+  const { locale } = useLocale();
   const status = statementStatusView(row.status);
-  const { title, sub } = rowTitle(row);
+  // Direction: category decides (DEPOSIT=in, WITHDRAWAL=out, REVERSAL/ADJUSTMENT
+  // =neutral); falls back to the legacy type before PR #56 ships.
+  const direction = categoryDirection(row.category, row.type);
+  const catLabel = row.category ? categoryLabel(row.category, locale) : null;
+
+  // REVERSAL/ADJUSTMENT have no counterparty — title is the category label.
+  const neutralRow = direction === "neutral";
+  const { title, sub } = neutralRow
+    ? { title: catLabel ?? "Lançamento", sub: row.counterparty }
+    : rowTitle(row);
   const { date, time } = formatRowDate(row.createdAt);
   // Incoming amounts are an estimate until the status is final (FX not settled).
-  const isEstimate = inbound && !status.final;
+  const isEstimate = direction === "in" && !status.final;
 
   return (
     <div className="grid grid-cols-[1.6fr_0.9fr_1fr_1.1fr_1fr_auto] items-center gap-3 px-4 py-3.5 sm:px-5">
@@ -38,13 +49,19 @@ export function StatementTableRow({
           <span
             className={cn(
               "absolute -bottom-0.5 -right-0.5 flex h-[18px] w-[18px] items-center justify-center rounded-full ring-2 ring-card",
-              inbound ? "bg-[#12a46b] text-white" : "bg-[#8a918c] text-white",
+              direction === "in"
+                ? "bg-[#12a46b] text-white"
+                : "bg-[#8a918c] text-white",
             )}
           >
-            {inbound ? (
+            {direction === "in" ? (
               <ArrowDownLeft className="h-2.5 w-2.5" />
-            ) : (
+            ) : direction === "out" ? (
               <ArrowUpRight className="h-2.5 w-2.5" />
+            ) : row.category === "ADJUSTMENT" ? (
+              <SlidersHorizontal className="h-2.5 w-2.5" />
+            ) : (
+              <RefreshCw className="h-2.5 w-2.5" />
             )}
           </span>
         </span>
@@ -77,11 +94,16 @@ export function StatementTableRow({
         <p
           className={cn(
             "text-sm font-semibold tabular-nums",
-            inbound ? "text-[#0b6b4f] dark:text-[#7be0b0]" : "text-foreground",
+            direction === "in"
+              ? "text-[#0b6b4f] dark:text-[#7be0b0]"
+              : direction === "neutral"
+                ? "text-muted-foreground"
+                : "text-foreground",
           )}
         >
           {isEstimate ? "≈ " : ""}
-          {inbound ? "+ " : "− "}
+          {/* REVERSAL/ADJUSTMENT are neutral — no entrada/saída sign. */}
+          {direction === "in" ? "+ " : direction === "out" ? "− " : ""}
           {formatMoney(Math.abs(row.amountBrl))}
         </p>
         {isEstimate && (
@@ -96,7 +118,7 @@ export function StatementTableRow({
 
       {/* Comprovante shortcut (withdrawals only) */}
       <div className="flex justify-end">
-        {!inbound && onViewReceipts ? (
+        {direction === "out" && onViewReceipts ? (
           <button
             type="button"
             onClick={onViewReceipts}

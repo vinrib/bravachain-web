@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Check, Copy, Clock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { CurrencyFlag } from "@/components/ui/flags";
 import { CopyField } from "./copy-field";
 import { DICT } from "@/lib/receive/i18n";
 import {
@@ -33,16 +34,19 @@ export function AccountCard({ account }: { account: DedicatedAccount }) {
     <Card>
       <CardContent className="space-y-4 pt-6">
         <div className="flex items-start justify-between gap-3">
-          <div>
-            <h2 className="text-base font-semibold text-foreground">
-              {currencyTitle(account.currency)}
-            </h2>
-            {account.confirmedAt && (
-              <p className="text-xs text-muted-foreground">
-                Confirmada em{" "}
-                {new Date(account.confirmedAt).toLocaleDateString("pt-BR")}
-              </p>
-            )}
+          <div className="flex items-center gap-3">
+            <CurrencyFlag currency={account.currency} size={32} />
+            <div>
+              <h2 className="text-base font-semibold text-foreground">
+                {currencyTitle(account.currency)}
+              </h2>
+              {account.confirmedAt && (
+                <p className="text-xs text-muted-foreground">
+                  Confirmada em{" "}
+                  {new Date(account.confirmedAt).toLocaleDateString("pt-BR")}
+                </p>
+              )}
+            </div>
           </div>
           {fields.length > 0 && (
             <Button

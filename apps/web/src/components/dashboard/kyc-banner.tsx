@@ -14,7 +14,7 @@ export function KycBanner({ status }: { status: KycStatus }) {
 
   return (
     <Link
-      href="/cadastro"
+      href="/configuracoes/verificacao"
       className={cn(
         "flex items-center gap-3 rounded-2xl border p-4 transition-colors",
         isProblem

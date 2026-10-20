@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { navItems, isActive } from "./nav-items";
+import { SettingsIcon } from "@/components/icons/nav-icons";
 import { Logo } from "@/components/ui/logo";
 import { useMe } from "@/lib/hooks";
 
@@ -26,27 +27,43 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 space-y-0.5 px-3 py-4">
-        {navItems.map(({ href, label, icon: Icon }) => {
-          const active = isActive(pathname, href);
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={cn(
-                "flex min-h-[44px] items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
-                active
-                  ? "bg-[#011a0f] text-white dark:bg-primary dark:text-primary-foreground"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
-              )}
-            >
-              <Icon className="h-4 w-4 shrink-0" />
-              {label}
-            </Link>
-          );
-        })}
+        {navItems
+          .filter((i) => i.href !== "/configuracoes")
+          .map(({ href, label, icon: Icon }) => {
+            const active = isActive(pathname, href);
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={cn(
+                  "flex min-h-[44px] items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+                  active
+                    ? "bg-[#011a0f] text-white dark:bg-primary dark:text-primary-foreground"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                )}
+              >
+                <Icon className="h-4 w-4 shrink-0" />
+                {label}
+              </Link>
+            );
+          })}
       </nav>
 
-      <div className="border-t border-border p-3">
+      <div className="space-y-2 border-t border-border p-3">
+        {/* Configurações in the footer, per the canvas. */}
+        <Link
+          href="/configuracoes"
+          className={cn(
+            "flex min-h-[44px] items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+            isActive(pathname, "/configuracoes")
+              ? "bg-[#011a0f] text-white dark:bg-primary dark:text-primary-foreground"
+              : "text-muted-foreground hover:bg-muted hover:text-foreground",
+          )}
+        >
+          <SettingsIcon className="h-4 w-4 shrink-0" />
+          Configurações
+        </Link>
+
         {name ? (
           <div className="flex items-center gap-3 rounded-xl px-2 py-2">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">

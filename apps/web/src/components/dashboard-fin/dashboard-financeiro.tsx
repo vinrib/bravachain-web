@@ -85,7 +85,7 @@ export function DashboardFinanceiro() {
               </p>
             </div>
             <Button asChild className="gap-2">
-              <Link href="/cadastro">
+              <Link href="/configuracoes/verificacao">
                 Concluir verificação
                 <ArrowRight className="h-4 w-4" />
               </Link>
@@ -151,8 +151,8 @@ export function DashboardFinanceiro() {
               Os indicadores aparecem aqui assim que o primeiro pagamento for recebido.
             </p>
             <Button asChild className="mt-1 gap-2">
-              <Link href="/recebimentos">
-                Ir para Recebimentos
+              <Link href="/instrucoes-de-recebimento">
+                Ver instruções de recebimento
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
@@ -162,7 +162,7 @@ export function DashboardFinanceiro() {
         <>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <KpiCard
-              label="Volume recebido (TPV)"
+              label="Volume recebido (líquido em BRL)"
               value={s.tpvBrl !== null ? formatMoney(s.tpvBrl) : "—"}
               variation={s.tpvVariation}
               caption={CAPTION}
@@ -172,7 +172,7 @@ export function DashboardFinanceiro() {
             <Card>
               <CardContent className="pt-5">
                 <p className="text-xs text-muted-foreground">
-                  Taxa média de câmbio aplicada
+                  Taxa média implícita (bruta)
                 </p>
                 <div className="mt-1 flex flex-wrap gap-x-6 gap-y-1">
                   <div>
@@ -194,7 +194,7 @@ export function DashboardFinanceiro() {
                   </div>
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  R$ por unidade · {CAPTION}
+                  R$ por unidade da moeda, antes de tarifas · {CAPTION}
                 </p>
               </CardContent>
             </Card>
