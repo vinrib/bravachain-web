@@ -11,14 +11,14 @@ import {
   accountFields,
   copyAllText,
   currencyTitle,
-  SETTLEMENT,
+  settlementFor,
 } from "@/lib/receive/account-content";
 import type { DedicatedAccount } from "@/lib/receive/types";
 
 export function AccountCard({ account }: { account: DedicatedAccount }) {
   const [copied, setCopied] = useState(false);
   const fields = accountFields(account);
-  const settlement = SETTLEMENT[account.currency] ?? [];
+  const settlement = settlementFor(account.currency);
 
   async function copyAll() {
     try {
@@ -74,16 +74,19 @@ export function AccountCard({ account }: { account: DedicatedAccount }) {
           ))}
         </div>
 
-        {settlement.length > 0 && (
+        {settlement && settlement.lines.length > 0 && (
           <div className="flex items-start gap-2 text-sm text-muted-foreground">
             <Clock className="mt-0.5 h-4 w-4 shrink-0" />
-            <div>
+            <div className="space-y-1">
               <p className="font-medium text-foreground">Prazo de liquidação</p>
-              {settlement.map((s) => (
+              {settlement.lines.map((s) => (
                 <p key={s.method}>
                   {s.method}: {s.time}
                 </p>
               ))}
+              {settlement.note && (
+                <p className="text-xs text-muted-foreground/80">{settlement.note}</p>
+              )}
             </div>
           </div>
         )}
