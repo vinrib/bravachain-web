@@ -3,8 +3,60 @@ import {
   accountFields,
   copyAllText,
   currencyTitle,
+  sameDayCutoffLocalLabel,
+  settlementFor,
 } from "./account-content";
 import type { DedicatedAccount } from "./types";
+
+// Reference instants well inside each US DST period (not near the transition).
+const BEFORE_DST_END = new Date("2026-10-20T12:00:00Z"); // EDT (UTC-4)
+const AFTER_DST_END = new Date("2026-11-15T12:00:00Z"); // EST (UTC-5)
+
+describe("sameDayCutoffLocalLabel", () => {
+  it("shows 16:45 in New York's own zone in both DST periods", () => {
+    expect(sameDayCutoffLocalLabel(BEFORE_DST_END, "America/New_York")).toBe("16:45");
+    expect(sameDayCutoffLocalLabel(AFTER_DST_END, "America/New_York")).toBe("16:45");
+  });
+
+  it("tracks US DST automatically in Rio Branco (UTC-5, no DST)", () => {
+    // 16:45 EDT = 20:45 UTC -> 15:45 in Rio Branco; after DST ends, 16:45.
+    expect(sameDayCutoffLocalLabel(BEFORE_DST_END, "America/Rio_Branco")).toBe("15:45");
+    expect(sameDayCutoffLocalLabel(AFTER_DST_END, "America/Rio_Branco")).toBe("16:45");
+  });
+
+  it("tracks US DST in São Paulo (UTC-3, no DST in 2026)", () => {
+    // 16:45 EDT = 20:45 UTC -> 17:45 in São Paulo; after DST ends, 18:45.
+    expect(sameDayCutoffLocalLabel(BEFORE_DST_END, "America/Sao_Paulo")).toBe("17:45");
+    expect(sameDayCutoffLocalLabel(AFTER_DST_END, "America/Sao_Paulo")).toBe("18:45");
+  });
+});
+
+describe("settlementFor", () => {
+  it("USD wire text carries the ET cutoff and local equivalent before DST ends", () => {
+    const usd = settlementFor("USD", BEFORE_DST_END, "America/Rio_Branco");
+    const wire = usd?.lines.find((l) => l.method === "Wire");
+    expect(wire?.time).toContain("16:45 em Nova York (ET)");
+    expect(wire?.time).toContain("15:45 no seu fuso");
+    expect(wire?.time).toContain("até 2h");
+    expect(usd?.note).toContain("dias úteis");
+    expect(usd?.note).toContain("próximo dia útil");
+  });
+
+  it("omits the local parenthetical when the viewer is already on ET", () => {
+    const usd = settlementFor("USD", AFTER_DST_END, "America/New_York");
+    const wire = usd?.lines.find((l) => l.method === "Wire");
+    expect(wire?.time).toContain("16:45 em Nova York (ET)");
+    expect(wire?.time).not.toContain("no seu fuso");
+  });
+
+  it("returns SEPA for EUR and null for unknown currencies", () => {
+    expect(settlementFor("EUR")?.lines[0]).toEqual({
+      method: "SEPA",
+      time: "1 a 2 dias úteis",
+    });
+    expect(settlementFor("GBP")).toBeNull();
+  });
+});
 
 describe("accountFields", () => {
   it("returns only present fields, in display order", () => {
