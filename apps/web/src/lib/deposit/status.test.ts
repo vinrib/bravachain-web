@@ -55,11 +55,24 @@ describe("remainingSeconds / formatCountdown", () => {
     expect(remainingSeconds(null, now)).toBeNull();
     expect(remainingSeconds("not-a-date", now)).toBeNull();
   });
-  it("formats mm:ss", () => {
+  it("scales the format to the remaining time (QR vale ~72h)", () => {
+    // >= 24h -> "Xd Yh"
+    expect(formatCountdown(72 * 3600)).toBe("3d 0h");
+    expect(formatCountdown(25 * 3600)).toBe("1d 1h");
+    // The old bug: ~72h used to render as "4319:52"; now it's a clean "2d 23h".
+    expect(formatCountdown(259_192)).toBe("2d 23h");
+    // >= 1h (and < 24h) -> "Xh YYmin"
+    expect(formatCountdown(3900)).toBe("1h 05min"); // 1h05
+    expect(formatCountdown(3600)).toBe("1h 00min");
+    // < 1h -> mm:ss
+    expect(formatCountdown(3599)).toBe("59:59");
+    expect(formatCountdown(600)).toBe("10:00");
     expect(formatCountdown(90)).toBe("01:30");
     expect(formatCountdown(5)).toBe("00:05");
+  });
+  it("never shows a negative or NaN value", () => {
     expect(formatCountdown(0)).toBe("00:00");
     expect(formatCountdown(-3)).toBe("00:00");
-    expect(formatCountdown(600)).toBe("10:00");
+    expect(formatCountdown(NaN)).toBe("00:00");
   });
 });
