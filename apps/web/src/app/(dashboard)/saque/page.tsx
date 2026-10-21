@@ -24,6 +24,8 @@ import { Badge } from "@/components/ui/badge";
 import { AmountInput } from "@/components/ui/amount-input";
 import { InfoAlert } from "@/components/ui/info-alert";
 import { WithdrawHistory } from "@/components/dashboard/withdraw-history";
+import { WithdrawPreview } from "@/components/withdraw/withdraw-preview";
+import { useWithdrawPreview } from "@/lib/withdraw/use-preview";
 import { useToast } from "@/components/toast-provider";
 import { PIX_RETURN_WARNING_FULL, PIX_RETURN_WARNING_SHORT } from "@/lib/pix-warning";
 
@@ -55,6 +57,12 @@ export default function SaquePage() {
 
   const amount = useMemo(() => parseBRL(amountInput), [amountInput]);
   const pixKeyType = useMemo(() => detectPixKeyType(pixKey), [pixKey]);
+  const backendPixKeyType = useMemo(
+    () => (pixKeyType ? toBackendPixKeyType(pixKeyType) : undefined),
+    [pixKeyType],
+  );
+  // Prévia de tarifa/líquido (não executa o saque). Nunca bloqueia a confirmação.
+  const preview = useWithdrawPreview(amount, backendPixKeyType);
   const available = balance.data?.available ?? 0;
 
   const kybApproved = kyc.data?.status === "approved";
@@ -228,6 +236,8 @@ export default function SaquePage() {
                   )}
                 </div>
               )}
+
+              <WithdrawPreview requestedAmount={amount} preview={preview} />
 
               <InfoAlert>{PIX_RETURN_WARNING_FULL}</InfoAlert>
 

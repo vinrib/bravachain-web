@@ -2357,6 +2357,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/withdraw/pix/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Prévia de tarifa e líquido de um saque PIX (não executa o saque) */
+        post: operations["PixWithdrawalController_previewWithdrawal"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/notifications/unread-count": {
         parameters: {
             query?: never;
@@ -2681,6 +2698,31 @@ export interface components {
              */
             pixKeyType: "CPF_CNPJ" | "EMAIL" | "PHONE" | "RANDOM";
         };
+        PreviewPixWithdrawalDto: {
+            /**
+             * @description Valor em BRLA a sacar
+             * @example 100
+             */
+            amountBrla: number;
+            /**
+             * @description Tipo de chave PIX (opcional; pode afetar a tarifa)
+             * @enum {string}
+             */
+            pixKeyType?: "CPF_CNPJ" | "EMAIL" | "PHONE" | "RANDOM";
+        };
+        PixWithdrawalPreviewResponseDto: {
+            /** @description Valor solicitado (BRLA) */
+            amountBrla: number;
+            /** @description Tarifa em BRL */
+            feeBrl: number;
+            /** @description Valor líquido que o beneficiário recebe em BRL */
+            netAmountBrl: number;
+            /**
+             * @description Moeda do líquido
+             * @example BRL
+             */
+            currency: string;
+        };
     };
     responses: never;
     parameters: never;
@@ -2716,6 +2758,8 @@ export type SchemaSendReportDto = components['schemas']['SendReportDto'];
 export type SchemaUpdateAccountantEmailDto = components['schemas']['UpdateAccountantEmailDto'];
 export type SchemaSubmitKycDto = components['schemas']['SubmitKycDto'];
 export type SchemaRequestPixWithdrawalDto = components['schemas']['RequestPixWithdrawalDto'];
+export type SchemaPreviewPixWithdrawalDto = components['schemas']['PreviewPixWithdrawalDto'];
+export type SchemaPixWithdrawalPreviewResponseDto = components['schemas']['PixWithdrawalPreviewResponseDto'];
 export type $defs = Record<string, never>;
 export interface operations {
     AppController_getHello: {
@@ -5783,6 +5827,29 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    PixWithdrawalController_previewWithdrawal: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PreviewPixWithdrawalDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PixWithdrawalPreviewResponseDto"];
+                };
             };
         };
     };

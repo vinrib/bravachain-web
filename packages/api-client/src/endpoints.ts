@@ -77,6 +77,11 @@ export const endpoints = {
   withdrawals: {
     /** POST (Bearer, KYB-approved) { amountBrla, pixKey, pixKeyType } */
     createPix: "/v1/withdraw/pix",
+    /**
+     * POST (Bearer) { amountBrla, pixKeyType? } -> { amountBrla, feeBrl,
+     * netAmountBrl, currency }. Prévia de tarifa/líquido; NÃO executa o saque.
+     */
+    previewPix: "/v1/withdraw/pix/preview",
     /** GET (Bearer) -> últimos saques */
     list: "/v1/withdraw/pix",
   },

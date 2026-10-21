@@ -4006,6 +4006,43 @@
         ]
       }
     },
+    "/v1/withdraw/pix/preview": {
+      "post": {
+        "operationId": "PixWithdrawalController_previewWithdrawal",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreviewPixWithdrawalDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PixWithdrawalPreviewResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Prévia de tarifa e líquido de um saque PIX (não executa o saque)",
+        "tags": [
+          "Withdraw"
+        ]
+      }
+    },
     "/v1/notifications/unread-count": {
       "get": {
         "operationId": "NotificationsController_getUnreadCount",
@@ -4723,6 +4760,57 @@
           "amountBrla",
           "pixKey",
           "pixKeyType"
+        ]
+      },
+      "PreviewPixWithdrawalDto": {
+        "type": "object",
+        "properties": {
+          "amountBrla": {
+            "type": "number",
+            "description": "Valor em BRLA a sacar",
+            "example": 100
+          },
+          "pixKeyType": {
+            "type": "string",
+            "enum": [
+              "CPF_CNPJ",
+              "EMAIL",
+              "PHONE",
+              "RANDOM"
+            ],
+            "description": "Tipo de chave PIX (opcional; pode afetar a tarifa)"
+          }
+        },
+        "required": [
+          "amountBrla"
+        ]
+      },
+      "PixWithdrawalPreviewResponseDto": {
+        "type": "object",
+        "properties": {
+          "amountBrla": {
+            "type": "number",
+            "description": "Valor solicitado (BRLA)"
+          },
+          "feeBrl": {
+            "type": "number",
+            "description": "Tarifa em BRL"
+          },
+          "netAmountBrl": {
+            "type": "number",
+            "description": "Valor líquido que o beneficiário recebe em BRL"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Moeda do líquido",
+            "example": "BRL"
+          }
+        },
+        "required": [
+          "amountBrla",
+          "feeBrl",
+          "netAmountBrl",
+          "currency"
         ]
       }
     }
