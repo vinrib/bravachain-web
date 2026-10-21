@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, KeyRound } from "lucide-react";
-import { formatMoney } from "@bravachain/shared";
+import { formatMoney, parseBRL } from "@bravachain/shared";
 import { Card, CardContent } from "@/components/ui/card";
 import { AmountInput } from "@/components/ui/amount-input";
+import { WithdrawPreview } from "@/components/withdraw/withdraw-preview";
 import { useBalance } from "@/lib/hooks";
+import { useWithdrawPreview } from "@/lib/withdraw/use-preview";
 import { getPixKey } from "@/lib/receive/api";
 
 /**
@@ -20,6 +22,11 @@ export function SaqueRapido() {
   const balance = useBalance();
   const [valor, setValor] = useState("");
   const [pixKey, setPixKey] = useState<string | null>(null);
+
+  // Prévia de tarifa/líquido (sem chave PIX aqui; pixKeyType é opcional). Não
+  // move dinheiro — o botão só leva à tela de Saque com o valor preenchido.
+  const amount = useMemo(() => parseBRL(valor), [valor]);
+  const preview = useWithdrawPreview(amount);
 
   useEffect(() => {
     let active = true;
@@ -59,6 +66,12 @@ export function SaqueRapido() {
           <label className="text-xs text-muted-foreground">Valor a sacar</label>
           <AmountInput value={valor} onChange={setValor} className="mt-1" />
         </div>
+
+        {amount !== null && amount > 0 && (
+          <div className="mt-3">
+            <WithdrawPreview requestedAmount={amount} preview={preview} />
+          </div>
+        )}
 
         {pixKey && (
           <div className="mt-3 flex items-start gap-2 rounded-xl border border-border bg-muted/40 px-3 py-2">
