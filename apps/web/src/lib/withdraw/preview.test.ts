@@ -4,7 +4,18 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 vi.mock("@/lib/client-api", () => ({ apiFetch: vi.fn() }));
 
 import { apiFetch } from "@/lib/client-api";
-import { getWithdrawPreview } from "./preview";
+import {
+  getWithdrawPreview,
+  derivePixWithdrawalFee,
+  type WithdrawPreview,
+} from "./preview";
+
+const makePreview = (feeBrl: string | null): WithdrawPreview => ({
+  amountBrla: null,
+  feeBrl,
+  netAmountBrl: null,
+  currency: "BRL",
+});
 
 const mockFetch = vi.mocked(apiFetch);
 
@@ -54,5 +65,24 @@ describe("getWithdrawPreview", () => {
       netAmountBrl: null,
       currency: "BRL",
     });
+  });
+});
+
+describe("derivePixWithdrawalFee", () => {
+  it("returns null when there is no preview yet", () => {
+    expect(derivePixWithdrawalFee(null)).toBeNull();
+  });
+
+  it("returns null when the backend did not send a fee", () => {
+    expect(derivePixWithdrawalFee(makePreview(null))).toBeNull();
+  });
+
+  it("parses the backend fee string into a number", () => {
+    expect(derivePixWithdrawalFee(makePreview("0.1"))).toBe(0.1);
+    expect(derivePixWithdrawalFee(makePreview("1.50"))).toBe(1.5);
+  });
+
+  it("returns null for a non-numeric fee", () => {
+    expect(derivePixWithdrawalFee(makePreview("abc"))).toBeNull();
   });
 });

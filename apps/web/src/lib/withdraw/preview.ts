@@ -43,6 +43,20 @@ function normalize(raw: unknown): WithdrawPreview {
   };
 }
 
+/**
+ * Tarifa (BRL) derivada da prévia do backend, como número — ou `null` quando
+ * ainda não há prévia carregada ou o valor não é um número válido. É a única
+ * fonte de tarifa no front: nenhum valor fixo é assumido aqui.
+ */
+export function derivePixWithdrawalFee(
+  preview: WithdrawPreview | null,
+): number | null {
+  const raw = preview?.feeBrl;
+  if (!raw) return null;
+  const n = Number(raw);
+  return Number.isFinite(n) && n >= 0 ? n : null;
+}
+
 export function getWithdrawPreview(
   amountBrla: number,
   pixKeyType?: BackendPixKeyType,
