@@ -26,6 +26,7 @@ import { InfoAlert } from "@/components/ui/info-alert";
 import { WithdrawHistory } from "@/components/dashboard/withdraw-history";
 import { WithdrawPreview } from "@/components/withdraw/withdraw-preview";
 import { useWithdrawPreview } from "@/lib/withdraw/use-preview";
+import { derivePixWithdrawalFee } from "@/lib/withdraw/preview";
 import { useToast } from "@/components/toast-provider";
 import { PIX_RETURN_WARNING_FULL, PIX_RETURN_WARNING_SHORT } from "@/lib/pix-warning";
 
@@ -65,6 +66,17 @@ export default function SaquePage() {
   const preview = useWithdrawPreview(amount, backendPixKeyType);
   const available = balance.data?.available ?? 0;
 
+  // Tarifa vinda da prévia do backend (única fonte; sem valor fixo no front).
+  // Enquanto a prévia não carrega, fica null e não valida contra tarifa.
+  const previewFee = derivePixWithdrawalFee(preview.data);
+  const feeTooHighMessage =
+    amount !== null &&
+    amount > 0 &&
+    previewFee !== null &&
+    amount <= previewFee
+      ? `O valor mínimo para saque precisa ser maior que a tarifa de ${formatMoney(previewFee)}`
+      : null;
+
   const kybApproved = kyc.data?.status === "approved";
   const kybResolved = Boolean(kyc.data);
 
@@ -74,6 +86,8 @@ export default function SaquePage() {
       next.amount = "Informe um valor válido.";
     } else if (amount > available) {
       next.amount = "Valor maior que o saldo disponível.";
+    } else if (feeTooHighMessage) {
+      next.amount = feeTooHighMessage;
     }
     if (!pixKeyType) next.pixKey = "Chave PIX inválida.";
     setErrors(next);
@@ -175,7 +189,7 @@ export default function SaquePage() {
                     setAmountInput(v);
                     setErrors((p) => ({ ...p, amount: "" }));
                   }}
-                  error={errors.amount}
+                  error={errors.amount || feeTooHighMessage || undefined}
                   className="mt-1.5"
                 />
                 <div className="mt-2 flex items-center justify-between text-xs">
