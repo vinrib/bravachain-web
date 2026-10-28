@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { endpoints, MFA_ENROLLMENT_REQUIRED } from "@bravachain/api-client";
+import { endpoints } from "@bravachain/api-client";
 import { apiFetch, ApiError } from "@/lib/client-api";
 import {
   normalizeBalance,
@@ -95,45 +95,47 @@ export function useMe(): AsyncState<Me> {
   );
 }
 
-function bodyIsAdmin(body: unknown): boolean {
-  if (!body || typeof body !== "object") return false;
-  const record = body as Record<string, unknown>;
-  const source =
-    (record.user as Record<string, unknown> | undefined) ??
-    (record.data as Record<string, unknown> | undefined) ??
-    record;
-  if (source.isAdmin === true) return true;
-  const role = source.role;
-  if (typeof role === "string" && role.toUpperCase() === "ADMIN") return true;
-  const roles = source.roles;
-  return (
-    Array.isArray(roles) &&
-    roles.some((r) => typeof r === "string" && r.toUpperCase() === "ADMIN")
-  );
+export interface AdminIdentity {
+  /** The signed-in user's id, used to identify "me" in admin screens. */
+  userId: string | null;
+  isAdmin: boolean;
+  loading: boolean;
 }
 
 /**
- * Whether the signed-in user is an admin, for toggling the admin entry point in
- * the client nav. Only ever reveals the admin link to admins. A 403
- * `MFA_ENROLLMENT_REQUIRED` (admin under enforcement, not yet enrolled) also
- * counts as admin so the link stays reachable. Any other failure → not admin.
+ * Reads `{ isAdmin, userId }` from the BFF session probe (`/api/auth/session`),
+ * which decodes them from the session JWT server-side — `GET /auth/me` does not
+ * return the role. Only ever reveals admin status to admins.
  */
-export function useIsAdmin(): boolean {
-  const [isAdmin, setIsAdmin] = useState(false);
+export function useAdminIdentity(): AdminIdentity {
+  const [state, setState] = useState<AdminIdentity>({
+    userId: null,
+    isAdmin: false,
+    loading: true,
+  });
   useEffect(() => {
     let active = true;
-    apiFetch<unknown>(endpoints.auth.me)
-      .then((body) => {
-        if (active) setIsAdmin(bodyIsAdmin(body));
+    fetch("/api/auth/session", { headers: { Accept: "application/json" } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((body: { isAdmin?: boolean; userId?: string | null } | null) => {
+        if (!active) return;
+        setState({
+          userId: typeof body?.userId === "string" ? body.userId : null,
+          isAdmin: body?.isAdmin === true,
+          loading: false,
+        });
       })
-      .catch((err) => {
-        if (active && err instanceof ApiError && err.code === MFA_ENROLLMENT_REQUIRED) {
-          setIsAdmin(true);
-        }
+      .catch(() => {
+        if (active) setState({ userId: null, isAdmin: false, loading: false });
       });
     return () => {
       active = false;
     };
   }, []);
-  return isAdmin;
+  return state;
+}
+
+/** Whether the signed-in user is an admin, for toggling the admin nav entry. */
+export function useIsAdmin(): boolean {
+  return useAdminIdentity().isAdmin;
 }

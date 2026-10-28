@@ -44,12 +44,7 @@ export async function mfaVerify(payload: MfaVerifyRequest): Promise<{ ok: true }
       | { message?: string; code?: string }
       | null;
     throw new MfaVerifyFailure(
-      mapMfaVerifyError({
-        status: res.status,
-        code: body?.code ?? null,
-        retryAfterHeader: res.headers.get("Retry-After"),
-        body,
-      }),
+      mapMfaVerifyError({ status: res.status, code: body?.code ?? null }),
     );
   }
   return { ok: true };

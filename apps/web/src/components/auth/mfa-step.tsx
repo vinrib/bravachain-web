@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { mfaVerify, MfaVerifyFailure } from "@/lib/mfa/api";
-import { formatLockWait } from "@/lib/mfa/errors";
 
 const FIELD =
   "h-[50px] w-full rounded-[12px] border border-[#d9d5ca] bg-white px-[15px] text-[15px] text-[#011a0f] outline-none placeholder:text-[#9aa09a] focus:border-[#011a0f] focus:ring-2 focus:ring-[#0b6b4f]/40";
@@ -14,13 +13,11 @@ interface MfaStepProps {
   mfaToken: string;
   /** Called after the second factor is verified and the session is set. */
   onSuccess: () => void;
-  /** Called when the challenge expired/was consumed; parent returns to step 1. */
-  onExpired: (message: string) => void;
   /** Called when the user chooses to go back to the credentials step. */
   onBack: () => void;
 }
 
-export function MfaStep({ mfaToken, onSuccess, onExpired, onBack }: MfaStepProps) {
+export function MfaStep({ mfaToken, onSuccess, onBack }: MfaStepProps) {
   const t = useTranslations("mfa");
   const [mode, setMode] = useState<"code" | "recovery">("code");
   const [value, setValue] = useState("");
@@ -55,24 +52,13 @@ export function MfaStep({ mfaToken, onSuccess, onExpired, onBack }: MfaStepProps
       setValue("");
       onSuccess();
     } catch (err) {
-      if (err instanceof MfaVerifyFailure) {
-        const { kind, retryAfterSeconds } = err.view;
-        if (kind === "expired") {
-          setValue("");
-          onExpired(t("errorExpired"));
-          return;
-        }
-        if (kind === "locked") {
-          const time = formatLockWait(retryAfterSeconds);
-          setError(time ? t("errorLocked", { time }) : t("errorLockedNoTime"));
-        } else if (kind === "invalid") {
-          setError(t("errorInvalid"));
-        } else {
-          setError(t("errorGeneric"));
-        }
-      } else {
-        setError(t("errorGeneric"));
-      }
+      // The backend returns one opaque failure for every bad/expired/locked
+      // factor — show a single neutral message, never guessing the cause.
+      setError(
+        err instanceof MfaVerifyFailure && err.view.kind === "invalid"
+          ? t("errorInvalid")
+          : t("errorGeneric"),
+      );
       setValue("");
     } finally {
       setLoading(false);

@@ -219,9 +219,6 @@
     "useCode": "Usar o código do aplicativo",
     "backToLogin": "Voltar ao login",
     "errorInvalid": "Código inválido. Verifique e tente novamente.",
-    "errorLocked": "Muitas tentativas. Tente novamente em {time}.",
-    "errorLockedNoTime": "Muitas tentativas. Tente novamente mais tarde.",
-    "errorExpired": "Sua verificação expirou. Entre novamente.",
     "errorGeneric": "Não foi possível verificar agora. Tente novamente."
   },
   "admin": {

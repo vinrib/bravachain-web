@@ -219,9 +219,6 @@
     "useCode": "Use the app code",
     "backToLogin": "Back to login",
     "errorInvalid": "Invalid code. Check it and try again.",
-    "errorLocked": "Too many attempts. Try again in {time}.",
-    "errorLockedNoTime": "Too many attempts. Please try again later.",
-    "errorExpired": "Your verification expired. Please sign in again.",
     "errorGeneric": "Could not verify right now. Please try again."
   },
   "admin": {

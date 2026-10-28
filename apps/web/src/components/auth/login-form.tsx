@@ -81,10 +81,6 @@ export function LoginForm() {
       <MfaStep
         mfaToken={mfaToken}
         onSuccess={goToDestination}
-        onExpired={(message) => {
-          setMfaToken(null);
-          setError(message);
-        }}
         onBack={() => {
           setMfaToken(null);
           setError(null);

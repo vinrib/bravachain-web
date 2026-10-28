@@ -105,16 +105,6 @@ describe("LoginForm — two-step login", () => {
     ).toBeTruthy();
   });
 
-  it("shows the wait time when the account is locked", async () => {
-    vi.mocked(mfaVerify).mockRejectedValue(
-      new MfaVerifyFailure({ kind: "locked", retryAfterSeconds: 300 }),
-    );
-    renderForm();
-    await reachCodeStep();
-    await enterCodeAndVerify();
-    expect(await screen.findByText(/5 min/)).toBeTruthy();
-  });
-
   it("switches to a recovery code when asked", async () => {
     renderForm();
     await reachCodeStep();
@@ -139,15 +129,11 @@ describe("LoginForm — two-step login", () => {
     );
   });
 
-  it("returns to step 1 with a message when the challenge expired", async () => {
-    vi.mocked(mfaVerify).mockRejectedValue(new MfaVerifyFailure({ kind: "expired" }));
+  it("lets the user go back to the credentials step", async () => {
     renderForm();
     await reachCodeStep();
-    await enterCodeAndVerify();
-    // Back to the credentials step…
+    fireEvent.click(screen.getByRole("button", { name: "Voltar ao login" }));
     expect(await screen.findByText("Entrar na sua conta")).toBeTruthy();
-    // …with the expired notice.
-    expect(screen.getByText("Sua verificação expirou. Entre novamente.")).toBeTruthy();
   });
 
   it("never writes the mfaToken (or anything) to web storage", async () => {

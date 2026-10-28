@@ -4,9 +4,13 @@
  * `openapi.json`: the backend's Swagger is prod-guarded, so the spec can't be
  * regenerated from a live doc, and `openapi.json` must not be hand-edited.
  *
- * Field names below follow the contract agreed for #84. Because the real schema
- * could not be inspected here, the BFF/web layers read these fields defensively
- * (see `apps/web/src/lib/mfa`) and must stay tolerant of harmless aliases.
+ * Field names below are CONFIRMED against the backend source (`src/auth/mfa/*`
+ * and `src/auth/auth.service.ts`): login → `{ mfaRequired, mfaToken }`;
+ * enroll/start → `{ otpauthUri, qrDataUrl, secret }`; enroll/confirm and
+ * recovery-codes/regenerate → `{ recoveryCodes }`; verify takes
+ * `{ mfaToken, code | recoveryCode }`. The BFF/web layers still read them
+ * defensively (see `apps/web/src/lib/mfa`). NOTE: verify returns a SINGLE opaque
+ * 401 for every failure (bad/expired/locked) — no code, no retry time.
  * Remove this file once the backend OpenAPI is regenerated with the MFA routes.
  *
  * Contracts:
