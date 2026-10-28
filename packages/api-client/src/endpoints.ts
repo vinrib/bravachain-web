@@ -36,8 +36,20 @@ export const endpoints = {
     resetPassword: "/v1/auth/reset-password",
     /** POST (Bearer) -> { message } — invalidates the stored refresh token */
     logout: "/v1/auth/logout",
-    /** GET (Bearer) -> { id, email, name, kycStatus } */
+    /** GET (Bearer) -> { id, email, name, kycStatus, role } */
     me: "/auth/me",
+    /**
+     * TOTP two-step login (ADMIN accounts with MFA active). Added by backend
+     * PR #84 (in production). Field names follow the contract in `mfa-types.ts`;
+     * reconcile with the backend OpenAPI once its Swagger is regeneratable.
+     *
+     * POST { mfaToken, code } | { mfaToken, recoveryCode } -> normal token pair
+     */
+    mfaVerify: "/v1/auth/mfa/verify",
+    /** POST (Bearer, ADMIN) -> { otpauthUri, qrDataUrl, secret } (enroll start) */
+    mfaEnrollStart: "/v1/auth/mfa/enroll/start",
+    /** POST (Bearer, ADMIN) { code } -> { recoveryCodes: string[] } (one time) */
+    mfaEnrollConfirm: "/v1/auth/mfa/enroll/confirm",
   },
   kyc: {
     /** GET -> { ready, localKycStatus, identityStatus?, ... } */

@@ -60,6 +60,27 @@ export function backendLogin(credentials: unknown): Promise<BackendCallResult> {
   return postJson(endpoints.auth.login, credentials);
 }
 
+/**
+ * Second-factor verification for the two-step login. Takes the opaque challenge
+ * (`mfaToken`) plus either a `code` or a `recoveryCode` and, on success, returns
+ * the normal token pair. The challenge token and factor are passed straight
+ * through and never logged here or anywhere downstream.
+ */
+export function backendMfaVerify(payload: unknown): Promise<BackendCallResult> {
+  return postJson(endpoints.auth.mfaVerify, payload);
+}
+
+/** Fetches the signed-in user (Bearer). Used by the admin route gate. */
+export async function backendMe(accessToken: string): Promise<BackendCallResult> {
+  const res = await fetch(backendUrl(endpoints.auth.me), {
+    method: "GET",
+    headers: { Accept: "application/json", Authorization: `Bearer ${accessToken}` },
+    cache: "no-store",
+  });
+  const body = await res.json().catch(() => null);
+  return { status: res.status, ok: res.ok, body };
+}
+
 export function backendSignup(payload: unknown): Promise<BackendCallResult> {
   return postJson(endpoints.auth.signup, payload);
 }
