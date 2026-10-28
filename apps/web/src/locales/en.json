@@ -204,5 +204,87 @@
       "fee": "Fee",
       "credited": "Credited"
     }
+  },
+  "mfa": {
+    "title": "Two-step verification",
+    "subtitle": "Enter the 6-digit code from your authenticator app.",
+    "codeLabel": "Verification code",
+    "codePlaceholder": "000000",
+    "recoverySubtitle": "Enter one of the recovery codes you saved.",
+    "recoveryLabel": "Recovery code",
+    "recoveryPlaceholder": "Recovery code",
+    "verify": "Verify",
+    "verifying": "Verifying…",
+    "useRecovery": "Use a recovery code",
+    "useCode": "Use the app code",
+    "backToLogin": "Back to login",
+    "errorInvalid": "Invalid code. Check it and try again.",
+    "errorLocked": "Too many attempts. Try again in {time}.",
+    "errorLockedNoTime": "Too many attempts. Please try again later.",
+    "errorExpired": "Your verification expired. Please sign in again.",
+    "errorGeneric": "Could not verify right now. Please try again."
+  },
+  "admin": {
+    "sidebarLink": "Admin area",
+    "nav": {
+      "title": "Administration",
+      "clients": "Clients under review",
+      "security": "Admins and security",
+      "mfa": "Two-step verification",
+      "backToApp": "Back to app"
+    },
+    "overview": {
+      "title": "Admin area",
+      "subtitle": "Bravachain compliance and security management."
+    },
+    "construction": {
+      "badge": "Under construction",
+      "body": "This area is still being built and will be available soon."
+    },
+    "clients": {
+      "title": "Clients under review",
+      "body": "The compliance (KYB) review queue is coming in a future release."
+    },
+    "security": {
+      "title": "Admins and security",
+      "body": "Admin management is coming in a future release.",
+      "mfaCardTitle": "Two-step verification",
+      "mfaCardBody": "Protect your admin account with an authenticator app.",
+      "mfaCardAction": "Activate verification"
+    },
+    "enroll": {
+      "title": "Activate two-step verification",
+      "required": "To access the admin area, activate two-step verification.",
+      "stepOf": "Step {current} of {total}",
+      "loading": "Preparing activation…",
+      "errorStart": "Could not start activation. Please try again.",
+      "errorConfirm": "Invalid code. Check the code in your app and try again.",
+      "step1": {
+        "title": "Install an authenticator app",
+        "body": "Use Google Authenticator, 1Password, Authy or similar. Scan the QR code below or enter the key manually.",
+        "qrAlt": "QR code for the authenticator app",
+        "secretLabel": "Key for manual entry",
+        "copyKey": "Copy key",
+        "copied": "Copied",
+        "continue": "Continue"
+      },
+      "step2": {
+        "title": "Enter the first code",
+        "body": "Enter the 6-digit code shown in your authenticator app.",
+        "codeLabel": "App code",
+        "confirm": "Confirm",
+        "confirming": "Confirming…",
+        "back": "Back"
+      },
+      "step3": {
+        "title": "Save your recovery codes",
+        "warning": "These 8 codes are shown only once. Keep them somewhere safe — each can be used once if you lose access to your app.",
+        "copy": "Copy codes",
+        "copied": "Copied",
+        "download": "Download",
+        "savedLabel": "I have saved my codes somewhere safe",
+        "finish": "Finish"
+      }
+    }
   }
 }

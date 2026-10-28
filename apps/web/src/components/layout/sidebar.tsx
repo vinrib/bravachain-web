@@ -2,11 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { navItems, isActive } from "./nav-items";
 import { SettingsIcon } from "@/components/icons/nav-icons";
 import { Logo } from "@/components/ui/logo";
-import { useMe } from "@/lib/hooks";
+import { useMe, useIsAdmin } from "@/lib/hooks";
+import { ADMIN_HOME } from "@/lib/mfa/routes";
 
 function initials(name: string): string {
   const parts = name.split(/\s+/).filter(Boolean);
@@ -18,6 +21,8 @@ function initials(name: string): string {
 export function Sidebar() {
   const pathname = usePathname();
   const me = useMe();
+  const isAdmin = useIsAdmin();
+  const tAdmin = useTranslations("admin");
   const name = me.data?.name?.trim() || null;
 
   return (
@@ -50,6 +55,22 @@ export function Sidebar() {
       </nav>
 
       <div className="space-y-2 border-t border-border p-3">
+        {/* Admin entry point — only rendered for admins (role-based). */}
+        {isAdmin && (
+          <Link
+            href={ADMIN_HOME}
+            className={cn(
+              "flex min-h-[44px] items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+              isActive(pathname, ADMIN_HOME)
+                ? "bg-[#011a0f] text-white dark:bg-primary dark:text-primary-foreground"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground",
+            )}
+          >
+            <ShieldCheck className="h-4 w-4 shrink-0" />
+            {tAdmin("sidebarLink")}
+          </Link>
+        )}
+
         {/* Configurações in the footer, per the canvas. */}
         <Link
           href="/configuracoes"

@@ -7,7 +7,10 @@ import type {
   LoginRequest,
   ForgotPasswordRequest,
   ResetPasswordRequest,
+  MfaChallengeResponse,
 } from "@bravachain/api-client";
+import { MFA_ENROLLMENT_PATH } from "@/lib/mfa/routes";
+import { shouldEnrollRedirect } from "@/lib/mfa/interceptor";
 
 export class ApiError extends Error {
   constructor(
@@ -49,6 +52,16 @@ export async function apiFetch<T>(
 
   if (!res.ok) {
     const { message, code } = await parseError(res);
+    // Central interceptor: any authenticated admin call that comes back with
+    // "MFA enrollment required" sends the user to the activation wizard, so no
+    // individual screen has to handle it. Guarded against a redirect loop when
+    // the wizard itself (or its own enroll calls) triggers the code.
+    if (
+      typeof window !== "undefined" &&
+      shouldEnrollRedirect(res.status, code, window.location.pathname)
+    ) {
+      window.location.assign(`${MFA_ENROLLMENT_PATH}?required=1`);
+    }
     throw new ApiError(res.status, message, code);
   }
   if (res.status === 204) return undefined as T;
@@ -69,8 +82,26 @@ async function authAction<T>(action: string, payload?: unknown): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+/** Successful login result once any required second factor is satisfied. */
+export interface LoginSuccess {
+  ok: true;
+  user: unknown;
+}
+
+export type LoginResult = LoginSuccess | MfaChallengeResponse;
+
+/** True when the login response asks for a second factor instead of signing in. */
+export function isMfaRequired(result: LoginResult): result is MfaChallengeResponse {
+  return (result as MfaChallengeResponse).mfaRequired === true;
+}
+
+/**
+ * Logs in. For an ADMIN account with MFA active the backend answers with an
+ * `{ mfaRequired, mfaToken }` challenge (no session yet) — see {@link isMfaRequired};
+ * every other account resolves to `{ ok: true, user }` exactly as before.
+ */
 export function login(credentials: LoginRequest) {
-  return authAction<{ ok: true; user: unknown }>("login", credentials);
+  return authAction<LoginResult>("login", credentials);
 }
 
 /**

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { login, ApiError } from "@/lib/client-api";
+import { login, isMfaRequired, ApiError } from "@/lib/client-api";
 import { isValidEmail } from "@bravachain/shared";
+import { MfaStep } from "./mfa-step";
 
 const FIELD =
   "h-[50px] w-full rounded-[12px] border border-[#d9d5ca] bg-white px-[15px] text-[15px] text-[#011a0f] outline-none placeholder:text-[#9aa09a] focus:border-[#011a0f] focus:ring-2 focus:ring-[#0b6b4f]/40";
@@ -38,6 +39,14 @@ export function LoginForm() {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  // Second-factor challenge token (ADMIN + MFA). Memory only — never stored.
+  const [mfaToken, setMfaToken] = useState<string | null>(null);
+
+  const goToDestination = useCallback(() => {
+    const next = params.get("next");
+    router.replace(next && next.startsWith("/") ? next : "/");
+    router.refresh();
+  }, [params, router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -48,10 +57,14 @@ export function LoginForm() {
     }
     setLoading(true);
     try {
-      await login({ email, password, rememberMe });
-      const next = params.get("next");
-      router.replace(next && next.startsWith("/") ? next : "/");
-      router.refresh();
+      const result = await login({ email, password, rememberMe });
+      if (isMfaRequired(result)) {
+        // Switch to the code step; no session has been created yet.
+        setPassword("");
+        setMfaToken(result.mfaToken);
+        return;
+      }
+      goToDestination();
     } catch (err) {
       setError(
         err instanceof ApiError && err.status === 429
@@ -61,6 +74,23 @@ export function LoginForm() {
     } finally {
       setLoading(false);
     }
+  }
+
+  if (mfaToken) {
+    return (
+      <MfaStep
+        mfaToken={mfaToken}
+        onSuccess={goToDestination}
+        onExpired={(message) => {
+          setMfaToken(null);
+          setError(message);
+        }}
+        onBack={() => {
+          setMfaToken(null);
+          setError(null);
+        }}
+      />
+    );
   }
 
   return (

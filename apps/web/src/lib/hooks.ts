@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { endpoints } from "@bravachain/api-client";
+import { endpoints, MFA_ENROLLMENT_REQUIRED } from "@bravachain/api-client";
 import { apiFetch, ApiError } from "@/lib/client-api";
 import {
   normalizeBalance,
@@ -93,4 +93,47 @@ export function useMe(): AsyncState<Me> {
       })),
     [],
   );
+}
+
+function bodyIsAdmin(body: unknown): boolean {
+  if (!body || typeof body !== "object") return false;
+  const record = body as Record<string, unknown>;
+  const source =
+    (record.user as Record<string, unknown> | undefined) ??
+    (record.data as Record<string, unknown> | undefined) ??
+    record;
+  if (source.isAdmin === true) return true;
+  const role = source.role;
+  if (typeof role === "string" && role.toUpperCase() === "ADMIN") return true;
+  const roles = source.roles;
+  return (
+    Array.isArray(roles) &&
+    roles.some((r) => typeof r === "string" && r.toUpperCase() === "ADMIN")
+  );
+}
+
+/**
+ * Whether the signed-in user is an admin, for toggling the admin entry point in
+ * the client nav. Only ever reveals the admin link to admins. A 403
+ * `MFA_ENROLLMENT_REQUIRED` (admin under enforcement, not yet enrolled) also
+ * counts as admin so the link stays reachable. Any other failure → not admin.
+ */
+export function useIsAdmin(): boolean {
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    let active = true;
+    apiFetch<unknown>(endpoints.auth.me)
+      .then((body) => {
+        if (active) setIsAdmin(bodyIsAdmin(body));
+      })
+      .catch((err) => {
+        if (active && err instanceof ApiError && err.code === MFA_ENROLLMENT_REQUIRED) {
+          setIsAdmin(true);
+        }
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+  return isAdmin;
 }

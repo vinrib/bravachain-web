@@ -204,5 +204,87 @@
       "fee": "Tarifa",
       "credited": "Creditado"
     }
+  },
+  "mfa": {
+    "title": "Verificação em duas etapas",
+    "subtitle": "Digite o código de 6 dígitos do seu aplicativo autenticador.",
+    "codeLabel": "Código de verificação",
+    "codePlaceholder": "000000",
+    "recoverySubtitle": "Digite um dos códigos de recuperação que você guardou.",
+    "recoveryLabel": "Código de recuperação",
+    "recoveryPlaceholder": "Código de recuperação",
+    "verify": "Verificar",
+    "verifying": "Verificando…",
+    "useRecovery": "Usar um código de recuperação",
+    "useCode": "Usar o código do aplicativo",
+    "backToLogin": "Voltar ao login",
+    "errorInvalid": "Código inválido. Verifique e tente novamente.",
+    "errorLocked": "Muitas tentativas. Tente novamente em {time}.",
+    "errorLockedNoTime": "Muitas tentativas. Tente novamente mais tarde.",
+    "errorExpired": "Sua verificação expirou. Entre novamente.",
+    "errorGeneric": "Não foi possível verificar agora. Tente novamente."
+  },
+  "admin": {
+    "sidebarLink": "Área administrativa",
+    "nav": {
+      "title": "Administração",
+      "clients": "Clientes em revisão",
+      "security": "Administradores e segurança",
+      "mfa": "Verificação em duas etapas",
+      "backToApp": "Voltar ao app"
+    },
+    "overview": {
+      "title": "Área administrativa",
+      "subtitle": "Gestão de compliance e segurança da Bravachain."
+    },
+    "construction": {
+      "badge": "Em construção",
+      "body": "Esta área ainda está sendo desenvolvida e estará disponível em breve."
+    },
+    "clients": {
+      "title": "Clientes em revisão",
+      "body": "A fila de revisão de compliance (KYB) chega em uma próxima entrega."
+    },
+    "security": {
+      "title": "Administradores e segurança",
+      "body": "A gestão de administradores chega em uma próxima entrega.",
+      "mfaCardTitle": "Verificação em duas etapas",
+      "mfaCardBody": "Proteja sua conta de administrador com um aplicativo autenticador.",
+      "mfaCardAction": "Ativar verificação"
+    },
+    "enroll": {
+      "title": "Ativar verificação em duas etapas",
+      "required": "Para acessar a área administrativa, ative a verificação em duas etapas.",
+      "stepOf": "Passo {current} de {total}",
+      "loading": "Preparando a ativação…",
+      "errorStart": "Não foi possível iniciar a ativação. Tente novamente.",
+      "errorConfirm": "Código inválido. Confira o código no aplicativo e tente novamente.",
+      "step1": {
+        "title": "Instale um aplicativo autenticador",
+        "body": "Use o Google Authenticator, 1Password, Authy ou similar. Escaneie o QR Code abaixo ou digite a chave manualmente.",
+        "qrAlt": "QR Code para o aplicativo autenticador",
+        "secretLabel": "Chave para digitação manual",
+        "copyKey": "Copiar chave",
+        "copied": "Copiado",
+        "continue": "Continuar"
+      },
+      "step2": {
+        "title": "Digite o primeiro código",
+        "body": "Digite o código de 6 dígitos que aparece no seu aplicativo autenticador.",
+        "codeLabel": "Código do aplicativo",
+        "confirm": "Confirmar",
+        "confirming": "Confirmando…",
+        "back": "Voltar"
+      },
+      "step3": {
+        "title": "Guarde seus códigos de recuperação",
+        "warning": "Estes 8 códigos aparecem uma única vez. Guarde-os em local seguro — cada um pode ser usado uma vez se você perder o acesso ao aplicativo.",
+        "copy": "Copiar códigos",
+        "copied": "Copiado",
+        "download": "Baixar",
+        "savedLabel": "Guardei meus códigos em local seguro",
+        "finish": "Concluir"
+      }
+    }
   }
 }

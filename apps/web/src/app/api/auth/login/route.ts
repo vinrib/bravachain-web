@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { backendLogin, extractTokens } from "@/lib/auth/backend";
 import { setSession } from "@/lib/auth/session";
 import { stripTokens } from "@/lib/auth/sanitize";
+import { extractMfaChallenge } from "@/lib/mfa/challenge";
 
 /**
  * BFF login. Accepts credentials, authenticates against the backend, and stores
@@ -21,6 +22,17 @@ export async function POST(request: Request) {
     const message =
       (body as { message?: string } | null)?.message ?? "Credenciais inválidas.";
     return NextResponse.json({ message }, { status: status || 401 });
+  }
+
+  // Two-step login: an ADMIN with MFA active gets a challenge instead of tokens.
+  // No cookies are set here; the client carries the `mfaToken` in memory and
+  // completes the login at /api/auth/mfa/verify.
+  const challenge = extractMfaChallenge(body);
+  if (challenge) {
+    return NextResponse.json(
+      { mfaRequired: true, mfaToken: challenge.mfaToken },
+      { status: 200 },
+    );
   }
 
   const tokens = extractTokens(body);
