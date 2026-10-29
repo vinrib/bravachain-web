@@ -10,14 +10,21 @@ import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/client-api";
 import { useAdminIdentity } from "@/lib/hooks";
 import { useDebounced } from "@/lib/admin/use-debounced";
-import { formatDateTimeBR } from "@/lib/admin/format";
+import { formatDateTimeBR, formatDateBR } from "@/lib/admin/format";
 import {
   listAdmins,
   searchUsers,
   changeRole,
   resetUserMfa,
 } from "@/lib/admin/users";
-import type { AdminUser, UserSearchResult } from "@/lib/admin/types";
+import { mfaStatus } from "@/lib/mfa/api";
+import {
+  MFA_RECOVERY_CODES_LOW,
+  MFA_RECOVERY_CODES_TOTAL,
+  type AdminUser,
+  type MfaStatus,
+  type UserSearchResult,
+} from "@/lib/admin/types";
 import { MFA_ENROLLMENT_PATH } from "@/lib/mfa/routes";
 import { ReasonModal } from "./reason-modal";
 import { RegenerateCodesModal } from "./regenerate-codes-modal";
@@ -32,6 +39,7 @@ export function AdminsSecurity() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [roleMgmtDisabled, setRoleMgmtDisabled] = useState(false);
+  const [myMfa, setMyMfa] = useState<MfaStatus | null>(null);
 
   const [resetTarget, setResetTarget] = useState<AdminUser | null>(null);
   const [demoteTarget, setDemoteTarget] = useState<AdminUser | null>(null);
@@ -52,12 +60,20 @@ export function AdminsSecurity() {
     }
   }, []);
 
+  const loadMfa = useCallback(async () => {
+    try {
+      setMyMfa(await mfaStatus());
+    } catch {
+      setMyMfa(null);
+    }
+  }, []);
+
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void load();
-  }, [load]);
+    void loadMfa();
+  }, [load, loadMfa]);
 
-  const myRow = admins.find((a) => a.userId === me.userId);
   const onlyOneAdmin = total <= 1;
 
   /** Shared 404 handling: the role route 404s when management is disabled. */
@@ -164,11 +180,15 @@ export function AdminsSecurity() {
             <div>
               <p className="font-semibold text-foreground">{t("myMfaTitle")}</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                {myRow?.mfaEnabled ? t("myMfaActive") : t("myMfaInactive")}
+                {myMfa?.enabled
+                  ? myMfa.enabledAt
+                    ? t("myMfaActiveAt", { date: formatDateBR(myMfa.enabledAt) })
+                    : t("myMfaActive")
+                  : t("myMfaInactive")}
               </p>
             </div>
           </div>
-          {myRow?.mfaEnabled ? (
+          {myMfa?.enabled ? (
             <Button type="button" size="md" variant="secondary" onClick={() => setRegenOpen(true)}>
               {t("regen.open")}
             </Button>
@@ -178,7 +198,21 @@ export function AdminsSecurity() {
             </Button>
           )}
         </div>
-        {myRow?.mfaEnabled && (
+        {myMfa?.enabled &&
+          myMfa.recoveryCodesRemaining !== null &&
+          myMfa.recoveryCodesRemaining <= MFA_RECOVERY_CODES_LOW && (
+            <p
+              role="alert"
+              className="mt-3 flex items-start gap-2 rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200"
+            >
+              <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
+              {t("recoveryLow", {
+                n: myMfa.recoveryCodesRemaining,
+                total: MFA_RECOVERY_CODES_TOTAL,
+              })}
+            </p>
+          )}
+        {myMfa?.enabled && (
           <p className="mt-3 text-xs text-muted-foreground">{t("regen.hint")}</p>
         )}
       </section>
@@ -242,7 +276,11 @@ export function AdminsSecurity() {
         }}
       />
 
-      <RegenerateCodesModal open={regenOpen} onOpenChange={setRegenOpen} />
+      <RegenerateCodesModal
+        open={regenOpen}
+        onOpenChange={setRegenOpen}
+        onDone={() => void loadMfa()}
+      />
     </div>
   );
 }

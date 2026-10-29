@@ -11,10 +11,12 @@ import type {
   ClientDetail,
   ClientListItem,
   ClientListResponse,
+  Company,
   Decision,
   GateDecision,
   KybDocument,
   Owner,
+  OwnerPayload,
   Review,
   ReviewStatus,
   RiskLevel,
@@ -112,23 +114,42 @@ function normalizeReview(raw: unknown): Review | null {
   };
 }
 
+function numOrStr(v: unknown): number | string | null {
+  return typeof v === "number" || typeof v === "string"
+    ? (v as number | string)
+    : null;
+}
+
 function normalizeOwner(raw: unknown): Owner {
   const r = asRecord(raw);
   return {
     id: str(r.id) ?? "",
     fullName: str(r.fullName) ?? "",
-    cpf: typeof r.cpf === "string" ? r.cpf : "",
-    ownershipPercent:
-      typeof r.ownershipPercent === "number" ||
-      typeof r.ownershipPercent === "string"
-        ? (r.ownershipPercent as number | string)
-        : null,
+    // The full CPF is never in the detail payload — only the server-masked form.
+    cpfMasked: str(r.cpfMasked) ?? "•••.•••.•••-••",
+    cpfRevealable: r.cpfRevealable !== false,
+    ownershipPercent: numOrStr(r.ownershipPercent),
     role: str(r.role),
     isPep: bool(r.isPep),
     pepRole: str(r.pepRole),
     pepEndedAt: str(r.pepEndedAt),
     relatedToPep: bool(r.relatedToPep),
     notes: str(r.notes),
+  };
+}
+
+function normalizeCompany(raw: unknown): Company | null {
+  if (!raw || typeof raw !== "object") return null;
+  const r = asRecord(raw);
+  return {
+    name: str(r.name),
+    cnpj: str(r.cnpj),
+    openingDate: str(r.openingDate),
+    cnae: str(r.cnae),
+    estimatedRevenue: numOrStr(r.estimatedRevenue),
+    mainBuyerCountry: str(r.mainBuyerCountry),
+    kybStatus: str(r.kybStatus),
+    kybSubmittedAt: str(r.kybSubmittedAt),
   };
 }
 
@@ -167,6 +188,7 @@ export function normalizeDetail(raw: unknown): ClientDetail {
     accountType: str(r.accountType),
     kybStatus: str(r.kybStatus),
     complianceGrandfathered: bool(r.complianceGrandfathered),
+    company: normalizeCompany(r.company),
     simulatedGateDecision: normalizeGate(r.simulatedGateDecision),
     review: normalizeReview(r.review),
     approvals: Array.isArray(r.approvals)
@@ -226,4 +248,96 @@ export async function setGrandfathered(
   // The PATCH returns a partial payload; re-read the full detail (never trust
   // optimistic state for exceptions).
   return getClient(userId);
+}
+
+/**
+ * Reveal one owner's full CPF via the audited route. Returns the raw digits —
+ * the caller keeps them in memory only, never persisting or logging them. The
+ * 20/min limit surfaces as an {@link ApiError} with status 429.
+ */
+export async function revealOwnerCpf(
+  userId: string,
+  ownerId: string,
+): Promise<string> {
+  const body = await apiFetch<unknown>(
+    endpoints.admin.complianceOwnerRevealCpf(userId, ownerId),
+    { method: "POST" },
+  );
+  const cpf = asRecord(body).cpf;
+  return typeof cpf === "string" ? cpf : "";
+}
+
+/**
+ * Request a short-lived signed URL for one KYB document. Returns the URL — the
+ * caller opens it and never stores or logs it.
+ */
+export async function accessDocument(
+  userId: string,
+  documentId: string,
+): Promise<string> {
+  const body = await apiFetch<unknown>(
+    endpoints.admin.complianceDocumentAccess(userId, documentId),
+    { method: "POST" },
+  );
+  const url = asRecord(body).url;
+  return typeof url === "string" ? url : "";
+}
+
+/** Serialize an owner payload, sending only the keys the reviewer actually set. */
+function ownerBody(payload: OwnerPayload): string {
+  const body: Record<string, unknown> = {
+    fullName: payload.fullName,
+    isPep: payload.isPep,
+    relatedToPep: payload.relatedToPep,
+  };
+  if (payload.cpf) body.cpf = payload.cpf;
+  if (payload.ownershipPercent !== undefined)
+    body.ownershipPercent = payload.ownershipPercent;
+  if (payload.role !== undefined) body.role = payload.role;
+  if (payload.pepRole !== undefined) body.pepRole = payload.pepRole;
+  if (payload.pepEndedAt !== undefined) body.pepEndedAt = payload.pepEndedAt;
+  if (payload.notes !== undefined) body.notes = payload.notes;
+  if (payload.reason) body.reason = payload.reason;
+  return JSON.stringify(body);
+}
+
+/** Add a beneficial owner. Returns the freshly-read detail (no optimistic state). */
+export async function addOwner(
+  userId: string,
+  payload: OwnerPayload,
+): Promise<ClientDetail> {
+  return normalizeDetail(
+    await apiFetch<unknown>(endpoints.admin.complianceOwnerCreate(userId), {
+      method: "POST",
+      body: ownerBody(payload),
+    }),
+  );
+}
+
+/** Edit a beneficial owner. Returns the freshly-read detail (no optimistic state). */
+export async function updateOwner(
+  userId: string,
+  ownerId: string,
+  payload: OwnerPayload,
+): Promise<ClientDetail> {
+  return normalizeDetail(
+    await apiFetch<unknown>(endpoints.admin.complianceOwner(userId, ownerId), {
+      method: "PATCH",
+      body: ownerBody(payload),
+    }),
+  );
+}
+
+/** Remove a beneficial owner (reason mandatory). Returns the freshly-read detail. */
+export async function removeOwner(
+  userId: string,
+  ownerId: string,
+  reason: string,
+): Promise<ClientDetail> {
+  return normalizeDetail(
+    await apiFetch<unknown>(endpoints.admin.complianceOwner(userId, ownerId), {
+      method: "DELETE",
+      body: JSON.stringify({ reason }),
+    }),
+  );
 }

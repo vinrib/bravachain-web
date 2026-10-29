@@ -46,6 +46,8 @@ export const endpoints = {
      * POST { mfaToken, code } | { mfaToken, recoveryCode } -> normal token pair
      */
     mfaVerify: "/v1/auth/mfa/verify",
+    /** GET (Bearer, ADMIN) -> { enabled, enabledAt, recoveryCodesRemaining } (own MFA) */
+    mfaStatus: "/v1/auth/mfa/status",
     /** POST (Bearer, ADMIN) -> { otpauthUri, qrDataUrl, secret } (enroll start) */
     mfaEnrollStart: "/v1/auth/mfa/enroll/start",
     /** POST (Bearer, ADMIN) { code } -> { recoveryCodes: string[] } (one time) */
@@ -65,9 +67,21 @@ export const endpoints = {
     /** PUT (UpsertReview) -> reopens review (IN_REVIEW) and clears approvals */
     complianceReview: (userId: string) =>
       `/v1/admin/compliance/clients/${userId}/review`,
-    /** PUT (ReplaceOwners) */
+    /** PUT (ReplaceOwners) — replaces the whole beneficial-owner list */
     complianceOwners: (userId: string) =>
       `/v1/admin/compliance/clients/${userId}/owners`,
+    /** POST (CreateOwner) -> full detail; reopens the review and clears approvals */
+    complianceOwnerCreate: (userId: string) =>
+      `/v1/admin/compliance/clients/${userId}/beneficial-owners`,
+    /** PATCH (UpdateOwner) / DELETE ({ reason }) -> full detail; reopens the review */
+    complianceOwner: (userId: string, ownerId: string) =>
+      `/v1/admin/compliance/clients/${userId}/beneficial-owners/${ownerId}`,
+    /** POST -> { cpf } (audited reveal; Cache-Control: no-store; 20/min per admin → 429) */
+    complianceOwnerRevealCpf: (userId: string, ownerId: string) =>
+      `/v1/admin/compliance/clients/${userId}/beneficial-owners/${ownerId}/reveal-cpf`,
+    /** POST -> { url, expiresAt } (audited short-lived signed URL; Cache-Control: no-store) */
+    complianceDocumentAccess: (userId: string, documentId: string) =>
+      `/v1/admin/compliance/clients/${userId}/documents/${documentId}/access`,
     /** PATCH { grandfathered, reason } -> { complianceGrandfathered, simulatedGateDecision } */
     complianceGrandfathered: (userId: string) =>
       `/v1/admin/compliance/clients/${userId}/grandfathered`,

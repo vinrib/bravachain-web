@@ -18,13 +18,16 @@ vi.mock("@/lib/admin/users", () => ({
   changeRole: vi.fn(),
   resetUserMfa: vi.fn(),
 }));
-vi.mock("@/lib/mfa/api", () => ({ mfaRegenerateRecoveryCodes: vi.fn() }));
+vi.mock("@/lib/mfa/api", () => ({
+  mfaRegenerateRecoveryCodes: vi.fn(),
+  mfaStatus: vi.fn(),
+}));
 
 let identity = { userId: "admin-1", isAdmin: true, loading: false };
 vi.mock("@/lib/hooks", () => ({ useAdminIdentity: () => identity }));
 
 import { listAdmins, searchUsers, changeRole, resetUserMfa } from "@/lib/admin/users";
-import { mfaRegenerateRecoveryCodes } from "@/lib/mfa/api";
+import { mfaRegenerateRecoveryCodes, mfaStatus } from "@/lib/mfa/api";
 import { AdminsSecurity } from "./admins-security";
 
 const ME: AdminUser = {
@@ -61,6 +64,13 @@ beforeEach(() => {
   vi.mocked(changeRole).mockReset();
   vi.mocked(resetUserMfa).mockReset();
   vi.mocked(mfaRegenerateRecoveryCodes).mockReset();
+  vi.mocked(mfaStatus).mockReset();
+  // Default: my own MFA is active with a full set of recovery codes.
+  vi.mocked(mfaStatus).mockResolvedValue({
+    enabled: true,
+    enabledAt: "2026-10-20T10:00:00Z",
+    recoveryCodesRemaining: 8,
+  });
 });
 afterEach(cleanup);
 
@@ -126,6 +136,30 @@ describe("AdminsSecurity", () => {
     await waitFor(() =>
       expect(resetUserMfa).toHaveBeenCalledWith("admin-2", "Perdeu o dispositivo."),
     );
+  });
+
+  it("shows the MFA enrollment date and a low-recovery-codes warning", async () => {
+    vi.mocked(listAdmins).mockResolvedValue({ items: [ME], page: 1, pageSize: 50, total: 1 });
+    vi.mocked(mfaStatus).mockResolvedValue({
+      enabled: true,
+      enabledAt: "2026-10-20T10:00:00Z",
+      recoveryCodesRemaining: 2,
+    });
+    renderScreen();
+    expect(await screen.findByText(/ativado em 20\/10\/2026/i)).toBeTruthy();
+    expect(await screen.findByText(/Restam 2 de 8 códigos de recuperação/i)).toBeTruthy();
+  });
+
+  it("offers activation when MFA is inactive", async () => {
+    vi.mocked(listAdmins).mockResolvedValue({ items: [ME], page: 1, pageSize: 50, total: 1 });
+    vi.mocked(mfaStatus).mockResolvedValue({
+      enabled: false,
+      enabledAt: null,
+      recoveryCodesRemaining: null,
+    });
+    renderScreen();
+    expect(await screen.findByRole("link", { name: "Ativar verificação" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Gerar novos códigos de recuperação" })).toBeNull();
   });
 
   it("regenerates my recovery codes and shows them once (never to storage)", async () => {

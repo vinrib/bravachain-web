@@ -15,9 +15,12 @@ import { mfaRegenerateRecoveryCodes } from "@/lib/mfa/api";
 export function RegenerateCodesModal({
   open,
   onOpenChange,
+  onDone,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Fires after a successful regeneration (recovery-code count reset to full). */
+  onDone?: () => void;
 }) {
   const t = useTranslations("admin.security.regen");
   const tc = useTranslations("admin.common");
@@ -49,6 +52,7 @@ export function RegenerateCodesModal({
       const { recoveryCodes } = await mfaRegenerateRecoveryCodes(code);
       setCode("");
       setCodes(recoveryCodes);
+      onDone?.();
     } catch {
       setError(true);
       setCode("");

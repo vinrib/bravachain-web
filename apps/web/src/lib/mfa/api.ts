@@ -11,6 +11,7 @@
  */
 import { endpoints, type MfaVerifyRequest } from "@bravachain/api-client";
 import { apiFetch } from "@/lib/client-api";
+import type { MfaStatus } from "@/lib/admin/types";
 import {
   normalizeEnrollStart,
   normalizeEnrollConfirm,
@@ -48,6 +49,25 @@ export async function mfaVerify(payload: MfaVerifyRequest): Promise<{ ok: true }
     );
   }
   return { ok: true };
+}
+
+/**
+ * Reads the admin's own MFA status. Defensive about the shape so a missing
+ * field never throws; `recoveryCodesRemaining` stays null when absent.
+ */
+export async function mfaStatus(): Promise<MfaStatus> {
+  const body = (await apiFetch<unknown>(endpoints.auth.mfaStatus)) as
+    | Record<string, unknown>
+    | null;
+  const r = body && typeof body === "object" ? body : {};
+  const remaining = (r as Record<string, unknown>).recoveryCodesRemaining;
+  const enabledAt = (r as Record<string, unknown>).enabledAt;
+  return {
+    enabled: (r as Record<string, unknown>).enabled === true,
+    enabledAt: typeof enabledAt === "string" && enabledAt.length > 0 ? enabledAt : null,
+    recoveryCodesRemaining:
+      typeof remaining === "number" && Number.isFinite(remaining) ? remaining : null,
+  };
 }
 
 /** Starts enrollment; returns the provisioning material (QR, secret, uri). */

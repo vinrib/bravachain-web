@@ -16,13 +16,22 @@ export function formatCpf(cpf: string | null | undefined): string {
 }
 
 /**
- * Masked CPF for display before reveal: shows only the last two digits, the rest
- * as bullets (e.g. "•••.•••.•••-01"). Never exposes the full number.
+ * Structural CPF validity (Receita Federal mod-11), mirroring the backend
+ * `isValidCpf` so the owner form can reject bad input before calling the API.
+ * Pure check — no external list. Rejects the all-same-digit runs.
  */
-export function maskCpf(cpf: string | null | undefined): string {
+export function isValidCpf(cpf: string | null | undefined): boolean {
   const d = digitsOnly(cpf);
-  if (d.length !== 11) return "•••.•••.•••-••";
-  return `•••.•••.•••-${d.slice(9)}`;
+  if (d.length !== 11) return false;
+  if (/^(\d)\1{10}$/.test(d)) return false;
+  for (let check = 9; check < 11; check++) {
+    let sum = 0;
+    for (let i = 0; i < check; i++) sum += Number(d[i]) * (check + 1 - i);
+    let verifier = (sum * 10) % 11;
+    if (verifier === 10) verifier = 0;
+    if (verifier !== Number(d[check])) return false;
+  }
+  return true;
 }
 
 /** Formats a 14-digit CNPJ as 00.000.000/0001-00; returns input if already formatted. */
