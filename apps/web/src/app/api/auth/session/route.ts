@@ -4,7 +4,7 @@ import {
   getAccessToken,
   getRefreshToken,
 } from "@/lib/auth/session";
-import { decodeJwt } from "@/lib/auth/jwt";
+import { identityFromToken } from "@/lib/auth/role";
 
 /**
  * Lightweight session probe for client components. Returns whether a session
@@ -16,12 +16,10 @@ import { decodeJwt } from "@/lib/auth/jwt";
 export async function GET() {
   const authenticated = await hasSession();
   const token = (await getAccessToken()) ?? (await getRefreshToken());
-  const claims = token ? decodeJwt(token) : null;
-  const role = typeof claims?.role === "string" ? claims.role.toUpperCase() : null;
-  const userId = typeof claims?.sub === "string" ? claims.sub : null;
+  const identity = identityFromToken(token);
   return NextResponse.json({
     authenticated,
-    isAdmin: authenticated && role === "ADMIN",
-    userId: authenticated ? userId : null,
+    isAdmin: authenticated && (identity?.isAdmin ?? false),
+    userId: authenticated ? (identity?.userId ?? null) : null,
   });
 }

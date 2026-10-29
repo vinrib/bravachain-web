@@ -2,7 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { redirect } from "next/navigation";
 import { getAccessToken, getRefreshToken } from "./session";
-import { decodeJwt } from "./jwt";
+import { identityFromToken } from "./role";
 
 /**
  * Server-side gate for the admin area.
@@ -21,24 +21,12 @@ import { decodeJwt } from "./jwt";
  * in `client-api.ts` when an admin data call returns it.
  */
 
-export interface AdminContext {
-  userId: string | null;
-  isAdmin: boolean;
-}
-
-function readIdentity(token: string | undefined): AdminContext | null {
-  if (!token) return null;
-  const claims = decodeJwt(token);
-  if (!claims) return null;
-  const role = typeof claims.role === "string" ? claims.role.toUpperCase() : null;
-  const userId = typeof claims.sub === "string" ? claims.sub : null;
-  return { userId, isAdmin: role === "ADMIN" };
-}
+export type AdminContext = { userId: string | null; isAdmin: boolean };
 
 /** Loads the admin identity once per request (memoized), or null when signed out. */
 export const loadAdminContext = cache(async (): Promise<AdminContext | null> => {
   const token = (await getAccessToken()) ?? (await getRefreshToken());
-  return readIdentity(token);
+  return identityFromToken(token);
 });
 
 /**

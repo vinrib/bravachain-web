@@ -66,3 +66,15 @@ export async function mfaEnrollConfirm(code: string): Promise<EnrollConfirm> {
   });
   return normalizeEnrollConfirm(body);
 }
+
+/**
+ * Regenerates the recovery codes (requires a fresh TOTP code); the old set stops
+ * working. Returns the new codes — shown once, never stored or logged.
+ */
+export async function mfaRegenerateRecoveryCodes(code: string): Promise<EnrollConfirm> {
+  const body = await apiFetch<unknown>(endpoints.auth.mfaRegenerate, {
+    method: "POST",
+    body: JSON.stringify({ code }),
+  });
+  return normalizeEnrollConfirm(body);
+}
