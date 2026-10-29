@@ -44,12 +44,7 @@ export async function mfaVerify(payload: MfaVerifyRequest): Promise<{ ok: true }
       | { message?: string; code?: string }
       | null;
     throw new MfaVerifyFailure(
-      mapMfaVerifyError({
-        status: res.status,
-        code: body?.code ?? null,
-        retryAfterHeader: res.headers.get("Retry-After"),
-        body,
-      }),
+      mapMfaVerifyError({ status: res.status, code: body?.code ?? null }),
     );
   }
   return { ok: true };
@@ -66,6 +61,18 @@ export async function mfaEnrollStart(): Promise<EnrollStart> {
 /** Confirms the first TOTP code; returns the one-time recovery codes. */
 export async function mfaEnrollConfirm(code: string): Promise<EnrollConfirm> {
   const body = await apiFetch<unknown>(endpoints.auth.mfaEnrollConfirm, {
+    method: "POST",
+    body: JSON.stringify({ code }),
+  });
+  return normalizeEnrollConfirm(body);
+}
+
+/**
+ * Regenerates the recovery codes (requires a fresh TOTP code); the old set stops
+ * working. Returns the new codes — shown once, never stored or logged.
+ */
+export async function mfaRegenerateRecoveryCodes(code: string): Promise<EnrollConfirm> {
+  const body = await apiFetch<unknown>(endpoints.auth.mfaRegenerate, {
     method: "POST",
     body: JSON.stringify({ code }),
   });

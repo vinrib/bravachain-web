@@ -50,6 +50,38 @@ export const endpoints = {
     mfaEnrollStart: "/v1/auth/mfa/enroll/start",
     /** POST (Bearer, ADMIN) { code } -> { recoveryCodes: string[] } (one time) */
     mfaEnrollConfirm: "/v1/auth/mfa/enroll/confirm",
+    /** POST (Bearer, ADMIN) { code } -> { recoveryCodes } — new set, invalidates old */
+    mfaRegenerate: "/v1/auth/mfa/recovery-codes/regenerate",
+  },
+  /**
+   * ADMIN-only area (compliance review #82, admin controls #83, listings PR C).
+   * All require Bearer + ADMIN on the backend; the web gates by role too.
+   */
+  admin: {
+    /** GET ?q&reviewStatus&risk&pep&grandfathered&page&pageSize -> { items, page, pageSize, total } */
+    complianceClients: "/v1/admin/compliance/clients",
+    /** GET -> full review (owners w/ CPF, approvals, documents, simulatedGateDecision) */
+    complianceClient: (userId: string) => `/v1/admin/compliance/clients/${userId}`,
+    /** PUT (UpsertReview) -> reopens review (IN_REVIEW) and clears approvals */
+    complianceReview: (userId: string) =>
+      `/v1/admin/compliance/clients/${userId}/review`,
+    /** PUT (ReplaceOwners) */
+    complianceOwners: (userId: string) =>
+      `/v1/admin/compliance/clients/${userId}/owners`,
+    /** PATCH { grandfathered, reason } -> { complianceGrandfathered, simulatedGateDecision } */
+    complianceGrandfathered: (userId: string) =>
+      `/v1/admin/compliance/clients/${userId}/grandfathered`,
+    /** POST { decision: APPROVE|REJECT, note? } -> full review (HIGH needs 2 admins) */
+    complianceDecision: (userId: string) =>
+      `/v1/admin/compliance/clients/${userId}/decision`,
+    /** GET ?role=ADMIN&page&pageSize -> { items, page, pageSize, total } */
+    users: "/v1/admin/users",
+    /** GET ?email= (min 3) -> { items } (max 5) */
+    usersSearch: "/v1/admin/users/search",
+    /** POST { role: USER|ADMIN, reason } — 404 when ADMIN_ROLE_MANAGEMENT_ENABLED off */
+    userRole: (userId: string) => `/v1/admin/users/${userId}/role`,
+    /** POST { reason } — reset another admin's MFA */
+    userMfaReset: (userId: string) => `/v1/admin/users/${userId}/mfa/reset`,
   },
   kyc: {
     /** GET -> { ready, localKycStatus, identityStatus?, ... } */

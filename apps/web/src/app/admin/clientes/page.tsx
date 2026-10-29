@@ -1,7 +1,7 @@
-import { requireAdminEnrolled } from "@/lib/auth/require-admin";
-import { AdminConstruction } from "@/components/admin/admin-construction";
+import { requireAdmin } from "@/lib/auth/require-admin";
+import { ClientsList } from "@/components/admin/clients-list";
 
 export default async function AdminClientsPage() {
-  await requireAdminEnrolled("/admin/clientes");
-  return <AdminConstruction section="clients" />;
+  await requireAdmin("/admin/clientes");
+  return <ClientsList />;
 }

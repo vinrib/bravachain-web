@@ -1,80 +1,37 @@
 import "server-only";
 import { cache } from "react";
 import { redirect } from "next/navigation";
-import { MFA_ENROLLMENT_REQUIRED } from "@bravachain/api-client";
-import { getAccessToken, clearSession } from "./session";
-import { backendMe } from "./backend";
-import { MFA_ENROLLMENT_PATH } from "@/lib/mfa/routes";
+import { getAccessToken, getRefreshToken } from "./session";
+import { identityFromToken } from "./role";
 
 /**
  * Server-side gate for the admin area.
  *
- * Admin-ness is decided by the backend `/auth/me` role. Because MFA enforcement
- * (`MFA_ADMIN_ENFORCED`) targets admins, a 403 `MFA_ENROLLMENT_REQUIRED` from
- * `/auth/me` is itself proof the account is an admin that simply hasn't enrolled
- * yet — we let those through so they can reach the activation wizard.
+ * Admin-ness is read from the `role` claim in the session JWT. `GET /auth/me`
+ * intentionally does NOT return the role (confirmed against the backend source),
+ * so decoding the token is the only server-side way to know it. We prefer the
+ * access token and fall back to the refresh token (same `role`/`sub` claims)
+ * because the access cookie expires with the short-lived access token while the
+ * refresh cookie outlives it — without the fallback an admin would be bounced to
+ * login a few minutes after signing in.
  *
- * The role is read defensively (role string / roles array / isAdmin) because the
- * real `/auth/me` schema could not be inspected against the live OpenAPI.
+ * This is a UI gate only: the token signature is NOT verified here. Real
+ * authorization is enforced by the backend on every proxied admin call, and MFA
+ * enrollment is enforced centrally by the `MFA_ENROLLMENT_REQUIRED` interceptor
+ * in `client-api.ts` when an admin data call returns it.
  */
 
-export interface AdminContext {
-  /** True when the account is an admin (enrolled, or admin-under-enforcement). */
-  isAdmin: boolean;
-  /** True when the admin must activate MFA before using the rest of the area. */
-  enrollmentRequired: boolean;
-  /** Raw `/auth/me` body when available (never contains tokens). */
-  user: unknown;
-}
+export type AdminContext = { userId: string | null; isAdmin: boolean };
 
-function isAdminRole(body: unknown): boolean {
-  if (!body || typeof body !== "object") return false;
-  const record = body as Record<string, unknown>;
-  const source =
-    (record.user as Record<string, unknown> | undefined) ??
-    (record.data as Record<string, unknown> | undefined) ??
-    record;
-
-  if (source.isAdmin === true) return true;
-  const role = source.role;
-  if (typeof role === "string" && role.toUpperCase() === "ADMIN") return true;
-  const roles = source.roles;
-  if (Array.isArray(roles)) {
-    return roles.some((r) => typeof r === "string" && r.toUpperCase() === "ADMIN");
-  }
-  return false;
-}
-
-/**
- * Loads the admin context once per request (memoized), or `null` when there is
- * no session at all. Shared by the layout and the pages so `/auth/me` is hit
- * only once even though several server components gate on it.
- */
+/** Loads the admin identity once per request (memoized), or null when signed out. */
 export const loadAdminContext = cache(async (): Promise<AdminContext | null> => {
-  const accessToken = await getAccessToken();
-  if (!accessToken) return null;
-
-  const { ok, status, body } = await backendMe(accessToken);
-
-  if (ok) {
-    return { isAdmin: isAdminRole(body), enrollmentRequired: false, user: body };
-  }
-
-  const code = (body as { code?: string } | null)?.code;
-  if (status === 403 && code === MFA_ENROLLMENT_REQUIRED) {
-    // Admin under enforcement who hasn't enrolled yet.
-    return { isAdmin: true, enrollmentRequired: true, user: null };
-  }
-
-  if (status === 401) {
-    await clearSession();
-  }
-  return { isAdmin: false, enrollmentRequired: false, user: null };
+  const token = (await getAccessToken()) ?? (await getRefreshToken());
+  return identityFromToken(token);
 });
 
 /**
- * Gates the admin area. Redirects anonymous users to login and non-admins to
- * the dashboard. Admins (including those who still need to enroll) pass through.
+ * Gates the admin area. Redirects anonymous users to login and non-admins to the
+ * dashboard. Returns the admin identity (including `userId`) for admins.
  */
 export async function requireAdmin(nextPath = "/admin"): Promise<AdminContext> {
   const ctx = await loadAdminContext();
@@ -84,11 +41,8 @@ export async function requireAdmin(nextPath = "/admin"): Promise<AdminContext> {
 }
 
 /**
- * For admin pages other than the wizard: ensures the admin has finished MFA
- * enrollment, redirecting to the activation wizard when enforcement requires it.
+ * Alias kept for the page gates. MFA enrollment is no longer pre-checked here
+ * (the backend `/auth/me` can't report it): an unenrolled admin is caught by the
+ * central interceptor the first time a page makes an admin data call.
  */
-export async function requireAdminEnrolled(nextPath = "/admin"): Promise<AdminContext> {
-  const ctx = await requireAdmin(nextPath);
-  if (ctx.enrollmentRequired) redirect(`${MFA_ENROLLMENT_PATH}?required=1`);
-  return ctx;
-}
+export const requireAdminEnrolled = requireAdmin;

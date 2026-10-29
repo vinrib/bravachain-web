@@ -9,10 +9,10 @@ import { stripTokens } from "@/lib/auth/sanitize";
  * stores the returned tokens in httpOnly cookies — the same session path as
  * login. No token is ever returned to the client.
  *
- * Errors are forwarded with the backend `status`, a neutral `message`, and the
- * machine `code` (plus `Retry-After` when present) so the client can tell apart
- * invalid / locked / expired without this route revealing which factor failed.
- * The challenge token and factor are never logged.
+ * Errors are forwarded with the backend `status` and its neutral `message`. The
+ * backend intentionally returns one opaque failure for every bad/expired/locked
+ * factor, so there is nothing more to classify here. The challenge token and the
+ * factor are never logged.
  */
 export async function POST(request: Request) {
   let payload: unknown;
@@ -26,18 +26,9 @@ export async function POST(request: Request) {
 
   if (!ok) {
     const parsed = body as { message?: string; code?: string } | null;
-    const headers = new Headers();
-    // Preserve a lock countdown if the backend sent one on the body (the raw
-    // fetch here can't read upstream headers, so callers also read the body).
-    const retryAfter =
-      (body as { retryAfter?: unknown } | null)?.retryAfter ??
-      (body as { retryAfterSeconds?: unknown } | null)?.retryAfterSeconds;
-    if (typeof retryAfter === "number" || typeof retryAfter === "string") {
-      headers.set("Retry-After", String(retryAfter));
-    }
     return NextResponse.json(
       { message: parsed?.message ?? "Não foi possível verificar.", code: parsed?.code },
-      { status: status || 401, headers },
+      { status: status || 401 },
     );
   }
 
