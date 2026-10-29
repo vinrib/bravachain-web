@@ -7,11 +7,9 @@ import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Spinner } from "@/components/ui/spinner";
 import { listClients, type ListClientsParams } from "@/lib/admin/compliance";
-import { rememberClientIdentity } from "@/lib/admin/handoff";
 import { useDebounced } from "@/lib/admin/use-debounced";
 import { formatCnpj, formatDateTimeBR } from "@/lib/admin/format";
 import type {
-  ClientListItem,
   ClientListResponse,
   ReviewStatus,
   RiskLevel,
@@ -89,13 +87,6 @@ export function ClientsList() {
 
   const totalPages = data ? Math.max(1, Math.ceil(data.total / data.pageSize)) : 1;
   const hasRows = !!data && data.items.length > 0;
-
-  function openClient(row: ClientListItem) {
-    rememberClientIdentity(row.userId, {
-      companyName: row.companyName,
-      companyCnpj: row.companyCnpj,
-    });
-  }
 
   return (
     <div className="mx-auto max-w-6xl space-y-5">
@@ -233,7 +224,6 @@ export function ClientsList() {
                   key={row.userId}
                   role="row"
                   href={`/admin/clientes/${row.userId}`}
-                  onClick={() => openClient(row)}
                   aria-label={t("openReview", { name: row.companyName ?? row.userId })}
                   className={cn(
                     GRID,
@@ -274,7 +264,6 @@ export function ClientsList() {
                 <li key={row.userId}>
                   <Link
                     href={`/admin/clientes/${row.userId}`}
-                    onClick={() => openClient(row)}
                     aria-label={t("openReview", { name: row.companyName ?? row.userId })}
                     className="flex flex-col gap-2 p-4 transition-colors hover:bg-muted/60 focus:bg-muted/60 focus:outline-none"
                   >

@@ -310,13 +310,53 @@
         "cnae": "CNAE",
         "openedAt": "Incorporation date",
         "mainBuyerCountry": "Main buyer country",
-        "estimatedRevenue": "Estimated revenue"
+        "estimatedRevenue": "Estimated revenue",
+        "kybStatus": "KYB status"
       },
       "owners": {
         "title": "Owners and beneficial owners",
         "empty": "No owners registered.",
+        "add": "Add owner",
+        "edit": "Edit owner",
+        "remove": "Remove owner",
         "reveal": "Reveal",
-        "cpfNote": "CPFs stay masked. After revealing, the CPF re-masks in 30 seconds."
+        "revealConfirm": "Reveal CPF",
+        "revealWarning": "This lookup will be recorded in the audit log.",
+        "revealError": "Could not reveal the CPF. Please try again.",
+        "revealRateLimited": "Too many reveals in a short time. Wait a minute and try again.",
+        "cpfNote": "CPFs stay masked. Revealing records the lookup in the audit log; the CPF re-masks after 30 seconds.",
+        "removeTitle": "Remove {name}",
+        "removeBody": "The owner is removed from the record. This action is recorded in the audit log.",
+        "removeReasonLabel": "Reason",
+        "reopenWarning": "Changing owners reopens the review and clears recorded approvals.",
+        "errors": {
+          "OWNERSHIP_SUM_EXCEEDED": "Total ownership across owners cannot exceed 100%.",
+          "PEP_POSITION_REQUIRED": "Enter the PEP position.",
+          "RISK_FLOOR_VIOLATION": "A PEP or PEP-related owner requires High risk. Raise the review risk first.",
+          "REASON_REQUIRED": "Enter a reason when changing the PEP field.",
+          "generic": "Could not save the owner. Please try again."
+        },
+        "modal": {
+          "createTitle": "Add owner",
+          "editTitle": "Edit owner",
+          "subtitle": "Owner or beneficial owner details.",
+          "fullName": "Full name",
+          "cpf": "CPF",
+          "cpfEditHint": "Leave blank to keep the current CPF.",
+          "cpfInvalid": "Invalid CPF. Check the digits.",
+          "ownership": "Ownership (%)",
+          "role": "Role",
+          "isPep": "Is a PEP (politically exposed person)",
+          "relatedToPep": "Family member or associate of a PEP",
+          "pepRole": "PEP position",
+          "pepRoleRequired": "Enter the PEP position.",
+          "pepEndedAt": "Term end (optional)",
+          "reason": "Reason",
+          "reasonPepHint": "Changing the PEP field requires a reason (3 to 500 characters).",
+          "reasonRequired": "Enter a reason (3 to 500 characters).",
+          "required": "This field is required.",
+          "save": "Save"
+        }
       },
       "diligence": {
         "title": "Due diligence",
@@ -334,7 +374,21 @@
       "documents": {
         "title": "Documents",
         "empty": "No documents uploaded.",
-        "unavailable": "Opening documents is not available yet in this version."
+        "open": "Open",
+        "pending": "Pending",
+        "sentAt": "Uploaded on {date}",
+        "accessNote": "Document access is recorded in the audit log.",
+        "openError": "Could not open the document. Please try again.",
+        "types": {
+          "CONTRATO_SOCIAL": "Articles of association",
+          "CARTAO_CNPJ": "CNPJ card",
+          "DOCUMENTO_SOCIO": "Owner ID document",
+          "COMPROVANTE_ENDERECO": "Proof of address",
+          "FATURAMENTO": "Revenue statement",
+          "DECLARACAO_PEP": "PEP declaration",
+          "ORIGEM_RECURSOS": "Source of funds",
+          "DEMONSTRACOES_FINANCEIRAS": "Financial statements"
+        }
       },
       "approvals": {
         "title": "Approvals",
@@ -406,8 +460,10 @@
       "roleTakesEffectNote": "A role change takes effect on the person's next login.",
       "auditNote": "Promote, demote and MFA reset require a reason and are recorded in the audit log.",
       "myMfaTitle": "My two-step verification",
-      "myMfaActive": "Authenticator app active.",
+      "myMfaActive": "Authenticator app · active.",
+      "myMfaActiveAt": "Authenticator app · active since {date}.",
       "myMfaInactive": "Two-step verification not activated yet.",
+      "recoveryLow": "{n} of {total} recovery codes left. Generate new ones before they run out.",
       "activate": "Activate verification",
       "reasonLabel": "Reason",
       "resetMfaTitle": "Reset MFA for {name}",

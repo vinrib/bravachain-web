@@ -11,17 +11,29 @@ import {
   CheckCircle2,
   XCircle,
   FileText,
+  Plus,
+  Pencil,
+  Trash2,
+  ExternalLink,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/client-api";
-import { getClient, saveReview, decide, setGrandfathered } from "@/lib/admin/compliance";
-import { recallClientIdentity, type ClientIdentity } from "@/lib/admin/handoff";
+import {
+  getClient,
+  saveReview,
+  decide,
+  setGrandfathered,
+  revealOwnerCpf,
+  removeOwner,
+  accessDocument,
+} from "@/lib/admin/compliance";
 import { useAdminIdentity } from "@/lib/hooks";
-import { formatCnpj, formatCpf, maskCpf, formatDateTimeBR } from "@/lib/admin/format";
+import { formatCnpj, formatCpf, formatDateTimeBR, formatDateBR, formatBrl } from "@/lib/admin/format";
 import type {
   ClientDetail,
+  Company,
   Decision,
   GateDecision,
   Owner,
@@ -30,9 +42,21 @@ import type {
 } from "@/lib/admin/types";
 import { ReviewStatusChip, RiskChip, PepTag, ExceptionTag } from "./badges";
 import { ReasonModal } from "./reason-modal";
+import { OwnerModal } from "./owner-modal";
 
 const RISK_OPTIONS: RiskLevel[] = ["LOW", "MEDIUM", "HIGH"];
 const CPF_REVEAL_MS = 30_000;
+/** KYB document types (the backend enum, in display order). */
+const DOC_TYPES = [
+  "CONTRATO_SOCIAL",
+  "CARTAO_CNPJ",
+  "DOCUMENTO_SOCIO",
+  "COMPROVANTE_ENDERECO",
+  "FATURAMENTO",
+  "DECLARACAO_PEP",
+  "ORIGEM_RECURSOS",
+  "DEMONSTRACOES_FINANCEIRAS",
+] as const;
 /** Known business errors whose backend message (pt-BR) is safe to show verbatim. */
 const BUSINESS_CODES = new Set(["RISK_FLOOR_VIOLATION", "RISK_LEVEL_REQUIRED"]);
 
@@ -41,7 +65,6 @@ export function ClientReview({ userId }: { userId: string }) {
   const tc = useTranslations("admin.common");
 
   const me = useAdminIdentity();
-  const identity = recallClientIdentity(userId);
 
   const [detail, setDetail] = useState<ClientDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -87,6 +110,7 @@ export function ClientReview({ userId }: { userId: string }) {
   }
 
   const review = detail.review;
+  const company = detail.company;
   const isSelf = !!me.userId && me.userId === detail.userId;
   const alreadyDecided =
     !!me.userId && detail.approvals.some((a) => a.approverUserId === me.userId);
@@ -98,10 +122,10 @@ export function ClientReview({ userId }: { userId: string }) {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
           <h1 className="font-serif text-[26px] font-bold text-foreground">
-            {identity?.companyName ?? "—"}
+            {company?.name ?? "—"}
           </h1>
           <p className="mt-1 font-mono text-sm text-muted-foreground">
-            {t("cnpj")} {formatCnpj(identity?.companyCnpj) || "—"}
+            {t("cnpj")} {formatCnpj(company?.cnpj) || "—"}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -122,8 +146,16 @@ export function ClientReview({ userId }: { userId: string }) {
         </div>
       )}
 
-      <CompanyData identity={identity} />
-      <OwnersSection owners={detail.owners} />
+      <CompanyData company={company} />
+      <OwnersSection
+        userId={detail.userId}
+        owners={detail.owners}
+        approvalsExist={detail.approvals.length > 0}
+        onChanged={(d) => {
+          setDetail(d);
+          setReopened(true);
+        }}
+      />
       <DiligenceForm
         key={`${review?.status}-${review?.riskLevel}`}
         detail={detail}
@@ -132,7 +164,7 @@ export function ClientReview({ userId }: { userId: string }) {
           setReopened(true);
         }}
       />
-      <DocumentsSection documents={detail.documents} />
+      <DocumentsSection userId={detail.userId} documents={detail.documents} />
       <ApprovalsSection
         detail={detail}
         isSelf={isSelf}
@@ -226,18 +258,19 @@ function YesNo({ value, onChange }: { value: boolean | null; onChange: (v: boole
   );
 }
 
-// ─── Company data (mostly a gap: the detail endpoint returns no company fields) ──
+// ─── Company data (read straight from the detail; survives reload / deep link) ──
 
-function CompanyData({ identity }: { identity: ClientIdentity | null }) {
+function CompanyData({ company }: { company: Company | null }) {
   const t = useTranslations("admin.review");
+  const dash = (v: string | null | undefined) => (v && v.length > 0 ? v : "—");
   const rows: Array<[string, string]> = [
-    [t("company.legalName"), identity?.companyName ?? "—"],
-    [t("company.cnpj"), formatCnpj(identity?.companyCnpj) || "—"],
-    // Not returned by the API — shown as "—" rather than invented.
-    [t("company.cnae"), "—"],
-    [t("company.openedAt"), "—"],
-    [t("company.mainBuyerCountry"), "—"],
-    [t("company.estimatedRevenue"), "—"],
+    [t("company.legalName"), dash(company?.name)],
+    [t("company.cnpj"), formatCnpj(company?.cnpj) || "—"],
+    [t("company.cnae"), dash(company?.cnae)],
+    [t("company.openedAt"), formatDateBR(company?.openingDate) || "—"],
+    [t("company.mainBuyerCountry"), dash(company?.mainBuyerCountry)],
+    [t("company.estimatedRevenue"), formatBrl(company?.estimatedRevenue) || "—"],
+    [t("company.kybStatus"), dash(company?.kybStatus)],
   ];
   return (
     <Section title={t("company.title")}>
@@ -253,10 +286,24 @@ function CompanyData({ identity }: { identity: ClientIdentity | null }) {
   );
 }
 
-// ─── Owners (CPF masked; reveal is client-side only — no reveal endpoint) ──────
+// ─── Owners (CPF masked server-side; reveal is audited, in memory only) ─────────
 
-function OwnersSection({ owners }: { owners: Owner[] }) {
+function OwnersSection({
+  userId,
+  owners,
+  approvalsExist,
+  onChanged,
+}: {
+  userId: string;
+  owners: Owner[];
+  approvalsExist: boolean;
+  onChanged: (detail: ClientDetail) => void;
+}) {
   const t = useTranslations("admin.review");
+  // `undefined` closed, `null` = create, an Owner = edit that owner.
+  const [modalOwner, setModalOwner] = useState<Owner | null | undefined>(undefined);
+  const [removeTarget, setRemoveTarget] = useState<Owner | null>(null);
+
   return (
     <Section title={t("owners.title")}>
       {owners.length === 0 ? (
@@ -264,63 +311,193 @@ function OwnersSection({ owners }: { owners: Owner[] }) {
       ) : (
         <ul className="flex flex-col divide-y divide-border">
           {owners.map((o) => (
-            <OwnerRow key={o.id} owner={o} />
+            <OwnerRow
+              key={o.id}
+              userId={userId}
+              owner={o}
+              onEdit={() => setModalOwner(o)}
+              onRemove={() => setRemoveTarget(o)}
+            />
           ))}
         </ul>
       )}
+
+      <div className="mt-4">
+        <Button type="button" size="sm" variant="secondary" onClick={() => setModalOwner(null)}>
+          <Plus className="h-4 w-4" />
+          {t("owners.add")}
+        </Button>
+      </div>
+
       <p className="mt-3 flex items-start gap-2 text-xs text-muted-foreground">
         <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
         {t("owners.cpfNote")}
       </p>
+
+      <OwnerModal
+        open={modalOwner !== undefined}
+        onOpenChange={(o) => !o && setModalOwner(undefined)}
+        userId={userId}
+        owner={modalOwner}
+        approvalsExist={approvalsExist}
+        onSaved={onChanged}
+      />
+
+      <ReasonModal
+        open={removeTarget !== null}
+        onOpenChange={(o) => !o && setRemoveTarget(null)}
+        title={t("owners.removeTitle", { name: removeTarget?.fullName ?? "" })}
+        description={approvalsExist ? t("owners.reopenWarning") : t("owners.removeBody")}
+        reasonLabel={t("owners.removeReasonLabel")}
+        confirmLabel={t("owners.remove")}
+        destructive
+        onConfirm={async (reason) => {
+          if (!removeTarget) return;
+          onChanged(await removeOwner(userId, removeTarget.id, reason));
+          setRemoveTarget(null);
+        }}
+      />
     </Section>
   );
 }
 
-function OwnerRow({ owner }: { owner: Owner }) {
+function OwnerRow({
+  userId,
+  owner,
+  onEdit,
+  onRemove,
+}: {
+  userId: string;
+  owner: Owner;
+  onEdit: () => void;
+  onRemove: () => void;
+}) {
   const t = useTranslations("admin.review");
   const tc = useTranslations("admin.common");
-  const [revealed, setRevealed] = useState(false);
+
+  type Phase = "masked" | "confirming" | "revealing" | "revealed";
+  const [phase, setPhase] = useState<Phase>("masked");
+  // The full CPF lives ONLY here, in memory — never storage, URL, log or state tree.
+  const [cpf, setCpf] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Scrub the auto-remask timer on unmount (leaving the screen re-masks the CPF).
+  function remask() {
+    if (timer.current) clearTimeout(timer.current);
+    setCpf(null);
+    setPhase("masked");
+    setError(null);
+  }
+
+  // Leaving the screen (or re-render teardown) scrubs the CPF and its timer.
   useEffect(() => {
     return () => {
       if (timer.current) clearTimeout(timer.current);
     };
   }, []);
 
-  function toggle() {
-    if (timer.current) clearTimeout(timer.current);
-    if (revealed) {
-      setRevealed(false);
-      return;
+  async function confirmReveal() {
+    setPhase("revealing");
+    setError(null);
+    try {
+      const value = await revealOwnerCpf(userId, owner.id);
+      setCpf(value);
+      setPhase("revealed");
+      timer.current = setTimeout(remask, CPF_REVEAL_MS);
+    } catch (err) {
+      setPhase("confirming");
+      setError(
+        err instanceof ApiError && err.status === 429
+          ? t("owners.revealRateLimited")
+          : t("owners.revealError"),
+      );
     }
-    setRevealed(true);
-    timer.current = setTimeout(() => setRevealed(false), CPF_REVEAL_MS);
   }
 
   return (
-    <li className="flex flex-wrap items-center gap-x-4 gap-y-1 py-3">
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-foreground">{owner.fullName}</p>
-        <p className="font-mono text-xs text-muted-foreground">
-          {revealed ? formatCpf(owner.cpf) : maskCpf(owner.cpf)}
-        </p>
+    <li className="flex flex-col gap-2 py-3">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold text-foreground">{owner.fullName}</p>
+          <p className="font-mono text-xs text-muted-foreground">
+            {phase === "revealed" && cpf ? formatCpf(cpf) : owner.cpfMasked}
+          </p>
+        </div>
+        {owner.ownershipPercent != null && (
+          <span className="text-xs text-muted-foreground">{owner.ownershipPercent}%</span>
+        )}
+        {owner.role && <span className="text-xs text-muted-foreground">{owner.role}</span>}
+        {(owner.isPep || owner.relatedToPep) && <PepTag isPep />}
+
+        <div className="flex items-center gap-1">
+          {owner.cpfRevealable &&
+            (phase === "revealed" ? (
+              <button
+                type="button"
+                onClick={remask}
+                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg px-2 text-sm font-semibold text-primary hover:underline"
+              >
+                <EyeOff className="h-4 w-4" />
+                {tc("hide")}
+              </button>
+            ) : (
+              <button
+                type="button"
+                disabled={phase === "revealing"}
+                onClick={() => setPhase("confirming")}
+                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg px-2 text-sm font-semibold text-primary hover:underline disabled:opacity-50"
+              >
+                <Eye className="h-4 w-4" />
+                {t("owners.reveal")}
+              </button>
+            ))}
+          <button
+            type="button"
+            onClick={onEdit}
+            aria-label={t("owners.edit")}
+            title={t("owners.edit")}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
+          >
+            <Pencil className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={onRemove}
+            aria-label={t("owners.remove")}
+            title={t("owners.remove")}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-lg text-destructive hover:bg-destructive/5"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        </div>
       </div>
-      {owner.ownershipPercent != null && (
-        <span className="text-xs text-muted-foreground">{owner.ownershipPercent}%</span>
+
+      {phase === "confirming" && (
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-muted/50 px-3 py-2.5">
+          <p className="flex flex-1 items-start gap-2 text-xs text-muted-foreground">
+            <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
+            {t("owners.revealWarning")}
+          </p>
+          <div className="flex gap-2">
+            <Button type="button" size="sm" variant="secondary" onClick={remask}>
+              {tc("cancel")}
+            </Button>
+            <Button type="button" size="sm" onClick={confirmReveal}>
+              {t("owners.revealConfirm")}
+            </Button>
+          </div>
+        </div>
       )}
-      {owner.role && <span className="text-xs text-muted-foreground">{owner.role}</span>}
-      {(owner.isPep || owner.relatedToPep) && <PepTag isPep />}
-      <button
-        type="button"
-        onClick={toggle}
-        aria-pressed={revealed}
-        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg px-2 text-sm font-semibold text-primary hover:underline"
-      >
-        {revealed ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-        {revealed ? tc("hide") : t("owners.reveal")}
-      </button>
+      {phase === "revealing" && (
+        <p className="flex items-center gap-2 text-xs text-muted-foreground">
+          <Spinner size="sm" /> {tc("loading")}
+        </p>
+      )}
+      {error && (
+        <p role="alert" className="text-xs font-medium text-destructive">
+          {error}
+        </p>
+      )}
     </li>
   );
 }
@@ -481,38 +658,115 @@ function DiligenceForm({
   );
 }
 
-// ─── Documents (gap: metadata only, no presigned URL to open) ──────────────────
+// ─── Documents (present = Enviado + Abrir; missing standard type = Pendente) ────
 
-function DocumentsSection({ documents }: { documents: ClientDetail["documents"] }) {
+function DocumentsSection({
+  userId,
+  documents,
+}: {
+  userId: string;
+  documents: ClientDetail["documents"];
+}) {
   const t = useTranslations("admin.review");
+  const tt = useTranslations("admin.review.documents.types");
+
+  const byType = new Map(documents.map((d) => [d.type, d]));
+  // Every standard type gets a row; any extra uploaded type is appended.
+  const extra = documents.filter((d) => !DOC_TYPES.includes(d.type as never));
+  const rows: Array<{ type: string; doc: ClientDetail["documents"][number] | undefined }> = [
+    ...DOC_TYPES.map((type) => ({ type, doc: byType.get(type) })),
+    ...extra.map((d) => ({ type: d.type, doc: d })),
+  ];
+  const typeLabel = (type: string) => (tt.has(type) ? tt(type) : type);
+
   return (
     <Section title={t("documents.title")}>
-      {documents.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{t("documents.empty")}</p>
-      ) : (
-        <ul className="flex flex-col gap-2">
-          {documents.map((d) => (
-            <li
-              key={d.id}
-              className="flex items-center gap-3 rounded-xl border border-border bg-muted/40 px-3 py-2.5"
-            >
-              <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-foreground">
-                  {d.fileName ?? d.type}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {d.type}
-                  {d.fileSizeKb != null ? ` · ${d.fileSizeKb} KB` : ""}
-                  {d.uploadedAt ? ` · ${formatDateTimeBR(d.uploadedAt)}` : ""}
-                </p>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-      <p className="mt-3 text-xs text-muted-foreground">{t("documents.unavailable")}</p>
+      <ul className="flex flex-col gap-2">
+        {rows.map(({ type, doc }) => (
+          <DocumentRow
+            key={type}
+            userId={userId}
+            label={typeLabel(type)}
+            doc={doc}
+          />
+        ))}
+      </ul>
+      <p className="mt-3 flex items-start gap-2 text-xs text-muted-foreground">
+        <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
+        {t("documents.accessNote")}
+      </p>
     </Section>
+  );
+}
+
+function DocumentRow({
+  userId,
+  label,
+  doc,
+}: {
+  userId: string;
+  label: string;
+  doc: ClientDetail["documents"][number] | undefined;
+}) {
+  const t = useTranslations("admin.review");
+  const tc = useTranslations("admin.common");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(false);
+
+  async function open() {
+    if (!doc || busy) return;
+    setBusy(true);
+    setError(false);
+    // Open the tab synchronously on the click so the pop-up blocker allows it,
+    // then point it at the signed URL once we have it. opener is severed for
+    // noopener semantics; the URL is never stored or logged.
+    const win = window.open("about:blank", "_blank");
+    if (win) win.opener = null;
+    try {
+      const url = await accessDocument(userId, doc.id);
+      if (!url) throw new Error("no url");
+      if (win) {
+        win.location.href = url;
+      } else {
+        // Pop-up was blocked; fall back to a direct, isolated open.
+        window.open(url, "_blank", "noopener,noreferrer");
+      }
+    } catch {
+      if (win) win.close();
+      setError(true);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <li className="flex items-center gap-3 rounded-xl border border-border bg-muted/40 px-3 py-2.5">
+      <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium text-foreground">{label}</p>
+        <p className="text-xs text-muted-foreground">
+          {doc
+            ? t("documents.sentAt", { date: formatDateTimeBR(doc.uploadedAt) || "—" })
+            : t("documents.pending")}
+          {doc?.fileName ? ` · ${doc.fileName}` : ""}
+        </p>
+        {error && (
+          <p role="alert" className="mt-1 text-xs font-medium text-destructive">
+            {t("documents.openError")}
+          </p>
+        )}
+      </div>
+      <Button
+        type="button"
+        size="sm"
+        variant="secondary"
+        disabled={!doc || busy}
+        onClick={open}
+      >
+        <ExternalLink className="h-4 w-4" />
+        {busy ? tc("loading") : t("documents.open")}
+      </Button>
+    </li>
   );
 }
 

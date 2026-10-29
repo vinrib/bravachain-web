@@ -1,16 +1,22 @@
 import { describe, it, expect } from "vitest";
-import { formatCpf, maskCpf, formatCnpj, formatBrl } from "./format";
+import { formatCpf, isValidCpf, formatCnpj, formatBrl } from "./format";
 
-describe("formatCpf / maskCpf", () => {
+describe("formatCpf", () => {
   it("formats an 11-digit CPF", () => {
-    expect(formatCpf("12345678901")).toBe("123.456.789-01");
+    expect(formatCpf("52998224725")).toBe("529.982.247-25");
   });
-  it("masks all but the last two digits", () => {
-    expect(maskCpf("12345678901")).toBe("•••.•••.•••-01");
+});
+
+describe("isValidCpf", () => {
+  it("accepts a structurally valid CPF (punctuated or not)", () => {
+    expect(isValidCpf("52998224725")).toBe(true);
+    expect(isValidCpf("529.982.247-25")).toBe(true);
   });
-  it("never exposes digits for a malformed CPF", () => {
-    expect(maskCpf("123")).toBe("•••.•••.•••-••");
-    expect(maskCpf(null)).toBe("•••.•••.•••-••");
+  it("rejects bad check digits, wrong length and repeated runs", () => {
+    expect(isValidCpf("12345678901")).toBe(false);
+    expect(isValidCpf("111")).toBe(false);
+    expect(isValidCpf("11111111111")).toBe(false);
+    expect(isValidCpf(null)).toBe(false);
   });
 });
 

@@ -310,13 +310,53 @@
         "cnae": "CNAE",
         "openedAt": "Data de abertura",
         "mainBuyerCountry": "País do principal comprador",
-        "estimatedRevenue": "Receita estimada"
+        "estimatedRevenue": "Receita estimada",
+        "kybStatus": "Situação do KYB"
       },
       "owners": {
         "title": "Sócios e beneficiários finais",
         "empty": "Nenhum sócio cadastrado.",
+        "add": "Adicionar sócio",
+        "edit": "Editar sócio",
+        "remove": "Remover sócio",
         "reveal": "Revelar",
-        "cpfNote": "Os CPFs ficam mascarados. Ao revelar, o CPF reaparece mascarado após 30 segundos."
+        "revealConfirm": "Revelar CPF",
+        "revealWarning": "Esta consulta será registrada na auditoria.",
+        "revealError": "Não foi possível revelar o CPF. Tente novamente.",
+        "revealRateLimited": "Muitas revelações em pouco tempo. Aguarde um minuto e tente de novo.",
+        "cpfNote": "Os CPFs ficam mascarados. Revelar registra a consulta na auditoria; o CPF reaparece mascarado após 30 segundos.",
+        "removeTitle": "Remover {name}",
+        "removeBody": "O sócio é removido do cadastro. Esta ação fica registrada na auditoria.",
+        "removeReasonLabel": "Motivo",
+        "reopenWarning": "Alterar sócios reabre a revisão e apaga as aprovações registradas.",
+        "errors": {
+          "OWNERSHIP_SUM_EXCEEDED": "A soma da participação dos sócios não pode passar de 100%.",
+          "PEP_POSITION_REQUIRED": "Informe o cargo do PEP.",
+          "RISK_FLOOR_VIOLATION": "Sócio PEP ou relacionado a PEP exige risco Alto. Ajuste o risco da revisão antes.",
+          "REASON_REQUIRED": "Informe um motivo ao alterar o campo PEP.",
+          "generic": "Não foi possível salvar o sócio. Tente novamente."
+        },
+        "modal": {
+          "createTitle": "Adicionar sócio",
+          "editTitle": "Editar sócio",
+          "subtitle": "Dados do sócio ou beneficiário final.",
+          "fullName": "Nome completo",
+          "cpf": "CPF",
+          "cpfEditHint": "Deixe em branco para manter o CPF atual.",
+          "cpfInvalid": "CPF inválido. Confira os dígitos.",
+          "ownership": "Participação (%)",
+          "role": "Função",
+          "isPep": "É PEP (pessoa exposta politicamente)",
+          "relatedToPep": "Parente ou colaborador de PEP",
+          "pepRole": "Cargo do PEP",
+          "pepRoleRequired": "Informe o cargo do PEP.",
+          "pepEndedAt": "Fim do mandato (opcional)",
+          "reason": "Motivo",
+          "reasonPepHint": "Alterar o campo PEP exige um motivo (3 a 500 caracteres).",
+          "reasonRequired": "Informe um motivo (3 a 500 caracteres).",
+          "required": "Informe este campo.",
+          "save": "Salvar"
+        }
       },
       "diligence": {
         "title": "Diligência",
@@ -334,7 +374,21 @@
       "documents": {
         "title": "Documentos",
         "empty": "Nenhum documento enviado.",
-        "unavailable": "A abertura de documentos ainda não está disponível nesta versão."
+        "open": "Abrir",
+        "pending": "Pendente",
+        "sentAt": "Enviado em {date}",
+        "accessNote": "O acesso aos documentos é registrado na auditoria.",
+        "openError": "Não foi possível abrir o documento. Tente novamente.",
+        "types": {
+          "CONTRATO_SOCIAL": "Contrato social",
+          "CARTAO_CNPJ": "Cartão CNPJ",
+          "DOCUMENTO_SOCIO": "Documento de sócio",
+          "COMPROVANTE_ENDERECO": "Comprovante de endereço",
+          "FATURAMENTO": "Faturamento",
+          "DECLARACAO_PEP": "Declaração de PEP",
+          "ORIGEM_RECURSOS": "Origem dos recursos",
+          "DEMONSTRACOES_FINANCEIRAS": "Demonstrações financeiras"
+        }
       },
       "approvals": {
         "title": "Aprovações",
@@ -406,8 +460,10 @@
       "roleTakesEffectNote": "A mudança de papel vale no próximo login da pessoa.",
       "auditNote": "Promover, rebaixar e resetar MFA exigem motivo e ficam registrados na auditoria.",
       "myMfaTitle": "Minha verificação em duas etapas",
-      "myMfaActive": "Aplicativo autenticador ativado.",
+      "myMfaActive": "Aplicativo autenticador · ativado.",
+      "myMfaActiveAt": "Aplicativo autenticador · ativado em {date}.",
       "myMfaInactive": "Verificação em duas etapas ainda não ativada.",
+      "recoveryLow": "Restam {n} de {total} códigos de recuperação. Gere novos antes que acabem.",
       "activate": "Ativar verificação",
       "reasonLabel": "Motivo",
       "resetMfaTitle": "Resetar MFA de {name}",
