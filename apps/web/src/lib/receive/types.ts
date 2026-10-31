@@ -121,6 +121,11 @@ export interface DedicatedAccount {
   swift?: string;
   reference?: string;
   confirmedAt?: string;
+  /** "CHECKING" | "SAVINGS" | other raw values from the backend. */
+  accountType?: string;
+  bankAddress?: string;
+  beneficiaryAddress?: string;
+  paymentRail?: string;
 }
 
 export interface AccountsResponse {

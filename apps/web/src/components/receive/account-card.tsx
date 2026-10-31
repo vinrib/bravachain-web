@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Check, Copy, Clock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,12 +13,21 @@ import {
   copyAllText,
   currencyTitle,
   settlementFor,
+  WRAPPING_FIELD_KEYS,
 } from "@/lib/receive/account-content";
 import type { DedicatedAccount } from "@/lib/receive/types";
 
 export function AccountCard({ account }: { account: DedicatedAccount }) {
   const [copied, setCopied] = useState(false);
-  const fields = accountFields(account);
+  const t = useTranslations("receiveAccount");
+  const fields = accountFields(account, {
+    accountType: t("accountType"),
+    bankAddress: t("bankAddress"),
+    paymentRail: t("paymentRail"),
+    beneficiaryAddress: t("beneficiaryAddress"),
+    accountTypeChecking: t("accountTypeChecking"),
+    accountTypeSavings: t("accountTypeSavings"),
+  });
   const settlement = settlementFor(account.currency);
 
   async function copyAll() {
@@ -70,6 +80,7 @@ export function AccountCard({ account }: { account: DedicatedAccount }) {
               value={f.value}
               dict={DICT.pt}
               emphasize={f.key === "reference"}
+              wrap={(WRAPPING_FIELD_KEYS as readonly string[]).includes(f.key)}
             />
           ))}
         </div>

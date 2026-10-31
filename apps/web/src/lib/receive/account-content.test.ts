@@ -7,6 +7,16 @@ import {
   settlementFor,
 } from "./account-content";
 import type { DedicatedAccount } from "./types";
+import type { NewAccountFieldLabels } from "./account-content";
+
+const LABELS: NewAccountFieldLabels = {
+  accountType: "Tipo de conta",
+  bankAddress: "Endereço do banco",
+  paymentRail: "Tipo de transferência",
+  beneficiaryAddress: "Endereço do beneficiário",
+  accountTypeChecking: "Corrente",
+  accountTypeSavings: "Poupança",
+};
 
 // Reference instants well inside each US DST period (not near the transition).
 const BEFORE_DST_END = new Date("2026-10-20T12:00:00Z"); // EDT (UTC-4)
@@ -70,7 +80,7 @@ describe("accountFields", () => {
       reference: "   ",
       confirmedAt: "2026-10-01T00:00:00Z",
     };
-    const keys = accountFields(usd).map((f) => f.key);
+    const keys = accountFields(usd, LABELS).map((f) => f.key);
     // swift (empty) and reference (whitespace) are dropped; order preserved.
     expect(keys).toEqual([
       "beneficiaryName",
@@ -87,9 +97,80 @@ describe("accountFields", () => {
       iban: "DE00 0000",
       swift: "XYZ",
     };
-    const fields = accountFields(eur);
+    const fields = accountFields(eur, LABELS);
     expect(fields.map((f) => f.key)).toEqual(["beneficiaryName", "iban", "swift"]);
     expect(fields.find((f) => f.key === "iban")?.label).toBe("IBAN");
+  });
+
+  it("USD account with the new fields shows them in order, with accountType translated", () => {
+    const usd: DedicatedAccount = {
+      currency: "USD",
+      beneficiaryName: "ACME LTDA",
+      bankName: "Modulus Bank",
+      bankAddress: "123 Main St, New York, NY 10001, USA",
+      accountNumber: "3123456789",
+      routingNumber: "026073150",
+      accountType: "CHECKING",
+      paymentRail: "ACH / Wire",
+    };
+    const fields = accountFields(usd, LABELS);
+    expect(fields.map((f) => f.key)).toEqual([
+      "beneficiaryName",
+      "bankName",
+      "bankAddress",
+      "accountNumber",
+      "routingNumber",
+      "accountType",
+      "paymentRail",
+    ]);
+    expect(fields.find((f) => f.key === "accountType")?.value).toBe("Corrente");
+    expect(fields.find((f) => f.key === "accountType")?.label).toBe("Tipo de conta");
+    expect(fields.find((f) => f.key === "bankAddress")?.label).toBe("Endereço do banco");
+  });
+
+  it("translates SAVINGS and passes through unknown accountType values as-is", () => {
+    const savings = accountFields(
+      { currency: "USD", accountType: "SAVINGS" },
+      LABELS,
+    );
+    expect(savings.find((f) => f.key === "accountType")?.value).toBe("Poupança");
+
+    const unknown = accountFields(
+      { currency: "USD", accountType: "JOINT" },
+      LABELS,
+    );
+    expect(unknown.find((f) => f.key === "accountType")?.value).toBe("JOINT");
+  });
+
+  it("EUR account with beneficiaryAddress shows it right after beneficiaryName", () => {
+    const eur: DedicatedAccount = {
+      currency: "EUR",
+      beneficiaryName: "ACME LTDA",
+      beneficiaryAddress: "Av. Paulista, 1000, São Paulo, SP, Brasil",
+      bankName: "Modulus Bank EU",
+      iban: "DE00 0000",
+      swift: "XYZ",
+    };
+    const fields = accountFields(eur, LABELS);
+    expect(fields.map((f) => f.key)).toEqual([
+      "beneficiaryName",
+      "beneficiaryAddress",
+      "bankName",
+      "iban",
+      "swift",
+    ]);
+  });
+
+  it("omits the new fields entirely when the backend doesn't send them", () => {
+    const usd: DedicatedAccount = {
+      currency: "USD",
+      beneficiaryName: "ACME LTDA",
+      bankName: "Modulus Bank",
+      accountNumber: "3123456789",
+      routingNumber: "026073150",
+    };
+    const fields = accountFields(usd, LABELS);
+    expect(fields.some((f) => ["accountType", "bankAddress", "paymentRail", "beneficiaryAddress"].includes(f.key))).toBe(false);
   });
 });
 

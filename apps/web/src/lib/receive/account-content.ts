@@ -164,32 +164,72 @@ const LABELS: Record<string, string> = {
   reference: "Referência",
 };
 
+/** Labels/values for the fields added alongside `accountType`/`bankAddress`/etc. Sourced from next-intl ("receiveAccount") so they're translated. */
+export interface NewAccountFieldLabels {
+  accountType: string;
+  bankAddress: string;
+  paymentRail: string;
+  beneficiaryAddress: string;
+  accountTypeChecking: string;
+  accountTypeSavings: string;
+}
+
 const ORDER = [
   "beneficiaryName",
+  "beneficiaryAddress",
   "bankName",
+  "bankAddress",
   "accountNumber",
   "routingNumber",
+  "accountType",
+  "paymentRail",
   "iban",
   "swift",
   "reference",
 ] as const;
 
+/** Fields that wrap onto multiple lines instead of truncating (long free-text addresses). */
+export const WRAPPING_FIELD_KEYS = ["bankAddress", "beneficiaryAddress"] as const;
+
+function accountTypeValue(raw: string, labels: NewAccountFieldLabels): string {
+  if (raw === "CHECKING") return labels.accountTypeChecking;
+  if (raw === "SAVINGS") return labels.accountTypeSavings;
+  return raw;
+}
+
+/** Present (non-empty) fields, in display order. `labels` supplies translated text for the backend-driven fields (accountType/bankAddress/paymentRail/beneficiaryAddress). */
+export function accountFields(
+  account: DedicatedAccount,
+  labels: NewAccountFieldLabels,
+): AccountField[] {
+  const fields: AccountField[] = [];
+  for (const key of ORDER) {
+    const raw = account[key];
+    if (typeof raw !== "string" || raw.trim().length === 0) continue;
+    switch (key) {
+      case "accountType":
+        fields.push({ key, label: labels.accountType, value: accountTypeValue(raw, labels) });
+        break;
+      case "bankAddress":
+        fields.push({ key, label: labels.bankAddress, value: raw });
+        break;
+      case "paymentRail":
+        fields.push({ key, label: labels.paymentRail, value: raw });
+        break;
+      case "beneficiaryAddress":
+        fields.push({ key, label: labels.beneficiaryAddress, value: raw });
+        break;
+      default:
+        fields.push({ key, label: LABELS[key] ?? key, value: raw });
+    }
+  }
+  return fields;
+}
+
 export interface AccountField {
   key: string;
   label: string;
   value: string;
-}
-
-/** Present (non-empty) fields, in display order. */
-export function accountFields(account: DedicatedAccount): AccountField[] {
-  const fields: AccountField[] = [];
-  for (const key of ORDER) {
-    const value = account[key];
-    if (typeof value === "string" && value.trim().length > 0) {
-      fields.push({ key, label: LABELS[key] ?? key, value });
-    }
-  }
-  return fields;
 }
 
 /** "Copiar todos" text — only available fields; never pending placeholders. */
