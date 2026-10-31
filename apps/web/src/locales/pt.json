@@ -259,8 +259,6 @@
       "yes": "Sim",
       "no": "Não",
       "hide": "Ocultar",
-      "approved": "Aprovou",
-      "rejected": "Rejeitou",
       "previous": "Anterior",
       "next": "Próxima"
     },
@@ -275,12 +273,6 @@
       "MEDIUM": "Médio",
       "HIGH": "Alto"
     },
-    "gate": {
-      "IDENTITY_PENDING": "Bloqueado: identidade pendente",
-      "KYB_PENDING": "Bloqueado: KYB pendente",
-      "USER_NOT_FOUND": "Bloqueado: usuário não encontrado",
-      "COMPLIANCE_REVIEW_PENDING": "Bloqueado: revisão de compliance pendente"
-    },
     "clients": {
       "title": "Clientes em revisão",
       "body": "A fila de revisão de compliance (KYB).",
@@ -292,17 +284,13 @@
       "statusAll": "Todos",
       "riskLabel": "Risco",
       "onlyPep": "Somente PEP",
-      "onlyException": "Somente com exceção",
       "colCompany": "Empresa e CNPJ",
       "colKyb": "Status KYB",
       "colReview": "Revisão",
       "colRisk": "Risco",
       "colPep": "PEP",
-      "colException": "Exceção",
-      "colApprovals": "Aprovações",
       "colUpdated": "Atualizado em",
       "openReview": "Abrir revisão de {name}",
-      "approvalsOf": "{approved} de {required}",
       "empty": "Nenhum cliente em revisão",
       "totalCount": "{total} cliente(s)",
       "pageOf": "Página {page} de {totalPages}"
@@ -310,7 +298,6 @@
     "review": {
       "back": "Clientes em revisão",
       "cnpj": "CNPJ",
-      "reopenedBanner": "Dados alterados: as aprovações anteriores foram apagadas e a revisão voltou para Em análise.",
       "company": {
         "title": "Dados da empresa",
         "legalName": "Razão social",
@@ -336,7 +323,6 @@
         "removeTitle": "Remover {name}",
         "removeBody": "O sócio é removido do cadastro. Esta ação fica registrada na auditoria.",
         "removeReasonLabel": "Motivo",
-        "reopenWarning": "Alterar sócios reabre a revisão e apaga as aprovações registradas.",
         "errors": {
           "OWNERSHIP_SUM_EXCEEDED": "A soma da participação dos sócios não pode passar de 100%.",
           "PEP_POSITION_REQUIRED": "Informe o cargo do PEP.",
@@ -376,7 +362,6 @@
         "publicFunds": "Há recursos públicos no fluxo?",
         "isPep": "Cliente é PEP",
         "pepNotes": "Observações sobre PEP",
-        "saveWarning": "Salvar a diligência reabre a revisão e apaga as aprovações registradas.",
         "save": "Salvar diligência"
       },
       "documents": {
@@ -397,51 +382,6 @@
           "ORIGEM_RECURSOS": "Origem dos recursos",
           "DEMONSTRACOES_FINANCEIRAS": "Demonstrações financeiras"
         }
-      },
-      "approvals": {
-        "title": "Aprovações",
-        "rule": "Risco Alto exige 2 aprovações de diretores diferentes. Baixo e Médio exigem 1.",
-        "progress": "{approved} de {required} aprovações"
-      },
-      "decisions": {
-        "approve": "Aprovar",
-        "reject": "Rejeitar",
-        "approveTitle": "Aprovar revisão",
-        "rejectTitle": "Rejeitar revisão",
-        "approveBody": "O cliente passa a ser liberado quando as aprovações necessárias forem registradas.",
-        "rejectBody": "O cliente continua bloqueado. O motivo aparece no histórico da revisão.",
-        "audit": "Sua decisão fica registrada na auditoria.",
-        "noteLabel": "Observação",
-        "notePlaceholder": "Ex.: origem dos recursos comprovada.",
-        "self": "Você não pode decidir sobre o seu próprio cadastro.",
-        "already": "Você já decidiu sobre esta revisão.",
-        "needRisk": "Defina o nível de risco antes de decidir.",
-        "notOpen": "A revisão não está aberta para decisão."
-      },
-      "gate": {
-        "title": "Efeito no acesso do cliente",
-        "subtitle": "Decisão simulada, como se a flag de compliance estivesse ligada.",
-        "allowed": "Liberado",
-        "blocked": "Bloqueado"
-      },
-      "exception": {
-        "title": "Exceção de compliance",
-        "toggle": "Dispensar a revisão deste cliente",
-        "audit": "Mudar exige motivo e fica registrado na auditoria.",
-        "activate": "Ativar exceção",
-        "deactivate": "Desativar exceção",
-        "self": "Você não pode alterar a própria exceção de compliance.",
-        "activateTitle": "Ativar exceção de compliance",
-        "deactivateTitle": "Desativar exceção de compliance",
-        "activateBody": "Ativar a exceção dispensa a revisão deste cliente.",
-        "deactivateBody": "Desativar a exceção volta a exigir a revisão deste cliente.",
-        "auditNote": "Fica registrado quem mudou, quando e por quê.",
-        "reasonLabel": "Motivo",
-        "reasonPlaceholder": "Explique por que a revisão será dispensada."
-      },
-      "history": {
-        "title": "Histórico",
-        "empty": "Ainda não há decisões registradas."
       }
     },
     "security": {

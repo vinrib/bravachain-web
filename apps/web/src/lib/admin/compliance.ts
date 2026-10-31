@@ -1,9 +1,10 @@
 /**
  * Client-side calls for the compliance-review admin area, via the authenticated
  * BFF proxy (`apiFetch`). Responses are normalized defensively into the types in
- * `./types`. Mutations return the full, freshly-read detail the backend sends
- * back (PUT /review, POST /decision return the updated view); the grandfathered
- * PATCH is followed by a re-read so callers never rely on optimistic state.
+ * `./types`. Bravachain does not approve, reject, or limit clients or operations
+ * (#92) — `saveReview` only stores an internal annotation (risk, PEP/source-of-
+ * funds notes); it never changes the client's status or eligibility. Mutations
+ * return the full, freshly-read detail the backend sends back.
  */
 import { endpoints } from "@bravachain/api-client";
 import { apiFetch } from "@/lib/client-api";
@@ -12,8 +13,6 @@ import type {
   ClientListItem,
   ClientListResponse,
   Company,
-  Decision,
-  GateDecision,
   KybDocument,
   Owner,
   OwnerPayload,
@@ -28,7 +27,6 @@ export interface ListClientsParams {
   reviewStatus?: ReviewStatus;
   risk?: RiskLevel;
   pep?: boolean;
-  grandfathered?: boolean;
   page?: number;
   pageSize?: number;
 }
@@ -48,8 +46,6 @@ function intOr(v: unknown, fallback: number): number {
 
 function normalizeListItem(raw: unknown): ClientListItem {
   const r = asRecord(raw);
-  const approvals = asRecord(r.approvals);
-  const requiredRaw = approvals.required;
   return {
     userId: str(r.userId) ?? "",
     companyName: str(r.companyName),
@@ -58,11 +54,6 @@ function normalizeListItem(raw: unknown): ClientListItem {
     reviewStatus: (str(r.reviewStatus) as ReviewStatus) ?? "NOT_STARTED",
     riskLevel: (str(r.riskLevel) as RiskLevel) ?? null,
     isPep: bool(r.isPep),
-    complianceGrandfathered: bool(r.complianceGrandfathered),
-    approvals: {
-      approved: intOr(approvals.approved, 0),
-      required: typeof requiredRaw === "number" ? requiredRaw : null,
-    },
     updatedAt: str(r.updatedAt),
   };
 }
@@ -75,7 +66,6 @@ export async function listClients(
   if (params.reviewStatus) qs.set("reviewStatus", params.reviewStatus);
   if (params.risk) qs.set("risk", params.risk);
   if (params.pep) qs.set("pep", "true");
-  if (params.grandfathered) qs.set("grandfathered", "true");
   qs.set("page", String(params.page ?? 1));
   qs.set("pageSize", String(params.pageSize ?? 20));
 
@@ -164,44 +154,14 @@ function normalizeDocument(raw: unknown): KybDocument {
   };
 }
 
-function normalizeGate(raw: unknown): GateDecision | null {
-  if (!raw || typeof raw !== "object") return null;
-  const r = asRecord(raw);
-  if (r.allowed === true) return { allowed: true };
-  if (r.allowed === false) {
-    return {
-      allowed: false,
-      reason: str(r.reason) ?? "UNKNOWN",
-      accountType: str(r.accountType) ?? undefined,
-      identityStatus: str(r.identityStatus) ?? undefined,
-      kybStatus: str(r.kybStatus) ?? undefined,
-      complianceReviewStatus: str(r.complianceReviewStatus) ?? undefined,
-    };
-  }
-  return null;
-}
-
 export function normalizeDetail(raw: unknown): ClientDetail {
   const r = asRecord(raw);
   return {
     userId: str(r.userId) ?? "",
     accountType: str(r.accountType),
     kybStatus: str(r.kybStatus),
-    complianceGrandfathered: bool(r.complianceGrandfathered),
     company: normalizeCompany(r.company),
-    simulatedGateDecision: normalizeGate(r.simulatedGateDecision),
     review: normalizeReview(r.review),
-    approvals: Array.isArray(r.approvals)
-      ? r.approvals.map((a) => {
-          const ar = asRecord(a);
-          return {
-            approverUserId: str(ar.approverUserId) ?? "",
-            decision: (str(ar.decision) as Decision) ?? "APPROVE",
-            note: str(ar.note),
-            createdAt: str(ar.createdAt),
-          };
-        })
-      : [],
     owners: Array.isArray(r.owners) ? r.owners.map(normalizeOwner) : [],
     documents: Array.isArray(r.documents) ? r.documents.map(normalizeDocument) : [],
   };
@@ -221,33 +181,6 @@ export async function saveReview(
       body: JSON.stringify(payload),
     }),
   );
-}
-
-export async function decide(
-  userId: string,
-  decision: Decision,
-  note: string | undefined,
-): Promise<ClientDetail> {
-  return normalizeDetail(
-    await apiFetch<unknown>(endpoints.admin.complianceDecision(userId), {
-      method: "POST",
-      body: JSON.stringify({ decision, note }),
-    }),
-  );
-}
-
-export async function setGrandfathered(
-  userId: string,
-  grandfathered: boolean,
-  reason: string,
-): Promise<ClientDetail> {
-  await apiFetch<unknown>(endpoints.admin.complianceGrandfathered(userId), {
-    method: "PATCH",
-    body: JSON.stringify({ grandfathered, reason }),
-  });
-  // The PATCH returns a partial payload; re-read the full detail (never trust
-  // optimistic state for exceptions).
-  return getClient(userId);
 }
 
 /**

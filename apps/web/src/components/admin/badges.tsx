@@ -55,13 +55,3 @@ export function PepTag({ isPep }: { isPep: boolean }) {
     </Chip>
   );
 }
-
-export function ExceptionTag({ on }: { on: boolean }) {
-  const t = useTranslations("admin.common");
-  if (!on) return <span className="text-muted-foreground">—</span>;
-  return (
-    <Chip className="bg-sky-100 text-sky-800 dark:bg-sky-500/15 dark:text-sky-200">
-      {t("exceptionActive")}
-    </Chip>
-  );
-}

@@ -16,8 +16,6 @@ vi.mock("next/link", () => ({
 vi.mock("@/lib/admin/compliance", () => ({
   getClient: vi.fn(),
   saveReview: vi.fn(),
-  decide: vi.fn(),
-  setGrandfathered: vi.fn(),
   revealOwnerCpf: vi.fn(),
   removeOwner: vi.fn(),
   accessDocument: vi.fn(),
@@ -25,13 +23,9 @@ vi.mock("@/lib/admin/compliance", () => ({
   updateOwner: vi.fn(),
 }));
 
-let identity = { userId: "admin-1", isAdmin: true, loading: false };
-vi.mock("@/lib/hooks", () => ({ useAdminIdentity: () => identity }));
-
 import {
   getClient,
   saveReview,
-  setGrandfathered,
   revealOwnerCpf,
   removeOwner,
   accessDocument,
@@ -50,7 +44,6 @@ function makeDetail(over: Partial<ClientDetail> = {}): ClientDetail {
     userId: "client-1",
     accountType: "COMPANY",
     kybStatus: "APPROVED",
-    complianceGrandfathered: false,
     company: {
       name: "Exemplo Comércio Exterior Ltda",
       cnpj: "00000000000100",
@@ -61,7 +54,6 @@ function makeDetail(over: Partial<ClientDetail> = {}): ClientDetail {
       kybStatus: "APPROVED",
       kybSubmittedAt: "2026-09-01T00:00:00Z",
     },
-    simulatedGateDecision: { allowed: false, reason: "COMPLIANCE_REVIEW_PENDING" },
     review: {
       status: "IN_REVIEW",
       riskLevel: "HIGH",
@@ -74,7 +66,6 @@ function makeDetail(over: Partial<ClientDetail> = {}): ClientDetail {
       reviewedAt: null,
       nextReviewAt: null,
     },
-    approvals: [],
     owners: [
       {
         id: "o1",
@@ -112,10 +103,8 @@ function renderReview() {
 }
 
 beforeEach(() => {
-  identity = { userId: "admin-1", isAdmin: true, loading: false };
   vi.mocked(getClient).mockReset();
   vi.mocked(saveReview).mockReset();
-  vi.mocked(setGrandfathered).mockReset();
   vi.mocked(revealOwnerCpf).mockReset();
   vi.mocked(removeOwner).mockReset();
   vi.mocked(accessDocument).mockReset();
@@ -343,16 +332,30 @@ describe("ClientReview — owners CRUD", () => {
     );
   });
 
-  it("warns that changing owners reopens the review when approvals exist", async () => {
-    vi.mocked(getClient).mockResolvedValue(
-      makeDetail({ approvals: [{ approverUserId: "admin-2", decision: "APPROVE", note: null, createdAt: null }] }),
-    );
+});
+
+describe("ClientReview — no decision actions (Bravachain does not approve/reject/limit)", () => {
+  it("shows no approve/reject/decide/exception button or section", async () => {
+    vi.mocked(getClient).mockResolvedValue(makeDetail());
     renderReview();
-    await screen.findByText("Sócios e beneficiários finais");
-    fireEvent.click(screen.getByRole("button", { name: "Adicionar sócio" }));
-    const dialog = await screen.findByRole("dialog");
-    expect(
-      within(dialog).getByText("Alterar sócios reabre a revisão e apaga as aprovações registradas."),
-    ).toBeTruthy();
+    await screen.findAllByText("Exemplo Comércio Exterior Ltda");
+
+    for (const name of [
+      "Aprovar",
+      "Rejeitar",
+      "Ativar exceção",
+      "Desativar exceção",
+    ]) {
+      expect(screen.queryByRole("button", { name })).toBeNull();
+    }
+    expect(screen.queryByText("Aprovações")).toBeNull();
+    expect(screen.queryByText("Exceção de compliance")).toBeNull();
+    expect(screen.queryByText("Efeito no acesso do cliente")).toBeNull();
+    expect(screen.queryByText(/dois diretores/i)).toBeNull();
+
+    // The rest of the screen keeps working: company data, owners, diligence, documents.
+    expect(screen.getByText("4669-9/99")).toBeTruthy();
+    expect(screen.getByText("Diligência")).toBeTruthy();
+    expect(screen.getByText("Documentos")).toBeTruthy();
   });
 });

@@ -259,8 +259,6 @@
       "yes": "Yes",
       "no": "No",
       "hide": "Hide",
-      "approved": "Approved",
-      "rejected": "Rejected",
       "previous": "Previous",
       "next": "Next"
     },
@@ -275,12 +273,6 @@
       "MEDIUM": "Medium",
       "HIGH": "High"
     },
-    "gate": {
-      "IDENTITY_PENDING": "Blocked: identity pending",
-      "KYB_PENDING": "Blocked: KYB pending",
-      "USER_NOT_FOUND": "Blocked: user not found",
-      "COMPLIANCE_REVIEW_PENDING": "Blocked: compliance review pending"
-    },
     "clients": {
       "title": "Clients under review",
       "body": "The compliance (KYB) review queue.",
@@ -292,17 +284,13 @@
       "statusAll": "All",
       "riskLabel": "Risk",
       "onlyPep": "PEP only",
-      "onlyException": "With exception only",
       "colCompany": "Company and CNPJ",
       "colKyb": "KYB status",
       "colReview": "Review",
       "colRisk": "Risk",
       "colPep": "PEP",
-      "colException": "Exception",
-      "colApprovals": "Approvals",
       "colUpdated": "Updated at",
       "openReview": "Open review of {name}",
-      "approvalsOf": "{approved} of {required}",
       "empty": "No clients under review",
       "totalCount": "{total} client(s)",
       "pageOf": "Page {page} of {totalPages}"
@@ -310,7 +298,6 @@
     "review": {
       "back": "Clients under review",
       "cnpj": "CNPJ",
-      "reopenedBanner": "Data changed: previous approvals were cleared and the review returned to In review.",
       "company": {
         "title": "Company data",
         "legalName": "Legal name",
@@ -336,7 +323,6 @@
         "removeTitle": "Remove {name}",
         "removeBody": "The owner is removed from the record. This action is recorded in the audit log.",
         "removeReasonLabel": "Reason",
-        "reopenWarning": "Changing owners reopens the review and clears recorded approvals.",
         "errors": {
           "OWNERSHIP_SUM_EXCEEDED": "Total ownership across owners cannot exceed 100%.",
           "PEP_POSITION_REQUIRED": "Enter the PEP position.",
@@ -376,7 +362,6 @@
         "publicFunds": "Are public funds involved?",
         "isPep": "Client is a PEP",
         "pepNotes": "PEP notes",
-        "saveWarning": "Saving the diligence reopens the review and clears recorded approvals.",
         "save": "Save diligence"
       },
       "documents": {
@@ -397,51 +382,6 @@
           "ORIGEM_RECURSOS": "Source of funds",
           "DEMONSTRACOES_FINANCEIRAS": "Financial statements"
         }
-      },
-      "approvals": {
-        "title": "Approvals",
-        "rule": "High risk requires 2 approvals from different directors. Low and Medium require 1.",
-        "progress": "{approved} of {required} approvals"
-      },
-      "decisions": {
-        "approve": "Approve",
-        "reject": "Reject",
-        "approveTitle": "Approve review",
-        "rejectTitle": "Reject review",
-        "approveBody": "The client becomes allowed once the required approvals are recorded.",
-        "rejectBody": "The client stays blocked. The reason appears in the review history.",
-        "audit": "Your decision is recorded in the audit log.",
-        "noteLabel": "Note",
-        "notePlaceholder": "e.g. source of funds confirmed.",
-        "self": "You cannot decide on your own registration.",
-        "already": "You have already decided on this review.",
-        "needRisk": "Set the risk level before deciding.",
-        "notOpen": "The review is not open for a decision."
-      },
-      "gate": {
-        "title": "Effect on client access",
-        "subtitle": "Simulated decision, as if the compliance flag were on.",
-        "allowed": "Allowed",
-        "blocked": "Blocked"
-      },
-      "exception": {
-        "title": "Compliance exception",
-        "toggle": "Waive the review for this client",
-        "audit": "Changing it requires a reason and is recorded in the audit log.",
-        "activate": "Activate exception",
-        "deactivate": "Deactivate exception",
-        "self": "You cannot change your own compliance exception.",
-        "activateTitle": "Activate compliance exception",
-        "deactivateTitle": "Deactivate compliance exception",
-        "activateBody": "Activating the exception waives the review for this client.",
-        "deactivateBody": "Deactivating the exception requires the review for this client again.",
-        "auditNote": "Who changed it, when and why is recorded.",
-        "reasonLabel": "Reason",
-        "reasonPlaceholder": "Explain why the review will be waived."
-      },
-      "history": {
-        "title": "History",
-        "empty": "No decisions recorded yet."
       }
     },
     "security": {

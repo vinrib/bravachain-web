@@ -58,22 +58,26 @@ export const endpoints = {
   /**
    * ADMIN-only area (compliance review #82, admin controls #83, listings PR C).
    * All require Bearer + ADMIN on the backend; the web gates by role too.
+   * #92 removed every decision/limit route (decision, grandfathered, pix-
+   * withdrawal approval) — Bravachain does not approve, reject, or limit
+   * clients or operations; only Avenia decides. This area is read-only plus
+   * internal annotations (review notes, owners, document access).
    */
   admin: {
-    /** GET ?q&reviewStatus&risk&pep&grandfathered&page&pageSize -> { items, page, pageSize, total } */
+    /** GET ?q&reviewStatus&risk&pep&page&pageSize -> { items, page, pageSize, total } */
     complianceClients: "/v1/admin/compliance/clients",
-    /** GET -> full review (owners w/ CPF, approvals, documents, simulatedGateDecision) */
+    /** GET -> full review (owners w/ CPF, documents) */
     complianceClient: (userId: string) => `/v1/admin/compliance/clients/${userId}`,
-    /** PUT (UpsertReview) -> reopens review (IN_REVIEW) and clears approvals */
+    /** PUT (UpsertReview) -> stores an internal annotation only; never changes status/eligibility */
     complianceReview: (userId: string) =>
       `/v1/admin/compliance/clients/${userId}/review`,
     /** PUT (ReplaceOwners) — replaces the whole beneficial-owner list */
     complianceOwners: (userId: string) =>
       `/v1/admin/compliance/clients/${userId}/owners`,
-    /** POST (CreateOwner) -> full detail; reopens the review and clears approvals */
+    /** POST (CreateOwner) -> full detail */
     complianceOwnerCreate: (userId: string) =>
       `/v1/admin/compliance/clients/${userId}/beneficial-owners`,
-    /** PATCH (UpdateOwner) / DELETE ({ reason }) -> full detail; reopens the review */
+    /** PATCH (UpdateOwner) / DELETE ({ reason }) -> full detail */
     complianceOwner: (userId: string, ownerId: string) =>
       `/v1/admin/compliance/clients/${userId}/beneficial-owners/${ownerId}`,
     /** POST -> { cpf } (audited reveal; Cache-Control: no-store; 20/min per admin → 429) */
@@ -82,12 +86,6 @@ export const endpoints = {
     /** POST -> { url, expiresAt } (audited short-lived signed URL; Cache-Control: no-store) */
     complianceDocumentAccess: (userId: string, documentId: string) =>
       `/v1/admin/compliance/clients/${userId}/documents/${documentId}/access`,
-    /** PATCH { grandfathered, reason } -> { complianceGrandfathered, simulatedGateDecision } */
-    complianceGrandfathered: (userId: string) =>
-      `/v1/admin/compliance/clients/${userId}/grandfathered`,
-    /** POST { decision: APPROVE|REJECT, note? } -> full review (HIGH needs 2 admins) */
-    complianceDecision: (userId: string) =>
-      `/v1/admin/compliance/clients/${userId}/decision`,
     /** GET ?role=ADMIN&page&pageSize -> { items, page, pageSize, total } */
     users: "/v1/admin/users",
     /** GET ?email= (min 3) -> { items } (max 5) */
