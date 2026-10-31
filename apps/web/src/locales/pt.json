@@ -205,6 +205,14 @@
       "credited": "Creditado"
     }
   },
+  "receiveAccount": {
+    "accountType": "Tipo de conta",
+    "bankAddress": "Endereço do banco",
+    "paymentRail": "Tipo de transferência",
+    "beneficiaryAddress": "Endereço do beneficiário",
+    "accountTypeChecking": "Corrente",
+    "accountTypeSavings": "Poupança"
+  },
   "mfa": {
     "title": "Verificação em duas etapas",
     "subtitle": "Digite o código de 6 dígitos do seu aplicativo autenticador.",

@@ -205,6 +205,14 @@
       "credited": "Credited"
     }
   },
+  "receiveAccount": {
+    "accountType": "Account type",
+    "bankAddress": "Bank address",
+    "paymentRail": "Transfer type",
+    "beneficiaryAddress": "Beneficiary address",
+    "accountTypeChecking": "Checking",
+    "accountTypeSavings": "Savings"
+  },
   "mfa": {
     "title": "Two-step verification",
     "subtitle": "Enter the 6-digit code from your authenticator app.",

@@ -11,13 +11,15 @@ interface CopyFieldProps {
   value: unknown;
   dict: ReceiveDict;
   emphasize?: boolean;
+  /** Wrap onto multiple lines instead of truncating — for long free-text values (addresses). */
+  wrap?: boolean;
 }
 
 /**
  * One labelled value with a copy button. Pending values ("A confirmar") are
  * shown muted and are NOT copyable.
  */
-export function CopyField({ label, value, dict, emphasize }: CopyFieldProps) {
+export function CopyField({ label, value, dict, emphasize, wrap }: CopyFieldProps) {
   const [copied, setCopied] = useState(false);
   const pending = isPending(value);
   const text = typeof value === "string" ? value : value == null ? "" : String(value);
@@ -46,7 +48,12 @@ export function CopyField({ label, value, dict, emphasize }: CopyFieldProps) {
             {dict.pending}
           </p>
         ) : (
-          <p className="truncate text-sm font-medium text-foreground tabular-nums">
+          <p
+            className={cn(
+              "text-sm font-medium text-foreground tabular-nums",
+              wrap ? "whitespace-normal break-words" : "truncate",
+            )}
+          >
             {text || "—"}
           </p>
         )}
