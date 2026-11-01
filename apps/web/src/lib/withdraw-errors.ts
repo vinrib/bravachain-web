@@ -1,22 +1,18 @@
 /**
- * Maps PIX-withdrawal "Regra A" backend errors to how the UI should present
- * them. The backend returns `{ code, message }` (message already in pt-BR).
+ * Maps PIX-withdrawal backend errors to how the UI should present them. The
+ * backend returns `{ code, message }` (message already in pt-BR).
  *
- * For the known business codes we show the backend `message` verbatim (it
- * carries the concrete limits/dates), falling back to a fixed pt-BR text when
- * the backend omits one. For opaque/internal failures (provider error, the
- * 412 "subaccount not ready", and anything unknown) we NEVER show the raw body:
- * provider/subaccount get a fixed pt-BR message, and unknown errors get the
- * generic message plus a short support code (HTTP status + time) so support can
+ * For opaque/internal failures (provider error, the 412 "subaccount not
+ * ready", and anything unknown) we NEVER show the raw body: provider/
+ * subaccount get a fixed pt-BR message, and unknown errors get the generic
+ * message plus a short support code (HTTP status + time) so support can
  * correlate it. The caller never retries the withdrawal automatically.
  *
- * Known codes (HTTP status from the backend):
- * - WITHDRAW_PROVIDER_ERROR            (varies) — opaque provider failure
- * - WITHDRAW_LIMIT_PER_TX              (422) — above per-withdrawal limit
- * - WITHDRAW_LIMIT_PER_DAY             (422) — daily withdrawal limit reached
- * - WITHDRAW_DESTINATION_NOT_OWN_CNPJ  (403) — destination isn't the company's CNPJ
- * - WITHDRAW_DESTINATION_ON_HOLD       (422) — key under a 24h security hold
- * - (HTTP 412)                         — payments subaccount not provisioned yet
+ * Bravachain does not limit or hold client withdrawals (#92 removed the
+ * per-tx/day caps, the own-CNPJ destination check and the 24h destination
+ * hold) — only Avenia's own payout can fail. The only business code left is:
+ * - WITHDRAW_PROVIDER_ERROR (varies) — opaque provider failure
+ * - (HTTP 412)               — payments subaccount not provisioned yet
  */
 
 export type WithdrawErrorField = "pixKey" | "amount" | null;
@@ -26,8 +22,6 @@ export interface WithdrawErrorView {
   message: string;
   /** Which form field to highlight, if any. */
   field: WithdrawErrorField;
-  /** Whether to render the 24h security-hold banner. */
-  hold: boolean;
   /** Short support code (status + time) shown only on generic failures. */
   supportCode?: string;
 }
@@ -42,44 +36,15 @@ const SUBACCOUNT_NOT_READY_MESSAGE =
   "Sua subconta de pagamentos ainda está sendo preparada. Tente novamente em instantes.";
 
 interface KnownWithdrawError {
-  /** Fixed pt-BR text. Used as fallback, or always when `useBackendMessage` is false. */
+  /** Fixed pt-BR text shown for this code. */
   fallback: string;
-  /** Whether to prefer the backend message (business errors) over `fallback`. */
-  useBackendMessage: boolean;
   field: WithdrawErrorField;
-  hold: boolean;
 }
 
 const KNOWN: Record<string, KnownWithdrawError> = {
   WITHDRAW_PROVIDER_ERROR: {
     fallback: PROVIDER_ERROR_MESSAGE,
-    useBackendMessage: false,
     field: null,
-    hold: false,
-  },
-  WITHDRAW_DESTINATION_NOT_OWN_CNPJ: {
-    fallback: "A chave PIX precisa estar no CNPJ da sua empresa.",
-    useBackendMessage: true,
-    field: "pixKey",
-    hold: false,
-  },
-  WITHDRAW_LIMIT_PER_TX: {
-    fallback: "Valor acima do limite por saque.",
-    useBackendMessage: true,
-    field: "amount",
-    hold: false,
-  },
-  WITHDRAW_LIMIT_PER_DAY: {
-    fallback: "Limite de saques do dia atingido.",
-    useBackendMessage: true,
-    field: "amount",
-    hold: false,
-  },
-  WITHDRAW_DESTINATION_ON_HOLD: {
-    fallback: "Esta chave PIX está em validação de segurança por 24h.",
-    useBackendMessage: true,
-    field: "pixKey",
-    hold: true,
   },
 };
 
@@ -102,23 +67,19 @@ export function mapWithdrawError(
 ): WithdrawErrorView {
   const known = code ? KNOWN[code] : undefined;
   if (known) {
-    const trimmed = backendMessage?.trim();
-    const message =
-      known.useBackendMessage && trimmed && trimmed.length > 0 ? trimmed : known.fallback;
-    return { message, field: known.field, hold: known.hold };
+    return { message: known.fallback, field: known.field };
   }
 
   // 412: the company's payments subaccount isn't provisioned yet. Keyed by
   // status (no stable code) — fixed pt-BR message, never the raw body.
   if (status === 412) {
-    return { message: SUBACCOUNT_NOT_READY_MESSAGE, field: null, hold: false };
+    return { message: SUBACCOUNT_NOT_READY_MESSAGE, field: null };
   }
 
   // Unknown or missing code → generic message + short support code, no body.
   return {
     message: GENERIC_WITHDRAW_ERROR,
     field: null,
-    hold: false,
     supportCode: formatSupportCode(status, now),
   };
 }

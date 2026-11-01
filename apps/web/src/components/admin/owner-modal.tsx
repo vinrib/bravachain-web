@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { ShieldAlert } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -29,8 +28,6 @@ export interface OwnerModalProps {
   userId: string;
   /** null/undefined → create; an owner → edit that owner. */
   owner?: Owner | null;
-  /** When true, saving reopens the review and clears approvals — warn the user. */
-  approvalsExist: boolean;
   onSaved: (detail: ClientDetail) => void;
 }
 
@@ -39,7 +36,6 @@ export function OwnerModal({
   onOpenChange,
   userId,
   owner,
-  approvalsExist,
   onSaved,
 }: OwnerModalProps) {
   const t = useTranslations("admin.review.owners");
@@ -236,16 +232,6 @@ export function OwnerModal({
             </ModalField>
           )}
         </div>
-
-        {approvalsExist && (
-          <div
-            role="note"
-            className="flex items-start gap-2.5 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2.5 text-xs leading-relaxed text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200"
-          >
-            <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
-            <span>{t("reopenWarning")}</span>
-          </div>
-        )}
 
         {error && (
           <p role="alert" className="text-sm font-medium text-destructive">

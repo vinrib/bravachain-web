@@ -14,7 +14,7 @@ import type {
   ReviewStatus,
   RiskLevel,
 } from "@/lib/admin/types";
-import { ReviewStatusChip, RiskChip, KybChip, PepTag, ExceptionTag } from "./badges";
+import { ReviewStatusChip, RiskChip, KybChip, PepTag } from "./badges";
 
 const REVIEW_OPTIONS: ReviewStatus[] = [
   "NOT_STARTED",
@@ -24,7 +24,7 @@ const REVIEW_OPTIONS: ReviewStatus[] = [
 ];
 const RISK_OPTIONS: RiskLevel[] = ["LOW", "MEDIUM", "HIGH"];
 const GRID =
-  "grid grid-cols-[minmax(0,1fr)_120px_120px_90px_70px_110px_96px_150px] gap-3 items-center";
+  "grid grid-cols-[minmax(0,1fr)_120px_120px_90px_70px_150px] gap-3 items-center";
 
 export function ClientsList() {
   const t = useTranslations("admin.clients");
@@ -36,7 +36,6 @@ export function ClientsList() {
   const [reviewStatus, setReviewStatus] = useState<ReviewStatus | "">("");
   const [risk, setRisk] = useState<RiskLevel | "">("");
   const [pep, setPep] = useState(false);
-  const [grandfathered, setGrandfathered] = useState(false);
   const [page, setPage] = useState(1);
 
   const [data, setData] = useState<ClientListResponse | null>(null);
@@ -50,7 +49,7 @@ export function ClientsList() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setPage(1);
-  }, [effectiveQ, reviewStatus, risk, pep, grandfathered]);
+  }, [effectiveQ, reviewStatus, risk, pep]);
 
   const params: ListClientsParams = useMemo(
     () => ({
@@ -58,11 +57,10 @@ export function ClientsList() {
       reviewStatus: reviewStatus || undefined,
       risk: risk || undefined,
       pep: pep || undefined,
-      grandfathered: grandfathered || undefined,
       page,
       pageSize: 20,
     }),
-    [effectiveQ, reviewStatus, risk, pep, grandfathered, page],
+    [effectiveQ, reviewStatus, risk, pep, page],
   );
 
   useEffect(() => {
@@ -173,15 +171,6 @@ export function ClientsList() {
             />
             {t("onlyPep")}
           </label>
-          <label className="flex min-h-[44px] cursor-pointer items-center gap-2 text-sm text-foreground">
-            <input
-              type="checkbox"
-              checked={grandfathered}
-              onChange={(e) => setGrandfathered(e.target.checked)}
-              className="h-5 w-5 accent-[#0b6b4f]"
-            />
-            {t("onlyException")}
-          </label>
         </div>
       </div>
 
@@ -215,8 +204,6 @@ export function ClientsList() {
                 <span role="columnheader">{t("colReview")}</span>
                 <span role="columnheader">{t("colRisk")}</span>
                 <span role="columnheader">{t("colPep")}</span>
-                <span role="columnheader">{t("colException")}</span>
-                <span role="columnheader">{t("colApprovals")}</span>
                 <span role="columnheader">{t("colUpdated")}</span>
               </div>
               {data!.items.map((row) => (
@@ -242,15 +229,6 @@ export function ClientsList() {
                   <span role="cell"><ReviewStatusChip status={row.reviewStatus} /></span>
                   <span role="cell"><RiskChip risk={row.riskLevel} /></span>
                   <span role="cell"><PepTag isPep={row.isPep} /></span>
-                  <span role="cell"><ExceptionTag on={row.complianceGrandfathered} /></span>
-                  <span role="cell" className="text-sm">
-                    {row.approvals.required === null
-                      ? "—"
-                      : t("approvalsOf", {
-                          approved: row.approvals.approved,
-                          required: row.approvals.required,
-                        })}
-                  </span>
                   <span role="cell" className="text-xs text-muted-foreground">
                     {formatDateTimeBR(row.updatedAt) || "—"}
                   </span>
@@ -282,17 +260,8 @@ export function ClientsList() {
                       <KybChip status={row.kybStatus} />
                       <RiskChip risk={row.riskLevel} />
                       {row.isPep && <PepTag isPep />}
-                      {row.complianceGrandfathered && <ExceptionTag on />}
                     </div>
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>
-                        {row.approvals.required === null
-                          ? "—"
-                          : t("approvalsOf", {
-                              approved: row.approvals.approved,
-                              required: row.approvals.required,
-                            })}
-                      </span>
+                    <div className="flex items-center justify-end text-xs text-muted-foreground">
                       <span>{formatDateTimeBR(row.updatedAt)}</span>
                     </div>
                   </Link>

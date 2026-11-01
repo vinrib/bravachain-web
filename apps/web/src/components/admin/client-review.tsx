@@ -8,8 +8,6 @@ import {
   ShieldAlert,
   Eye,
   EyeOff,
-  CheckCircle2,
-  XCircle,
   FileText,
   Plus,
   Pencil,
@@ -23,24 +21,19 @@ import { ApiError } from "@/lib/client-api";
 import {
   getClient,
   saveReview,
-  decide,
-  setGrandfathered,
   revealOwnerCpf,
   removeOwner,
   accessDocument,
 } from "@/lib/admin/compliance";
-import { useAdminIdentity } from "@/lib/hooks";
 import { formatCnpj, formatCpf, formatDateTimeBR, formatDateBR, formatBrl } from "@/lib/admin/format";
 import type {
   ClientDetail,
   Company,
-  Decision,
-  GateDecision,
   Owner,
   RiskLevel,
   UpsertReviewPayload,
 } from "@/lib/admin/types";
-import { ReviewStatusChip, RiskChip, PepTag, ExceptionTag } from "./badges";
+import { ReviewStatusChip, RiskChip, PepTag } from "./badges";
 import { ReasonModal } from "./reason-modal";
 import { OwnerModal } from "./owner-modal";
 
@@ -64,12 +57,9 @@ export function ClientReview({ userId }: { userId: string }) {
   const t = useTranslations("admin.review");
   const tc = useTranslations("admin.common");
 
-  const me = useAdminIdentity();
-
   const [detail, setDetail] = useState<ClientDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [reopened, setReopened] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -111,9 +101,6 @@ export function ClientReview({ userId }: { userId: string }) {
 
   const review = detail.review;
   const company = detail.company;
-  const isSelf = !!me.userId && me.userId === detail.userId;
-  const alreadyDecided =
-    !!me.userId && detail.approvals.some((a) => a.approverUserId === me.userId);
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
@@ -132,58 +119,17 @@ export function ClientReview({ userId }: { userId: string }) {
           <ReviewStatusChip status={review?.status ?? "NOT_STARTED"} />
           <RiskChip risk={review?.riskLevel ?? null} />
           {review?.isPep && <PepTag isPep />}
-          <ExceptionTag on={detail.complianceGrandfathered} />
         </div>
       </div>
 
-      {reopened && (
-        <div
-          role="status"
-          className="flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200"
-        >
-          <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0" />
-          <span>{t("reopenedBanner")}</span>
-        </div>
-      )}
-
       <CompanyData company={company} />
-      <OwnersSection
-        userId={detail.userId}
-        owners={detail.owners}
-        approvalsExist={detail.approvals.length > 0}
-        onChanged={(d) => {
-          setDetail(d);
-          setReopened(true);
-        }}
-      />
+      <OwnersSection userId={detail.userId} owners={detail.owners} onChanged={setDetail} />
       <DiligenceForm
         key={`${review?.status}-${review?.riskLevel}`}
         detail={detail}
-        onSaved={(d) => {
-          setDetail(d);
-          setReopened(true);
-        }}
+        onSaved={setDetail}
       />
       <DocumentsSection userId={detail.userId} documents={detail.documents} />
-      <ApprovalsSection
-        detail={detail}
-        isSelf={isSelf}
-        alreadyDecided={alreadyDecided}
-        onDecided={(d) => {
-          setDetail(d);
-          setReopened(false);
-        }}
-      />
-      <GateEffect gate={detail.simulatedGateDecision} />
-      <ExceptionSection
-        detail={detail}
-        isSelf={isSelf}
-        onChanged={(d) => {
-          setDetail(d);
-          setReopened(false);
-        }}
-      />
-      <HistorySection detail={detail} />
     </div>
   );
 }
@@ -291,12 +237,10 @@ function CompanyData({ company }: { company: Company | null }) {
 function OwnersSection({
   userId,
   owners,
-  approvalsExist,
   onChanged,
 }: {
   userId: string;
   owners: Owner[];
-  approvalsExist: boolean;
   onChanged: (detail: ClientDetail) => void;
 }) {
   const t = useTranslations("admin.review");
@@ -339,7 +283,6 @@ function OwnersSection({
         onOpenChange={(o) => !o && setModalOwner(undefined)}
         userId={userId}
         owner={modalOwner}
-        approvalsExist={approvalsExist}
         onSaved={onChanged}
       />
 
@@ -347,7 +290,7 @@ function OwnersSection({
         open={removeTarget !== null}
         onOpenChange={(o) => !o && setRemoveTarget(null)}
         title={t("owners.removeTitle", { name: removeTarget?.fullName ?? "" })}
-        description={approvalsExist ? t("owners.reopenWarning") : t("owners.removeBody")}
+        description={t("owners.removeBody")}
         reasonLabel={t("owners.removeReasonLabel")}
         confirmLabel={t("owners.remove")}
         destructive
@@ -637,11 +580,6 @@ function DiligenceForm({
           </Field>
         )}
 
-        <p className="flex items-start gap-2 text-xs text-muted-foreground">
-          <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
-          {t("diligence.saveWarning")}
-        </p>
-
         {formError && (
           <p role="alert" className="text-sm font-medium text-destructive">
             {formError}
@@ -770,219 +708,3 @@ function DocumentRow({
   );
 }
 
-// ─── Approvals + decisions ─────────────────────────────────────────────────────
-
-function ApprovalsSection({
-  detail,
-  isSelf,
-  alreadyDecided,
-  onDecided,
-}: {
-  detail: ClientDetail;
-  isSelf: boolean;
-  alreadyDecided: boolean;
-  onDecided: (d: ClientDetail) => void;
-}) {
-  const t = useTranslations("admin.review");
-  const tc = useTranslations("admin.common");
-  const [modal, setModal] = useState<Decision | null>(null);
-
-  const review = detail.review;
-  const risk = review?.riskLevel ?? null;
-  const required = risk ? (risk === "HIGH" ? 2 : 1) : null;
-  const approved = detail.approvals.filter((a) => a.decision === "APPROVE").length;
-  const isOpen = review?.status === "IN_REVIEW";
-
-  let blockedReason: string | null = null;
-  if (isSelf) blockedReason = t("decisions.self");
-  else if (alreadyDecided) blockedReason = t("decisions.already");
-  else if (!risk) blockedReason = t("decisions.needRisk");
-  else if (!isOpen) blockedReason = t("decisions.notOpen");
-  const canDecide = blockedReason === null;
-
-  return (
-    <Section title={t("approvals.title")}>
-      <p className="mb-3 text-sm text-muted-foreground">{t("approvals.rule")}</p>
-
-      {required !== null && (
-        <p className="mb-4 text-sm font-semibold text-foreground">
-          {t("approvals.progress", { approved, required })}
-        </p>
-      )}
-
-      <div className="flex flex-wrap gap-3">
-        <Button type="button" size="md" disabled={!canDecide} onClick={() => setModal("APPROVE")}>
-          <CheckCircle2 className="h-4 w-4" />
-          {t("decisions.approve")}
-        </Button>
-        <Button
-          type="button"
-          size="md"
-          variant="destructive"
-          disabled={!canDecide}
-          onClick={() => setModal("REJECT")}
-        >
-          <XCircle className="h-4 w-4" />
-          {t("decisions.reject")}
-        </Button>
-      </div>
-
-      {blockedReason && <p className="mt-3 text-sm text-muted-foreground">{blockedReason}</p>}
-
-      <ReasonModal
-        open={modal !== null}
-        onOpenChange={(o) => !o && setModal(null)}
-        title={modal === "REJECT" ? t("decisions.rejectTitle") : t("decisions.approveTitle")}
-        description={modal === "REJECT" ? t("decisions.rejectBody") : t("decisions.approveBody")}
-        auditNote={t("decisions.audit")}
-        requireReason={false}
-        reasonLabel={t("decisions.noteLabel")}
-        reasonPlaceholder={t("decisions.notePlaceholder")}
-        confirmLabel={modal === "REJECT" ? t("decisions.reject") : t("decisions.approve")}
-        destructive={modal === "REJECT"}
-        onConfirm={async (note) => {
-          if (!modal) return;
-          onDecided(await decide(detail.userId, modal, note || undefined));
-          setModal(null);
-        }}
-      />
-
-      {detail.approvals.length > 0 && (
-        <ul className="mt-5 flex flex-col gap-2 border-t border-border pt-4">
-          {detail.approvals.map((a, i) => (
-            <li key={i} className="flex items-start gap-2 text-sm">
-              {a.decision === "APPROVE" ? (
-                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-              ) : (
-                <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
-              )}
-              <div>
-                <span className="font-medium text-foreground">
-                  {a.decision === "APPROVE" ? tc("approved") : tc("rejected")}
-                </span>
-                {a.note && <span className="text-muted-foreground"> — {a.note}</span>}
-                {a.createdAt && (
-                  <span className="block text-xs text-muted-foreground">
-                    {formatDateTimeBR(a.createdAt)}
-                  </span>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-    </Section>
-  );
-}
-
-// ─── Effect on client access (gate preview) ───────────────────────────────────
-
-function GateEffect({ gate }: { gate: GateDecision | null }) {
-  const t = useTranslations("admin.review");
-  const tgate = useTranslations("admin.gate");
-  return (
-    <Section title={t("gate.title")}>
-      <p className="mb-3 text-xs text-muted-foreground">{t("gate.subtitle")}</p>
-      {gate === null ? (
-        <span className="text-sm text-muted-foreground">—</span>
-      ) : gate.allowed ? (
-        <span className="inline-flex items-center gap-2 rounded-xl bg-emerald-100 px-3 py-2 text-sm font-semibold text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-200">
-          <CheckCircle2 className="h-4 w-4" />
-          {t("gate.allowed")}
-        </span>
-      ) : (
-        <span className="inline-flex items-center gap-2 rounded-xl bg-red-100 px-3 py-2 text-sm font-semibold text-red-800 dark:bg-red-500/15 dark:text-red-200">
-          <XCircle className="h-4 w-4" />
-          {tgate.has(gate.reason) ? tgate(gate.reason) : t("gate.blocked")}
-        </span>
-      )}
-    </Section>
-  );
-}
-
-// ─── Compliance exception ──────────────────────────────────────────────────────
-
-function ExceptionSection({
-  detail,
-  isSelf,
-  onChanged,
-}: {
-  detail: ClientDetail;
-  isSelf: boolean;
-  onChanged: (d: ClientDetail) => void;
-}) {
-  const t = useTranslations("admin.review");
-  const [open, setOpen] = useState(false);
-  const on = detail.complianceGrandfathered;
-
-  return (
-    <Section title={t("exception.title")}>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-sm font-medium text-foreground">{t("exception.toggle")}</p>
-          <p className="mt-1 text-xs text-muted-foreground">{t("exception.audit")}</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <ExceptionTag on={on} />
-          <Button
-            type="button"
-            size="md"
-            variant={on ? "destructive" : "secondary"}
-            disabled={isSelf}
-            onClick={() => setOpen(true)}
-          >
-            {on ? t("exception.deactivate") : t("exception.activate")}
-          </Button>
-        </div>
-      </div>
-      {isSelf && <p className="mt-2 text-sm text-muted-foreground">{t("exception.self")}</p>}
-
-      <ReasonModal
-        open={open}
-        onOpenChange={setOpen}
-        title={on ? t("exception.deactivateTitle") : t("exception.activateTitle")}
-        description={on ? t("exception.deactivateBody") : t("exception.activateBody")}
-        auditNote={t("exception.auditNote")}
-        reasonLabel={t("exception.reasonLabel")}
-        reasonPlaceholder={t("exception.reasonPlaceholder")}
-        confirmLabel={on ? t("exception.deactivate") : t("exception.activate")}
-        destructive={on}
-        onConfirm={async (reason) => {
-          onChanged(await setGrandfathered(detail.userId, !on, reason));
-          setOpen(false);
-        }}
-      />
-    </Section>
-  );
-}
-
-// ─── History (only the approval trail is exposed by the API) ───────────────────
-
-function HistorySection({ detail }: { detail: ClientDetail }) {
-  const t = useTranslations("admin.review");
-  const tc = useTranslations("admin.common");
-  return (
-    <Section title={t("history.title")}>
-      {detail.approvals.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{t("history.empty")}</p>
-      ) : (
-        <ol className="flex flex-col gap-3">
-          {detail.approvals.map((a, i) => (
-            <li key={i} className="flex gap-3 text-sm">
-              <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
-              <div>
-                <p className="font-medium text-foreground">
-                  {a.decision === "APPROVE" ? tc("approved") : tc("rejected")}
-                </p>
-                {a.note && <p className="text-muted-foreground">{a.note}</p>}
-                {a.createdAt && (
-                  <p className="text-xs text-muted-foreground">{formatDateTimeBR(a.createdAt)}</p>
-                )}
-              </div>
-            </li>
-          ))}
-        </ol>
-      )}
-    </Section>
-  );
-}

@@ -31,8 +31,6 @@ const RESPONSE: ClientListResponse = {
       reviewStatus: "NOT_STARTED",
       riskLevel: null,
       isPep: false,
-      complianceGrandfathered: false,
-      approvals: { approved: 0, required: null },
       updatedAt: "2026-10-27T12:12:00Z",
     },
   ],
@@ -50,7 +48,7 @@ beforeEach(() => vi.mocked(listClients).mockReset());
 afterEach(cleanup);
 
 describe("ClientsList", () => {
-  it("renders rows, with '—' approvals and 'Não iniciada' when risk is undefined", async () => {
+  it("renders rows, with '—' risk and 'Não iniciada' review status when unset", async () => {
     vi.mocked(listClients).mockResolvedValue(RESPONSE);
     renderList();
     // Desktop table + mobile cards both render in jsdom → match all.
@@ -58,6 +56,15 @@ describe("ClientsList", () => {
     expect(screen.getAllByText("00.000.000/0001-00").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Não iniciada").length).toBeGreaterThan(0);
     expect(screen.getAllByText("—").length).toBeGreaterThan(0);
+  });
+
+  it("has no compliance-exception filter or column (Bravachain does not limit clients)", async () => {
+    vi.mocked(listClients).mockResolvedValue(RESPONSE);
+    renderList();
+    await screen.findAllByText("Exemplo Comércio Exterior Ltda");
+    expect(screen.queryByLabelText("Somente com exceção")).toBeNull();
+    expect(screen.queryByText("Exceção")).toBeNull();
+    expect(screen.queryByText("Aprovações")).toBeNull();
   });
 
   it("shows the empty state", async () => {

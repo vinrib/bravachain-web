@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ShieldAlert, ArrowRight, Clock } from "lucide-react";
+import { ShieldAlert, ArrowRight } from "lucide-react";
 import { PixIcon } from "@/components/icons/pix-icon";
 import {
   parseBRL,
@@ -52,7 +52,6 @@ export default function SaquePage() {
   });
   const [pixKey, setPixKey] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [holdMessage, setHoldMessage] = useState<string | null>(null);
   const [supportCode, setSupportCode] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -96,7 +95,6 @@ export default function SaquePage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setHoldMessage(null);
     setSupportCode(null);
     if (!validate() || amount === null || !pixKeyType) return;
     setSubmitting(true);
@@ -119,10 +117,7 @@ export default function SaquePage() {
     } catch (err) {
       if (err instanceof ApiError) {
         const view = mapWithdrawError(err.code, err.message, err.status);
-        if (view.hold) {
-          setHoldMessage(view.message);
-          setErrors({});
-        } else if (view.field) {
+        if (view.field) {
           setErrors({ [view.field]: view.message });
         } else {
           setErrors({ form: view.message });
@@ -222,7 +217,6 @@ export default function SaquePage() {
                 onChange={(e) => {
                   setPixKey(e.target.value);
                   setErrors((p) => ({ ...p, pixKey: "" }));
-                  setHoldMessage(null);
                 }}
                 placeholder="CPF, CNPJ, e-mail, telefone ou chave aleatória"
                 error={errors.pixKey}
@@ -232,13 +226,6 @@ export default function SaquePage() {
                   ) : undefined
                 }
               />
-
-              {holdMessage && (
-                <div className="flex items-start gap-2 rounded-lg bg-[#c77a18]/10 px-3 py-2.5">
-                  <Clock className="mt-0.5 h-4 w-4 shrink-0 text-[#c77a18]" />
-                  <p className="text-sm text-[#8a5310] dark:text-[#d79a3a]">{holdMessage}</p>
-                </div>
-              )}
 
               {errors.form && (
                 <div className="rounded-lg bg-destructive/10 px-3 py-2">

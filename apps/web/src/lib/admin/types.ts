@@ -1,12 +1,19 @@
 /**
- * Types for the admin area, mirroring the backend compliance-review (#82/#83)
- * and admin-users (#83 / PR C) responses. Enum values match the Prisma enums
- * used by the API (ComplianceReviewStatus, ComplianceRiskLevel, etc.).
+ * Types for the admin area, mirroring the backend compliance-review (#82/#83),
+ * admin-users (#83 / PR C) and #92 (decision/limit removal) responses. Enum
+ * values match the Prisma enums used by the API (ComplianceReviewStatus,
+ * ComplianceRiskLevel, etc.). Bravachain does not approve, reject, or limit
+ * clients or operations — only Avenia decides; this area is read-only plus
+ * internal annotations.
  */
 
+/**
+ * `reviewStatus` is read-only/historical: since #92, nothing in the backend
+ * ever sets it to IN_REVIEW/APPROVED/REJECTED again (the decision and the
+ * reopen-on-change flow were removed). Existing values predate that change.
+ */
 export type ReviewStatus = "NOT_STARTED" | "IN_REVIEW" | "APPROVED" | "REJECTED";
 export type RiskLevel = "LOW" | "MEDIUM" | "HIGH";
-export type Decision = "APPROVE" | "REJECT";
 export type KybStatus = string; // free-form on the backend; shown as a labeled chip
 export type UserRole = "USER" | "ADMIN";
 
@@ -19,8 +26,6 @@ export interface ClientListItem {
   reviewStatus: ReviewStatus;
   riskLevel: RiskLevel | null;
   isPep: boolean;
-  complianceGrandfathered: boolean;
-  approvals: { approved: number; required: number | null };
   updatedAt: string | null;
 }
 
@@ -30,23 +35,6 @@ export interface ClientListResponse {
   pageSize: number;
   total: number;
 }
-
-/** The money-movement gate preview ("Efeito no acesso do cliente"). */
-export type GateDecision =
-  | { allowed: true }
-  | {
-      allowed: false;
-      reason:
-        | "IDENTITY_PENDING"
-        | "KYB_PENDING"
-        | "USER_NOT_FOUND"
-        | "COMPLIANCE_REVIEW_PENDING"
-        | string;
-      accountType?: string;
-      identityStatus?: string;
-      kybStatus?: string;
-      complianceReviewStatus?: string;
-    };
 
 export interface Review {
   status: ReviewStatus;
@@ -59,13 +47,6 @@ export interface Review {
   publicFundsInvolved: boolean | null;
   reviewedAt: string | null;
   nextReviewAt: string | null;
-}
-
-export interface Approval {
-  approverUserId: string;
-  decision: Decision;
-  note: string | null;
-  createdAt: string | null;
 }
 
 export interface Owner {
@@ -111,11 +92,8 @@ export interface ClientDetail {
   userId: string;
   accountType: string | null;
   kybStatus: KybStatus | null;
-  complianceGrandfathered: boolean;
   company: Company | null;
-  simulatedGateDecision: GateDecision | null;
   review: Review | null;
-  approvals: Approval[];
   owners: Owner[];
   documents: KybDocument[];
 }
