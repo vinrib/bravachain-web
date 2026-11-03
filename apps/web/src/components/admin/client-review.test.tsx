@@ -358,4 +358,24 @@ describe("ClientReview — no decision actions (Bravachain does not approve/reje
     expect(screen.getByText("Diligência")).toBeTruthy();
     expect(screen.getByText("Documentos")).toBeTruthy();
   });
+
+  it("renders no review-status chip (not an approval — #93), present or absent in the response", async () => {
+    vi.mocked(getClient).mockResolvedValue(makeDetail());
+    renderReview();
+    await screen.findAllByText("Exemplo Comércio Exterior Ltda");
+    for (const label of ["Em análise", "Aprovada", "Rejeitada", "Não iniciada"]) {
+      expect(screen.queryByText(label)).toBeNull();
+    }
+
+    cleanup();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { status, ...reviewWithoutStatus } = makeDetail().review!;
+    vi.mocked(getClient).mockResolvedValue(
+      makeDetail({ review: reviewWithoutStatus }),
+    );
+    renderReview();
+    // Still renders fine without `review.status` in the response at all.
+    expect(await screen.findAllByText("Exemplo Comércio Exterior Ltda")).toBeTruthy();
+    expect(screen.getByText("Diligência")).toBeTruthy();
+  });
 });

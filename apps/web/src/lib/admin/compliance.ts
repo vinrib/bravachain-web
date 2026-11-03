@@ -17,14 +17,12 @@ import type {
   Owner,
   OwnerPayload,
   Review,
-  ReviewStatus,
   RiskLevel,
   UpsertReviewPayload,
 } from "./types";
 
 export interface ListClientsParams {
   q?: string;
-  reviewStatus?: ReviewStatus;
   risk?: RiskLevel;
   pep?: boolean;
   page?: number;
@@ -51,7 +49,9 @@ function normalizeListItem(raw: unknown): ClientListItem {
     companyName: str(r.companyName),
     companyCnpj: str(r.companyCnpj),
     kybStatus: str(r.kybStatus),
-    reviewStatus: (str(r.reviewStatus) as ReviewStatus) ?? "NOT_STARTED",
+    // Not an approval and not filtered/rendered by the web (#93) — carried
+    // through only if the API happens to send it.
+    reviewStatus: str(r.reviewStatus) ?? undefined,
     riskLevel: (str(r.riskLevel) as RiskLevel) ?? null,
     isPep: bool(r.isPep),
     updatedAt: str(r.updatedAt),
@@ -63,7 +63,6 @@ export async function listClients(
 ): Promise<ClientListResponse> {
   const qs = new URLSearchParams();
   if (params.q) qs.set("q", params.q);
-  if (params.reviewStatus) qs.set("reviewStatus", params.reviewStatus);
   if (params.risk) qs.set("risk", params.risk);
   if (params.pep) qs.set("pep", "true");
   qs.set("page", String(params.page ?? 1));
@@ -86,7 +85,9 @@ function normalizeReview(raw: unknown): Review | null {
   if (!raw || typeof raw !== "object") return null;
   const r = asRecord(raw);
   return {
-    status: (str(r.status) as ReviewStatus) ?? "NOT_STARTED",
+    // Not an approval and not rendered by the web (#93) — carried through
+    // only if the API happens to send it.
+    status: str(r.status) ?? undefined,
     riskLevel: (str(r.riskLevel) as RiskLevel) ?? null,
     riskRationale: str(r.riskRationale),
     isPep: bool(r.isPep),

@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import type { ReviewStatus, RiskLevel } from "@/lib/admin/types";
+import type { RiskLevel } from "@/lib/admin/types";
 
 function Chip({ className, children }: { className?: string; children: React.ReactNode }) {
   return (
@@ -15,18 +15,6 @@ function Chip({ className, children }: { className?: string; children: React.Rea
       {children}
     </span>
   );
-}
-
-const REVIEW_STYLES: Record<ReviewStatus, string> = {
-  NOT_STARTED: "bg-muted text-muted-foreground",
-  IN_REVIEW: "bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-200",
-  APPROVED: "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-200",
-  REJECTED: "bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-200",
-};
-
-export function ReviewStatusChip({ status }: { status: ReviewStatus }) {
-  const t = useTranslations("admin.reviewStatus");
-  return <Chip className={REVIEW_STYLES[status]}>{t(status)}</Chip>;
 }
 
 const RISK_STYLES: Record<RiskLevel, string> = {

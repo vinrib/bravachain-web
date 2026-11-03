@@ -1,18 +1,11 @@
 /**
  * Types for the admin area, mirroring the backend compliance-review (#82/#83),
- * admin-users (#83 / PR C) and #92 (decision/limit removal) responses. Enum
- * values match the Prisma enums used by the API (ComplianceReviewStatus,
- * ComplianceRiskLevel, etc.). Bravachain does not approve, reject, or limit
- * clients or operations — only Avenia decides; this area is read-only plus
- * internal annotations.
+ * admin-users (#83 / PR C), #92 (decision/limit removal) and #93 (reviewStatus
+ * is not an approval) responses. Bravachain does not approve, reject, or
+ * limit clients or operations — only Avenia decides; this area is read-only
+ * plus internal annotations.
  */
 
-/**
- * `reviewStatus` is read-only/historical: since #92, nothing in the backend
- * ever sets it to IN_REVIEW/APPROVED/REJECTED again (the decision and the
- * reopen-on-change flow were removed). Existing values predate that change.
- */
-export type ReviewStatus = "NOT_STARTED" | "IN_REVIEW" | "APPROVED" | "REJECTED";
 export type RiskLevel = "LOW" | "MEDIUM" | "HIGH";
 export type KybStatus = string; // free-form on the backend; shown as a labeled chip
 export type UserRole = "USER" | "ADMIN";
@@ -23,7 +16,13 @@ export interface ClientListItem {
   companyName: string | null;
   companyCnpj: string | null;
   kybStatus: KybStatus | null;
-  reviewStatus: ReviewStatus;
+  /**
+   * No guard reads this (confirmed by the API) — it is not an approval and
+   * must never be rendered as one (#93). Optional and untyped on purpose: the
+   * web does not read its value, only carries it through if present, and
+   * must not break if the API stops sending it.
+   */
+  reviewStatus?: string;
   riskLevel: RiskLevel | null;
   isPep: boolean;
   updatedAt: string | null;
@@ -37,7 +36,8 @@ export interface ClientListResponse {
 }
 
 export interface Review {
-  status: ReviewStatus;
+  /** See the note on {@link ClientListItem.reviewStatus} — not an approval. */
+  status?: string;
   riskLevel: RiskLevel | null;
   riskRationale: string | null;
   isPep: boolean;

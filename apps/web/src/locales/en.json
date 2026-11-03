@@ -262,12 +262,6 @@
       "previous": "Previous",
       "next": "Next"
     },
-    "reviewStatus": {
-      "NOT_STARTED": "Not started",
-      "IN_REVIEW": "In review",
-      "APPROVED": "Approved",
-      "REJECTED": "Rejected"
-    },
     "risk": {
       "LOW": "Low",
       "MEDIUM": "Medium",
@@ -280,13 +274,10 @@
       "searchLabel": "Search",
       "searchPlaceholder": "Company or CNPJ",
       "searchMin": "Type at least 2 characters.",
-      "statusLabel": "Review status",
-      "statusAll": "All",
       "riskLabel": "Risk",
       "onlyPep": "PEP only",
       "colCompany": "Company and CNPJ",
       "colKyb": "KYB status",
-      "colReview": "Review",
       "colRisk": "Risk",
       "colPep": "PEP",
       "colUpdated": "Updated at",

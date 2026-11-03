@@ -9,31 +9,18 @@ import { Spinner } from "@/components/ui/spinner";
 import { listClients, type ListClientsParams } from "@/lib/admin/compliance";
 import { useDebounced } from "@/lib/admin/use-debounced";
 import { formatCnpj, formatDateTimeBR } from "@/lib/admin/format";
-import type {
-  ClientListResponse,
-  ReviewStatus,
-  RiskLevel,
-} from "@/lib/admin/types";
-import { ReviewStatusChip, RiskChip, KybChip, PepTag } from "./badges";
+import type { ClientListResponse, RiskLevel } from "@/lib/admin/types";
+import { RiskChip, KybChip, PepTag } from "./badges";
 
-const REVIEW_OPTIONS: ReviewStatus[] = [
-  "NOT_STARTED",
-  "IN_REVIEW",
-  "APPROVED",
-  "REJECTED",
-];
 const RISK_OPTIONS: RiskLevel[] = ["LOW", "MEDIUM", "HIGH"];
-const GRID =
-  "grid grid-cols-[minmax(0,1fr)_120px_120px_90px_70px_150px] gap-3 items-center";
+const GRID = "grid grid-cols-[minmax(0,1fr)_120px_90px_70px_150px] gap-3 items-center";
 
 export function ClientsList() {
   const t = useTranslations("admin.clients");
   const tc = useTranslations("admin.common");
-  const trs = useTranslations("admin.reviewStatus");
   const trisk = useTranslations("admin.risk");
 
   const [q, setQ] = useState("");
-  const [reviewStatus, setReviewStatus] = useState<ReviewStatus | "">("");
   const [risk, setRisk] = useState<RiskLevel | "">("");
   const [pep, setPep] = useState(false);
   const [page, setPage] = useState(1);
@@ -49,18 +36,17 @@ export function ClientsList() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setPage(1);
-  }, [effectiveQ, reviewStatus, risk, pep]);
+  }, [effectiveQ, risk, pep]);
 
   const params: ListClientsParams = useMemo(
     () => ({
       q: effectiveQ,
-      reviewStatus: reviewStatus || undefined,
       risk: risk || undefined,
       pep: pep || undefined,
       page,
       pageSize: 20,
     }),
-    [effectiveQ, reviewStatus, risk, pep, page],
+    [effectiveQ, risk, pep, page],
   );
 
   useEffect(() => {
@@ -113,25 +99,6 @@ export function ClientsList() {
           {q.trim().length === 1 && (
             <span className="text-xs text-muted-foreground">{t("searchMin")}</span>
           )}
-        </div>
-
-        <div className="flex w-[180px] flex-col gap-1.5">
-          <label htmlFor="client-status" className="text-xs font-semibold text-foreground">
-            {t("statusLabel")}
-          </label>
-          <select
-            id="client-status"
-            value={reviewStatus}
-            onChange={(e) => setReviewStatus(e.target.value as ReviewStatus | "")}
-            className="h-11 rounded-xl border border-border bg-input px-3 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
-          >
-            <option value="">{t("statusAll")}</option>
-            {REVIEW_OPTIONS.map((s) => (
-              <option key={s} value={s}>
-                {trs(s)}
-              </option>
-            ))}
-          </select>
         </div>
 
         <fieldset className="flex flex-col gap-1.5 border-0 p-0">
@@ -201,7 +168,6 @@ export function ClientsList() {
               >
                 <span role="columnheader">{t("colCompany")}</span>
                 <span role="columnheader">{t("colKyb")}</span>
-                <span role="columnheader">{t("colReview")}</span>
                 <span role="columnheader">{t("colRisk")}</span>
                 <span role="columnheader">{t("colPep")}</span>
                 <span role="columnheader">{t("colUpdated")}</span>
@@ -226,7 +192,6 @@ export function ClientsList() {
                     </span>
                   </span>
                   <span role="cell"><KybChip status={row.kybStatus} /></span>
-                  <span role="cell"><ReviewStatusChip status={row.reviewStatus} /></span>
                   <span role="cell"><RiskChip risk={row.riskLevel} /></span>
                   <span role="cell"><PepTag isPep={row.isPep} /></span>
                   <span role="cell" className="text-xs text-muted-foreground">
@@ -245,16 +210,13 @@ export function ClientsList() {
                     aria-label={t("openReview", { name: row.companyName ?? row.userId })}
                     className="flex flex-col gap-2 p-4 transition-colors hover:bg-muted/60 focus:bg-muted/60 focus:outline-none"
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="truncate font-semibold text-foreground">
-                          {row.companyName ?? "—"}
-                        </p>
-                        <p className="font-mono text-xs text-muted-foreground">
-                          {formatCnpj(row.companyCnpj) || "—"}
-                        </p>
-                      </div>
-                      <ReviewStatusChip status={row.reviewStatus} />
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold text-foreground">
+                        {row.companyName ?? "—"}
+                      </p>
+                      <p className="font-mono text-xs text-muted-foreground">
+                        {formatCnpj(row.companyCnpj) || "—"}
+                      </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
                       <KybChip status={row.kybStatus} />
