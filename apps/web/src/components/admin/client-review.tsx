@@ -33,7 +33,7 @@ import type {
   RiskLevel,
   UpsertReviewPayload,
 } from "@/lib/admin/types";
-import { ReviewStatusChip, RiskChip, PepTag } from "./badges";
+import { RiskChip, PepTag } from "./badges";
 import { ReasonModal } from "./reason-modal";
 import { OwnerModal } from "./owner-modal";
 
@@ -116,7 +116,6 @@ export function ClientReview({ userId }: { userId: string }) {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <ReviewStatusChip status={review?.status ?? "NOT_STARTED"} />
           <RiskChip risk={review?.riskLevel ?? null} />
           {review?.isPep && <PepTag isPep />}
         </div>
@@ -124,11 +123,7 @@ export function ClientReview({ userId }: { userId: string }) {
 
       <CompanyData company={company} />
       <OwnersSection userId={detail.userId} owners={detail.owners} onChanged={setDetail} />
-      <DiligenceForm
-        key={`${review?.status}-${review?.riskLevel}`}
-        detail={detail}
-        onSaved={setDetail}
-      />
+      <DiligenceForm key={review?.riskLevel} detail={detail} onSaved={setDetail} />
       <DocumentsSection userId={detail.userId} documents={detail.documents} />
     </div>
   );

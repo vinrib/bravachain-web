@@ -28,7 +28,9 @@ const RESPONSE: ClientListResponse = {
       companyName: "Exemplo Comércio Exterior Ltda",
       companyCnpj: "00000000000100",
       kybStatus: "APPROVED",
-      reviewStatus: "NOT_STARTED",
+      // Present but never rendered/filtered on (#93) — exercises the "field
+      // present" path; the next test exercises "field absent".
+      reviewStatus: "APPROVED",
       riskLevel: null,
       isPep: false,
       updatedAt: "2026-10-27T12:12:00Z",
@@ -48,14 +50,38 @@ beforeEach(() => vi.mocked(listClients).mockReset());
 afterEach(cleanup);
 
 describe("ClientsList", () => {
-  it("renders rows, with '—' risk and 'Não iniciada' review status when unset", async () => {
+  it("renders rows, with '—' risk when unset", async () => {
     vi.mocked(listClients).mockResolvedValue(RESPONSE);
     renderList();
     // Desktop table + mobile cards both render in jsdom → match all.
     expect((await screen.findAllByText("Exemplo Comércio Exterior Ltda")).length).toBeGreaterThan(0);
     expect(screen.getAllByText("00.000.000/0001-00").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Não iniciada").length).toBeGreaterThan(0);
     expect(screen.getAllByText("—").length).toBeGreaterThan(0);
+  });
+
+  it("renders fine when the API omits reviewStatus entirely", async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { reviewStatus, ...itemWithoutReviewStatus } = RESPONSE.items[0]!;
+    vi.mocked(listClients).mockResolvedValue({
+      ...RESPONSE,
+      items: [itemWithoutReviewStatus],
+    });
+    renderList();
+    expect((await screen.findAllByText("Exemplo Comércio Exterior Ltda")).length).toBeGreaterThan(0);
+  });
+
+  it("has no review-status chip, filter or column, and never sends it to the API (not an approval — #93)", async () => {
+    vi.mocked(listClients).mockResolvedValue(RESPONSE);
+    renderList();
+    await screen.findAllByText("Exemplo Comércio Exterior Ltda");
+    expect(screen.queryByLabelText("Status da revisão")).toBeNull();
+    expect(screen.queryByText("Revisão")).toBeNull();
+    expect(screen.queryByText("Aprovada")).toBeNull();
+    expect(screen.queryByText("Rejeitada")).toBeNull();
+    expect(screen.queryByText("Em análise")).toBeNull();
+    expect(
+      vi.mocked(listClients).mock.calls.every(([p]) => !("reviewStatus" in p)),
+    ).toBe(true);
   });
 
   it("has no compliance-exception filter or column (Bravachain does not limit clients)", async () => {

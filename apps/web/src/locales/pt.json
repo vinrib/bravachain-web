@@ -262,12 +262,6 @@
       "previous": "Anterior",
       "next": "Próxima"
     },
-    "reviewStatus": {
-      "NOT_STARTED": "Não iniciada",
-      "IN_REVIEW": "Em análise",
-      "APPROVED": "Aprovada",
-      "REJECTED": "Rejeitada"
-    },
     "risk": {
       "LOW": "Baixo",
       "MEDIUM": "Médio",
@@ -280,13 +274,10 @@
       "searchLabel": "Buscar",
       "searchPlaceholder": "Empresa ou CNPJ",
       "searchMin": "Digite ao menos 2 caracteres.",
-      "statusLabel": "Status da revisão",
-      "statusAll": "Todos",
       "riskLabel": "Risco",
       "onlyPep": "Somente PEP",
       "colCompany": "Empresa e CNPJ",
       "colKyb": "Status KYB",
-      "colReview": "Revisão",
       "colRisk": "Risco",
       "colPep": "PEP",
       "colUpdated": "Atualizado em",
