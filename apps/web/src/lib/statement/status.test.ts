@@ -17,9 +17,9 @@ describe("statementStatusView — exact PR #56 enum", () => {
     expect(v).toEqual({ label: "Em processamento", tone: "processing", final: false });
   });
 
-  it("PENDING → Em andamento (Em análise)", () => {
+  it("PENDING → Em andamento (Em processamento)", () => {
     const v = statementStatusView("PENDING");
-    expect(v).toEqual({ label: "Em análise", tone: "review", final: false });
+    expect(v).toEqual({ label: "Em processamento", tone: "review", final: false });
   });
 });
 
@@ -52,7 +52,7 @@ describe("statementStatusView — backward compatible (pre-PR#56 strings)", () =
       final: true,
     });
     expect(statementStatusView("UNDER_REVIEW")).toEqual({
-      label: "Em análise",
+      label: "Em processamento",
       tone: "review",
       final: false,
     });

@@ -178,7 +178,7 @@ export function RatesChart({ data }: { data: RatePoint[] }) {
   const yDomain: [number, number] = [lo - pad, hi + pad];
   return (
     <ChartCard
-      title="Taxas de câmbio aplicadas por mês"
+      title="Cotação média aplicada por mês"
       subtitle="média mensal · R$ por unidade"
       empty={data.length === 0}
       legend={

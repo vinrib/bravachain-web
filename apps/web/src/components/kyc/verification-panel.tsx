@@ -162,7 +162,7 @@ export function VerificationPanel() {
             state?.kycUrl && (
               <VerificationLinkCard
                 title="Verificação de identidade"
-                description="Conclua a verificação de identidade para liberar a conta."
+                description="Conclua a verificação de identidade para concluir a verificação."
                 url={state.kycUrl}
               />
             )
