@@ -32,7 +32,7 @@ const STATUS_VIEW: Record<KybStatus, { label: string; tone: Tone; message: strin
   RESUBMIT: {
     label: "Reenvio necessário",
     tone: "review",
-    message: "Precisamos de novos documentos.",
+    message: "São necessários novos documentos para concluir a verificação.",
   },
 };
 
@@ -136,7 +136,7 @@ export function OnboardingDocuments() {
           </p>
         )}
 
-        {/* Mensagem do estado (inclui "Precisamos de novos documentos" no RESUBMIT). */}
+        {/* Mensagem do estado (inclui o aviso de novos documentos no RESUBMIT). */}
         {view.message && (
           <p className="text-sm text-muted-foreground">{view.message}</p>
         )}

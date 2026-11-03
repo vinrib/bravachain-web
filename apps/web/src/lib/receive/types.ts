@@ -24,7 +24,7 @@ export interface CreateReceiveBody {
   pixKey?: string;
 }
 
-/** Present only when the backend spread flag is on. All values are strings. */
+/** Present only when the backend enables the fee breakdown. All values are strings. */
 export interface FeeBreakdown {
   grossBrl: string;
   percentChargeBrl: string;

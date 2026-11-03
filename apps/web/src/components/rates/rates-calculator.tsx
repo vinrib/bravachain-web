@@ -100,7 +100,7 @@ export function RatesCalculator() {
         </div>
 
         <p className="text-xs text-muted-foreground">
-          Estimativa sem tarifas nem spread. O valor final aparece na cotação do envio.
+          Estimativa sem tarifas nem Comissão Bravachain. O valor final aparece na cotação da operação.
         </p>
       </CardContent>
     </Card>

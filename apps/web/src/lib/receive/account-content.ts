@@ -11,7 +11,7 @@ export const ACCOUNT_SECURITY_NOTICE =
   "Use estes dados apenas para receber pagamentos em nome da sua empresa. Confira o nome do beneficiário e inclua sempre o memo/referência. A Bravachain nunca pede senha nem altera dados bancários por e-mail ou mensagem.";
 
 export const ACCOUNT_FEE_NOTE =
-  "Taxas e câmbio são exibidos na estimativa de cada recebimento.";
+  "As taxas e a Comissão Bravachain são exibidas na estimativa de cada recebimento.";
 
 export const ACCOUNT_MIN_RECOMMENDATION =
   "Recomendamos pagamentos de pelo menos US$ 200: a tarifa fixa de transferência internacional pesa mais em valores pequenos.";

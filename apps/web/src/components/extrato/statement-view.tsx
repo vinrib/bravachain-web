@@ -264,7 +264,7 @@ export function StatementView({
             </div>
           )}
           <div>
-            <p className="text-xs text-muted-foreground">Taxa média USD/BRL</p>
+            <p className="text-xs text-muted-foreground">Cotação média USD/BRL</p>
             <p className="mt-0.5 font-serif text-lg font-bold tabular-nums text-foreground">
               {/* Vem do backend (summary.averageRate); null → "—". Nunca recalculada. */}
               {summary.averageRate !== null && summary.averageRate > 0

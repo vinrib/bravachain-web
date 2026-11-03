@@ -21,7 +21,7 @@ export const kycStatusMeta: Record<KycStatus, KycStatusMeta> = {
     Icon: ShieldCheck,
     title: "Verificação aprovada",
     description:
-      "A sua empresa está verificada. Você tem acesso completo à plataforma, incluindo saques via PIX.",
+      "A sua empresa foi verificada pela Avenia. Você tem acesso completo à plataforma, incluindo saques via PIX.",
   },
   under_review: {
     label: "Em análise",
@@ -29,7 +29,7 @@ export const kycStatusMeta: Record<KycStatus, KycStatusMeta> = {
     Icon: Clock,
     title: "Verificação em análise",
     description:
-      "Recebemos os dados e estamos analisando. Isso costuma levar até 2 dias úteis — avisaremos assim que concluir.",
+      "Recebemos seus dados e a Avenia, parceira de pagamentos da Bravachain, está analisando o cadastro. O prazo depende da Avenia; mostraremos o resultado aqui assim que ela responder.",
   },
   pending: {
     label: "Pendente",
@@ -37,7 +37,7 @@ export const kycStatusMeta: Record<KycStatus, KycStatusMeta> = {
     Icon: FileText,
     title: "Verificação pendente",
     description:
-      "Os links de verificação foram gerados. Conclua as etapas abaixo para liberar a conta.",
+      "Os links de verificação foram gerados. Conclua as etapas abaixo para concluir a verificação.",
   },
   rejected: {
     label: "Rejeitado",
@@ -45,7 +45,7 @@ export const kycStatusMeta: Record<KycStatus, KycStatusMeta> = {
     Icon: XCircle,
     title: "Verificação não aprovada",
     description:
-      "Não foi possível concluir a verificação. Revise os dados e tente novamente.",
+      "A verificação não foi concluída pela Avenia. Revise os dados e tente novamente.",
   },
   not_started: {
     label: "Não iniciado",

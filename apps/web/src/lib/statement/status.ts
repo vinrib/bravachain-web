@@ -29,7 +29,7 @@ export function statementStatusView(raw: string): StatusView {
     case "PROCESSING":
       return { label: "Em processamento", tone: "processing", final: false };
     case "PENDING":
-      return { label: "Em análise", tone: "review", final: false };
+      return { label: "Em processamento", tone: "review", final: false };
   }
 
   // Backward-compatible substring handling for pre-PR#56 statuses.
@@ -40,7 +40,7 @@ export function statementStatusView(raw: string): StatusView {
     return { label: "Concluído", tone: "success", final: true };
   }
   if (/HOLD|VERIF|REVIEW|HELD|ANALYS/.test(s)) {
-    return { label: "Em análise", tone: "review", final: false };
+    return { label: "Em processamento", tone: "review", final: false };
   }
   if (/PEND|PROC|CONFIRM|DELIVER|HOP|DEPOSIT/.test(s)) {
     return { label: "Em processamento", tone: "processing", final: false };
