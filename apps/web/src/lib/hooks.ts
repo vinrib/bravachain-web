@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { endpoints } from "@bravachain/api-client";
-import { apiFetch, ApiError } from "@/lib/client-api";
+import { apiFetch, ApiError, logout } from "@/lib/client-api";
 import {
   normalizeBalance,
   normalizeTransactions,
@@ -138,4 +139,28 @@ export function useAdminIdentity(): AdminIdentity {
 /** Whether the signed-in user is an admin, for toggling the admin nav entry. */
 export function useIsAdmin(): boolean {
   return useAdminIdentity().isAdmin;
+}
+
+export interface LogoutControl {
+  signingOut: boolean;
+  handleLogout: () => Promise<void>;
+}
+
+/** Shared sign-out flow — used by the sidebar, the mobile "Mais" sheet, and Configurações. */
+export function useLogout(): LogoutControl {
+  const router = useRouter();
+  const [signingOut, setSigningOut] = useState(false);
+
+  const handleLogout = useCallback(async () => {
+    setSigningOut(true);
+    try {
+      await logout();
+    } finally {
+      // Even if revocation fails, drop the user to login; cookies are cleared server-side.
+      router.replace("/login");
+      router.refresh();
+    }
+  }, [router]);
+
+  return { signingOut, handleLogout };
 }

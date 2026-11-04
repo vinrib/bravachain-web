@@ -68,16 +68,11 @@ export function RegisterForm() {
 
   return (
     <div className="w-full max-w-md">
-      <div className="mb-8 flex flex-col items-center gap-3">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary shadow-lg shadow-primary/25">
-          <span className="text-lg font-bold text-primary-foreground">B</span>
-        </div>
-        <div className="text-center">
-          <h1 className="text-xl font-bold text-foreground">Cadastrar empresa</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Depois do cadastro você concluirá a verificação (KYB)
-          </p>
-        </div>
+      <div className="mb-8 text-center">
+        <h1 className="text-xl font-bold text-foreground">Cadastrar empresa</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Depois do cadastro você concluirá a verificação (KYB)
+        </p>
       </div>
 
       <div className="rounded-2xl border border-border bg-card p-8 shadow-sm">

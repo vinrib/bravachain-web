@@ -1,13 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { ChevronRight, Landmark, Languages, LogOut, ShieldCheck } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { logout } from "@/lib/client-api";
+import { useLogout } from "@/lib/hooks";
 
 const SECTIONS = [
   {
@@ -25,24 +23,13 @@ const SECTIONS = [
   {
     href: "/configuracoes/preferencias",
     label: "Preferências",
-    description: "Idioma",
+    description: "Idioma e tema",
     icon: Languages,
   },
 ] as const;
 
 export default function ConfiguracoesPage() {
-  const router = useRouter();
-  const [signingOut, setSigningOut] = useState(false);
-
-  async function handleLogout() {
-    setSigningOut(true);
-    try {
-      await logout();
-    } finally {
-      router.replace("/login");
-      router.refresh();
-    }
-  }
+  const { signingOut, handleLogout } = useLogout();
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">

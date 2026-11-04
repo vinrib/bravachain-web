@@ -1,0 +1,309 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "wallet": "Billetera",
+    "send": "Enviar",
+    "deposit": "Agregar fondos",
+    "convert": "Convertir",
+    "history": "Historial",
+    "kyc": "Verificación",
+    "profile": "Perfil",
+    "logout": "Cerrar sesión",
+    "notifications": "Notificaciones"
+  },
+  "common": {
+    "save": "Guardar modificaciones",
+    "cancel": "Cancelar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "skip": "Omitir",
+    "close": "Cerrar",
+    "confirm": "Confirmar",
+    "loading": "Cargando...",
+    "error": "Se produjo un error",
+    "send": "Enviar",
+    "pix": "PIX",
+    "receive": "Recibir",
+    "copyright": "© 2025 Bravachain"
+  },
+  "settings": {
+    "preferences": "Preferencias",
+    "language": "Idioma",
+    "theme": "Tema",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Sistema"
+  },
+  "depositPix": {
+    "estimate": {
+      "fee": "Tarifa del depósito",
+      "youReceive": "Recibes"
+    },
+    "settled": {
+      "paid": "Pagado",
+      "fee": "Tarifa",
+      "credited": "Acreditado"
+    }
+  },
+  "receiveAccount": {
+    "accountType": "Tipo de cuenta",
+    "bankAddress": "Dirección del banco",
+    "paymentRail": "Tipo de transferencia",
+    "beneficiaryAddress": "Dirección del beneficiario",
+    "accountTypeChecking": "Cuenta corriente",
+    "accountTypeSavings": "Cuenta de ahorros"
+  },
+  "mfa": {
+    "title": "Verificación en dos pasos",
+    "subtitle": "Ingresa el código de 6 dígitos de tu aplicación de autenticación.",
+    "codeLabel": "Código de verificación",
+    "codePlaceholder": "000000",
+    "recoverySubtitle": "Ingresa uno de los códigos de recuperación que guardaste.",
+    "recoveryLabel": "Código de recuperación",
+    "recoveryPlaceholder": "Código de recuperación",
+    "verify": "Verificar",
+    "verifying": "Verificando…",
+    "useRecovery": "Usar un código de recuperación",
+    "useCode": "Usar el código de la aplicación",
+    "backToLogin": "Volver al inicio de sesión",
+    "errorInvalid": "Código inválido. Revísalo e inténtalo de nuevo.",
+    "errorGeneric": "No fue posible verificar en este momento. Inténtalo de nuevo."
+  },
+  "admin": {
+    "sidebarLink": "Área administrativa",
+    "nav": {
+      "title": "Administración",
+      "clients": "Clientes en revisión",
+      "security": "Administradores y seguridad",
+      "mfa": "Verificación en dos pasos",
+      "backToApp": "Volver a la aplicación"
+    },
+    "overview": {
+      "title": "Área administrativa",
+      "subtitle": "Gestión de cumplimiento y seguridad de Bravachain."
+    },
+    "construction": {
+      "badge": "En construcción",
+      "body": "Esta área todavía está en desarrollo y estará disponible pronto."
+    },
+    "common": {
+      "loading": "Cargando…",
+      "loadError": "No fue posible cargar. Inténtalo de nuevo.",
+      "actionError": "No fue posible completar la acción. Inténtalo de nuevo.",
+      "cancel": "Cancelar",
+      "saving": "Guardando…",
+      "optional": "(opcional)",
+      "reasonHint": "Entre {min} y {max} caracteres.",
+      "pep": "PEP",
+      "exceptionActive": "Excepción activa",
+      "yes": "Sí",
+      "no": "No",
+      "hide": "Ocultar",
+      "previous": "Anterior",
+      "next": "Siguiente"
+    },
+    "risk": {
+      "LOW": "Bajo",
+      "MEDIUM": "Medio",
+      "HIGH": "Alto"
+    },
+    "clients": {
+      "title": "Clientes en revisión",
+      "body": "La cola de revisión de cumplimiento (KYB).",
+      "subtitle": "Registros KYB en espera de análisis de cumplimiento (PLD/FT).",
+      "searchLabel": "Buscar",
+      "searchPlaceholder": "Empresa o CNPJ",
+      "searchMin": "Escribe al menos 2 caracteres.",
+      "riskLabel": "Riesgo",
+      "onlyPep": "Solo PEP",
+      "colCompany": "Empresa y CNPJ",
+      "colKyb": "Estado KYB",
+      "colRisk": "Riesgo",
+      "colPep": "PEP",
+      "colUpdated": "Actualizado el",
+      "openReview": "Abrir revisión de {name}",
+      "empty": "Ningún cliente en revisión",
+      "totalCount": "{total} cliente(s)",
+      "pageOf": "Página {page} de {totalPages}"
+    },
+    "review": {
+      "back": "Clientes en revisión",
+      "cnpj": "CNPJ",
+      "company": {
+        "title": "Datos de la empresa",
+        "legalName": "Razón social",
+        "cnpj": "CNPJ",
+        "cnae": "CNAE",
+        "openedAt": "Fecha de constitución",
+        "mainBuyerCountry": "País del principal comprador",
+        "estimatedRevenue": "Ingresos estimados",
+        "kybStatus": "Situación del KYB"
+      },
+      "owners": {
+        "title": "Socios y beneficiarios finales",
+        "empty": "Ningún socio registrado.",
+        "add": "Agregar socio",
+        "edit": "Editar socio",
+        "remove": "Quitar socio",
+        "reveal": "Revelar",
+        "revealConfirm": "Revelar CPF",
+        "revealWarning": "Esta consulta quedará registrada en la auditoría.",
+        "revealError": "No fue posible revelar el CPF. Inténtalo de nuevo.",
+        "revealRateLimited": "Demasiadas revelaciones en poco tiempo. Espera un minuto e inténtalo de nuevo.",
+        "cpfNote": "Los CPF permanecen enmascarados. Revelar registra la consulta en la auditoría; el CPF vuelve a enmascararse después de 30 segundos.",
+        "removeTitle": "Quitar a {name}",
+        "removeBody": "El socio se elimina del registro. Esta acción queda registrada en la auditoría.",
+        "removeReasonLabel": "Motivo",
+        "errors": {
+          "OWNERSHIP_SUM_EXCEEDED": "La suma de la participación de los socios no puede superar el 100%.",
+          "PEP_POSITION_REQUIRED": "Indica el cargo del PEP.",
+          "RISK_FLOOR_VIOLATION": "Un socio PEP o vinculado a un PEP exige riesgo Alto. Ajusta el riesgo de la revisión primero.",
+          "REASON_REQUIRED": "Indica un motivo al modificar el campo PEP.",
+          "generic": "No fue posible guardar el socio. Inténtalo de nuevo."
+        },
+        "modal": {
+          "createTitle": "Agregar socio",
+          "editTitle": "Editar socio",
+          "subtitle": "Datos del socio o beneficiario final.",
+          "fullName": "Nombre completo",
+          "cpf": "CPF",
+          "cpfEditHint": "Déjalo en blanco para mantener el CPF actual.",
+          "cpfInvalid": "CPF inválido. Revisa los dígitos.",
+          "ownership": "Participación (%)",
+          "role": "Función",
+          "isPep": "Es PEP (persona expuesta políticamente)",
+          "relatedToPep": "Familiar o colaborador de un PEP",
+          "pepRole": "Cargo del PEP",
+          "pepRoleRequired": "Indica el cargo del PEP.",
+          "pepEndedAt": "Fin del mandato (opcional)",
+          "reason": "Motivo",
+          "reasonPepHint": "Modificar el campo PEP exige un motivo (3 a 500 caracteres).",
+          "reasonRequired": "Indica un motivo (3 a 500 caracteres).",
+          "required": "Completa este campo.",
+          "save": "Guardar"
+        }
+      },
+      "diligence": {
+        "title": "Diligencia",
+        "riskLevel": "Nivel de riesgo",
+        "pepFloor": "Cliente con PEP o fondos públicos: riesgo mínimo Alto.",
+        "riskRationale": "Justificación del riesgo",
+        "sourceOfFunds": "Origen de los fondos",
+        "monthlyVolume": "Volumen mensual proyectado",
+        "publicFunds": "¿Hay fondos públicos en el flujo?",
+        "isPep": "El cliente es PEP",
+        "pepNotes": "Observaciones sobre el PEP",
+        "save": "Guardar diligencia"
+      },
+      "documents": {
+        "title": "Documentos",
+        "empty": "Ningún documento enviado.",
+        "open": "Abrir",
+        "pending": "Pendiente",
+        "sentAt": "Enviado el {date}",
+        "accessNote": "El acceso a los documentos queda registrado en la auditoría.",
+        "openError": "No fue posible abrir el documento. Inténtalo de nuevo.",
+        "types": {
+          "CONTRATO_SOCIAL": "Contrato social",
+          "CARTAO_CNPJ": "Tarjeta CNPJ",
+          "DOCUMENTO_SOCIO": "Documento del socio",
+          "COMPROVANTE_ENDERECO": "Comprobante de domicilio",
+          "FATURAMENTO": "Facturación",
+          "DECLARACAO_PEP": "Declaración de PEP",
+          "ORIGEM_RECURSOS": "Origen de los fondos",
+          "DEMONSTRACOES_FINANCEIRAS": "Estados financieros"
+        }
+      }
+    },
+    "security": {
+      "title": "Administradores y seguridad",
+      "body": "Quién accede al área administrativa y cómo se protege cada cuenta.",
+      "subtitle": "Quién accede al área administrativa y cómo se protege cada cuenta.",
+      "roleMgmtDisabled": "La gestión de roles está desactivada. Actívala temporalmente en la configuración del servidor para promover a alguien.",
+      "adminsTitle": "Administradores",
+      "promote": "Promover a administrador",
+      "colName": "Nombre",
+      "colEmail": "Correo electrónico",
+      "colRole": "Rol",
+      "colMfa": "MFA",
+      "colLastLogin": "Último acceso",
+      "colActions": "Acciones",
+      "you": "Tú",
+      "resetMfa": "Restablecer MFA",
+      "demote": "Degradar a usuario",
+      "selfDisabled": "No puedes hacer esto en tu propia cuenta.",
+      "lastAdminDisabled": "No es posible degradar al último administrador.",
+      "mfaOn": "Activo",
+      "mfaPending": "Pendiente",
+      "role": { "USER": "Usuario", "ADMIN": "Administrador" },
+      "roleTakesEffectNote": "El nuevo rol entra en vigor en el próximo inicio de sesión de la persona.",
+      "auditNote": "Promover, degradar y restablecer el MFA exigen un motivo y quedan registrados en la auditoría.",
+      "myMfaTitle": "Mi verificación en dos pasos",
+      "myMfaActive": "Aplicación de autenticación · activada.",
+      "myMfaActiveAt": "Aplicación de autenticación · activada el {date}.",
+      "myMfaInactive": "La verificación en dos pasos aún no está activada.",
+      "recoveryLow": "Quedan {n} de {total} códigos de recuperación. Genera nuevos antes de que se agoten.",
+      "activate": "Activar verificación",
+      "reasonLabel": "Motivo",
+      "resetMfaTitle": "Restablecer el MFA de {name}",
+      "resetMfaBody": "La persona deberá configurar el MFA nuevamente en su próximo acceso.",
+      "demoteTitle": "Degradar a {name}",
+      "demoteBody": "La persona pierde el acceso al área administrativa.",
+      "promoteTitle": "Promover a administrador",
+      "promoteBody": "Busca a la persona por correo electrónico. Debe tener una cuenta de usuario en Bravachain.",
+      "promoteReasonPlaceholder": "Ej.: nuevo director de cumplimiento.",
+      "searchUserLabel": "Buscar usuario por correo electrónico",
+      "searchUserPlaceholder": "nombre@ejemplo.com",
+      "searchUserMin": "Escribe al menos 3 caracteres.",
+      "searching": "Buscando…",
+      "regen": {
+        "open": "Generar nuevos códigos de recuperación",
+        "hint": "Requiere un código actual de la aplicación. Al generar, los códigos anteriores dejan de ser válidos.",
+        "title": "Generar nuevos códigos de recuperación",
+        "body": "Ingresa el código de 6 dígitos de tu aplicación de autenticación.",
+        "codeLabel": "Código actual del autenticador",
+        "error": "Código inválido. Inténtalo de nuevo.",
+        "generate": "Generar",
+        "warning": "Estos códigos aparecen solo esta vez e invalidan los anteriores. Guárdalos en un lugar seguro.",
+        "copy": "Copiar códigos",
+        "copied": "Copiado",
+        "download": "Descargar",
+        "done": "Listo"
+      }
+    },
+    "enroll": {
+      "title": "Activar verificación en dos pasos",
+      "required": "Para acceder al área administrativa, activa la verificación en dos pasos.",
+      "stepOf": "Paso {current} de {total}",
+      "loading": "Preparando la activación…",
+      "errorStart": "No fue posible iniciar la activación. Inténtalo de nuevo.",
+      "errorConfirm": "Código inválido. Revisa el código en la aplicación e inténtalo de nuevo.",
+      "step1": {
+        "title": "Instala una aplicación de autenticación",
+        "body": "Usa Google Authenticator, 1Password, Authy o similar. Escanea el código QR a continuación o ingresa la clave manualmente.",
+        "qrAlt": "Código QR para la aplicación de autenticación",
+        "secretLabel": "Clave para ingreso manual",
+        "copyKey": "Copiar clave",
+        "copied": "Copiado",
+        "continue": "Continuar"
+      },
+      "step2": {
+        "title": "Ingresa el primer código",
+        "body": "Ingresa el código de 6 dígitos que aparece en tu aplicación de autenticación.",
+        "codeLabel": "Código de la aplicación",
+        "confirm": "Confirmar",
+        "confirming": "Confirmando…",
+        "back": "Atrás"
+      },
+      "step3": {
+        "title": "Guarda tus códigos de recuperación",
+        "warning": "Estos 8 códigos se muestran una sola vez. Guárdalos en un lugar seguro: cada uno se puede usar una vez si pierdes el acceso a tu aplicación.",
+        "copy": "Copiar códigos",
+        "copied": "Copiado",
+        "download": "Descargar",
+        "savedLabel": "Guardé mis códigos en un lugar seguro",
+        "finish": "Finalizar"
+      }
+    }
+  }
+}

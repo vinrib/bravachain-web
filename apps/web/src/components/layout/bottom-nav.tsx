@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MoreHorizontal, X } from "lucide-react";
+import { LogOut, MoreHorizontal, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLogout } from "@/lib/hooks";
+import { Spinner } from "@/components/ui/spinner";
 import { navItems, isActive, type NavItem } from "./nav-items";
 
 // The four primary slots (in order); the rest go under "Mais".
@@ -13,6 +15,7 @@ const PRIMARY_HREFS = ["/", "/instrucoes-de-recebimento", "/saque", "/extrato"] 
 export function BottomNav() {
   const pathname = usePathname();
   const [sheetOpen, setSheetOpen] = useState(false);
+  const { signingOut, handleLogout } = useLogout();
 
   // navItems already respects the feature flags (disabled screens are absent).
   const primary: NavItem[] = PRIMARY_HREFS.map((h) =>
@@ -116,6 +119,15 @@ export function BottomNav() {
                   </Link>
                 );
               })}
+              <button
+                type="button"
+                onClick={handleLogout}
+                disabled={signingOut}
+                className="flex min-h-[44px] w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-60"
+              >
+                {signingOut ? <Spinner size="sm" /> : <LogOut className="h-5 w-5 shrink-0" />}
+                Sair
+              </button>
             </div>
           </div>
         </div>
