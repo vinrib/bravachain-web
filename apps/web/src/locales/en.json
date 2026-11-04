@@ -73,14 +73,13 @@
     "sidebarLink": "Admin area",
     "nav": {
       "title": "Administration",
-      "clients": "Clients under review",
       "security": "Admins and security",
       "mfa": "Two-step verification",
       "backToApp": "Back to app"
     },
     "overview": {
       "title": "Admin area",
-      "subtitle": "Bravachain compliance and security management."
+      "subtitle": "Platform access and security."
     },
     "construction": {
       "badge": "Under construction",
@@ -93,127 +92,7 @@
       "cancel": "Cancel",
       "saving": "Saving…",
       "optional": "(optional)",
-      "reasonHint": "Between {min} and {max} characters.",
-      "pep": "PEP",
-      "exceptionActive": "Exception on",
-      "yes": "Yes",
-      "no": "No",
-      "hide": "Hide",
-      "previous": "Previous",
-      "next": "Next"
-    },
-    "risk": {
-      "LOW": "Low",
-      "MEDIUM": "Medium",
-      "HIGH": "High"
-    },
-    "clients": {
-      "title": "Clients under review",
-      "body": "The compliance (KYB) review queue.",
-      "subtitle": "KYB registrations awaiting compliance (AML/CFT) analysis.",
-      "searchLabel": "Search",
-      "searchPlaceholder": "Company or CNPJ",
-      "searchMin": "Type at least 2 characters.",
-      "riskLabel": "Risk",
-      "onlyPep": "PEP only",
-      "colCompany": "Company and CNPJ",
-      "colKyb": "KYB status",
-      "colRisk": "Risk",
-      "colPep": "PEP",
-      "colUpdated": "Updated at",
-      "openReview": "Open review of {name}",
-      "empty": "No clients under review",
-      "totalCount": "{total} client(s)",
-      "pageOf": "Page {page} of {totalPages}"
-    },
-    "review": {
-      "back": "Clients under review",
-      "cnpj": "CNPJ",
-      "company": {
-        "title": "Company data",
-        "legalName": "Legal name",
-        "cnpj": "CNPJ",
-        "cnae": "CNAE",
-        "openedAt": "Incorporation date",
-        "mainBuyerCountry": "Main buyer country",
-        "estimatedRevenue": "Estimated revenue",
-        "kybStatus": "KYB status"
-      },
-      "owners": {
-        "title": "Owners and beneficial owners",
-        "empty": "No owners registered.",
-        "add": "Add owner",
-        "edit": "Edit owner",
-        "remove": "Remove owner",
-        "reveal": "Reveal",
-        "revealConfirm": "Reveal CPF",
-        "revealWarning": "This lookup will be recorded in the audit log.",
-        "revealError": "Could not reveal the CPF. Please try again.",
-        "revealRateLimited": "Too many reveals in a short time. Wait a minute and try again.",
-        "cpfNote": "CPFs stay masked. Revealing records the lookup in the audit log; the CPF re-masks after 30 seconds.",
-        "removeTitle": "Remove {name}",
-        "removeBody": "The owner is removed from the record. This action is recorded in the audit log.",
-        "removeReasonLabel": "Reason",
-        "errors": {
-          "OWNERSHIP_SUM_EXCEEDED": "Total ownership across owners cannot exceed 100%.",
-          "PEP_POSITION_REQUIRED": "Enter the PEP position.",
-          "RISK_FLOOR_VIOLATION": "A PEP or PEP-related owner requires High risk. Raise the review risk first.",
-          "REASON_REQUIRED": "Enter a reason when changing the PEP field.",
-          "generic": "Could not save the owner. Please try again."
-        },
-        "modal": {
-          "createTitle": "Add owner",
-          "editTitle": "Edit owner",
-          "subtitle": "Owner or beneficial owner details.",
-          "fullName": "Full name",
-          "cpf": "CPF",
-          "cpfEditHint": "Leave blank to keep the current CPF.",
-          "cpfInvalid": "Invalid CPF. Check the digits.",
-          "ownership": "Ownership (%)",
-          "role": "Role",
-          "isPep": "Is a PEP (politically exposed person)",
-          "relatedToPep": "Family member or associate of a PEP",
-          "pepRole": "PEP position",
-          "pepRoleRequired": "Enter the PEP position.",
-          "pepEndedAt": "Term end (optional)",
-          "reason": "Reason",
-          "reasonPepHint": "Changing the PEP field requires a reason (3 to 500 characters).",
-          "reasonRequired": "Enter a reason (3 to 500 characters).",
-          "required": "This field is required.",
-          "save": "Save"
-        }
-      },
-      "diligence": {
-        "title": "Due diligence",
-        "riskLevel": "Risk level",
-        "pepFloor": "Client with PEP or public funds: minimum risk High.",
-        "riskRationale": "Risk rationale",
-        "sourceOfFunds": "Source of funds",
-        "monthlyVolume": "Projected monthly volume",
-        "publicFunds": "Are public funds involved?",
-        "isPep": "Client is a PEP",
-        "pepNotes": "PEP notes",
-        "save": "Save diligence"
-      },
-      "documents": {
-        "title": "Documents",
-        "empty": "No documents uploaded.",
-        "open": "Open",
-        "pending": "Pending",
-        "sentAt": "Uploaded on {date}",
-        "accessNote": "Document access is recorded in the audit log.",
-        "openError": "Could not open the document. Please try again.",
-        "types": {
-          "CONTRATO_SOCIAL": "Articles of association",
-          "CARTAO_CNPJ": "CNPJ card",
-          "DOCUMENTO_SOCIO": "Owner ID document",
-          "COMPROVANTE_ENDERECO": "Proof of address",
-          "FATURAMENTO": "Revenue statement",
-          "DECLARACAO_PEP": "PEP declaration",
-          "ORIGEM_RECURSOS": "Source of funds",
-          "DEMONSTRACOES_FINANCEIRAS": "Financial statements"
-        }
-      }
+      "reasonHint": "Between {min} and {max} characters."
     },
     "security": {
       "title": "Admins and security",
@@ -235,7 +114,10 @@
       "lastAdminDisabled": "You cannot demote the last admin.",
       "mfaOn": "Active",
       "mfaPending": "Pending",
-      "role": { "USER": "User", "ADMIN": "Admin" },
+      "role": {
+        "USER": "User",
+        "ADMIN": "Admin"
+      },
       "roleTakesEffectNote": "A role change takes effect on the person's next login.",
       "auditNote": "Promote, demote and MFA reset require a reason and are recorded in the audit log.",
       "myMfaTitle": "My two-step verification",
