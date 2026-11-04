@@ -111,7 +111,7 @@ export function DashboardFinanceiro() {
       <div>
         <h1 className="font-serif text-[30px] font-bold text-foreground">Dashboard financeiro</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Acompanhe volume, câmbio e taxas do período
+          Acompanhe volume, cotação e taxas do período
         </p>
       </div>
 
