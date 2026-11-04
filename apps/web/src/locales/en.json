@@ -23,7 +23,16 @@
     "error": "An error occurred",
     "send": "Send",
     "pix": "PIX",
+    "receive": "Receive",
     "copyright": "© 2025 Bravachain"
+  },
+  "settings": {
+    "preferences": "Preferences",
+    "language": "Language",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
   },
   "depositPix": {
     "estimate": {

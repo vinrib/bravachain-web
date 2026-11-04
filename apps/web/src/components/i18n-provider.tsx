@@ -9,8 +9,9 @@ import {
 import { NextIntlClientProvider } from "next-intl";
 import ptMessages from "@/locales/pt.json";
 import enMessages from "@/locales/en.json";
+import esMessages from "@/locales/es.json";
 
-export type Locale = "pt" | "en";
+export type Locale = "pt" | "en" | "es";
 
 interface I18nCtx {
   locale: Locale;
@@ -29,6 +30,7 @@ export function useLocale() {
 const MESSAGES: Record<Locale, object> = {
   pt: ptMessages,
   en: enMessages,
+  es: esMessages,
 };
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
@@ -39,7 +41,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     const saved = localStorage.getItem("bravachain_lang");
     // Intentional one-time sync of the saved locale on mount.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (saved === "pt" || saved === "en") setLocaleState(saved);
+    if (saved === "pt" || saved === "en" || saved === "es") setLocaleState(saved);
     setMounted(true);
   }, []);
 
@@ -63,20 +65,5 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
         {children}
       </NextIntlClientProvider>
     </I18nContext.Provider>
-  );
-}
-
-/** Language toggle button for use in Navbar */
-export function LangToggle() {
-  const { locale, setLocale } = useLocale();
-  return (
-    <button
-      onClick={() => setLocale(locale === "pt" ? "en" : "pt")}
-      className="flex h-11 w-11 items-center justify-center rounded-xl text-sm font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-      aria-label="Alternar idioma"
-      title={locale === "pt" ? "Switch to English" : "Mudar para Português"}
-    >
-      {locale === "pt" ? "PT" : "EN"}
-    </button>
   );
 }

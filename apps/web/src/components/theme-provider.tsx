@@ -7,7 +7,6 @@ import {
   useEffect,
   useState,
 } from "react";
-import { Sun, Moon } from "lucide-react";
 
 export type Theme = "light" | "dark" | "system";
 export type ResolvedTheme = "light" | "dark";
@@ -85,27 +84,5 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme, toggle }}>
       {children}
     </ThemeContext.Provider>
-  );
-}
-
-/** Icon-only toggle button — drop-in for Navbar */
-export function ThemeToggle({ className }: { className?: string }) {
-  const { resolvedTheme, toggle } = useTheme();
-
-  return (
-    <button
-      onClick={toggle}
-      aria-label={resolvedTheme === "dark" ? "Modo claro" : "Modo escuro"}
-      className={
-        className ??
-        "flex h-11 w-11 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-      }
-    >
-      {resolvedTheme === "dark" ? (
-        <Sun className="h-4 w-4" />
-      ) : (
-        <Moon className="h-4 w-4" />
-      )}
-    </button>
   );
 }

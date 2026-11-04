@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Banknote, Eye, EyeOff, Receipt } from "lucide-react";
 import { formatMoney } from "@bravachain/shared";
 import { useBalance, useMe } from "@/lib/hooks";
+import { featureFlags } from "@/lib/feature-flags";
+import { ReceiveIcon } from "@/components/icons/nav-icons";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/ui/state";
 
@@ -78,6 +80,15 @@ export function WelcomeBalanceCard() {
             <Banknote className="h-4 w-4" />
             Sacar via PIX
           </Link>
+          {featureFlags.recebimentos && (
+            <Link
+              href="/instrucoes-de-recebimento"
+              className="inline-flex min-h-[44px] items-center gap-2 rounded-xl border border-white/20 px-5 text-sm font-medium text-white hover:bg-white/10"
+            >
+              <ReceiveIcon className="h-4 w-4" />
+              Receber
+            </Link>
+          )}
           <Link
             href="/extrato"
             className="inline-flex min-h-[44px] items-center gap-2 rounded-xl border border-white/20 px-5 text-sm font-medium text-white hover:bg-white/10"

@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { ShieldCheck } from "lucide-react";
+import { LogOut, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { navItems, isActive } from "./nav-items";
 import { SettingsIcon } from "@/components/icons/nav-icons";
 import { Logo } from "@/components/ui/logo";
-import { useMe, useIsAdmin } from "@/lib/hooks";
+import { Spinner } from "@/components/ui/spinner";
+import { useMe, useIsAdmin, useLogout } from "@/lib/hooks";
 import { ADMIN_HOME } from "@/lib/mfa/routes";
 
 function initials(name: string): string {
@@ -22,6 +23,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const me = useMe();
   const isAdmin = useIsAdmin();
+  const { signingOut, handleLogout } = useLogout();
   const tAdmin = useTranslations("admin");
   const name = me.data?.name?.trim() || null;
 
@@ -84,6 +86,16 @@ export function Sidebar() {
           <SettingsIcon className="h-4 w-4 shrink-0" />
           Configurações
         </Link>
+
+        <button
+          type="button"
+          onClick={handleLogout}
+          disabled={signingOut}
+          className="flex min-h-[44px] w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-60"
+        >
+          {signingOut ? <Spinner size="sm" /> : <LogOut className="h-4 w-4 shrink-0" />}
+          Sair
+        </button>
 
         {name ? (
           <div className="flex items-center gap-3 rounded-xl px-2 py-2">
