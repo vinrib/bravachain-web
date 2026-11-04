@@ -11,6 +11,12 @@ import es from "./es.json";
  * Avenia decides) and never offers currency exchange (its margin is the
  * "Comissão Bravachain", not a spread/câmbio). Guards against either leaking
  * back into any locale string or any visible component/app copy.
+ *
+ * The compliance-review queue (clients, owners, documents) was removed
+ * entirely per board directive (2026-10-31) — Bravachain never approves,
+ * rejects, limits, or "reviews" a client or operation; only Avenia decides.
+ * Reintroducing it requires a new ADR. See also `lib/admin/no-review-queue.test.ts`,
+ * which locks down the route tree itself.
  */
 const FORBIDDEN = [
   "spread",
@@ -20,6 +26,11 @@ const FORBIDDEN = [
   "estamos analisando",
   "aprovamos",
   "reprovamos",
+  "clientes em revisão",
+  "fila de revisão",
+  "revisão de compliance",
+  "aprovar cliente",
+  "reprovar cliente",
 ];
 
 function hasForbiddenTerm(text: string, term: string): boolean {
