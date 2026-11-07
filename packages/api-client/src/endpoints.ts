@@ -187,6 +187,35 @@ export const endpoints = {
     pixStatus: (txid: string) => `/v1/pix/status/${txid}`,
   },
   /**
+   * Outbound remittance ("Enviar"): send BRL/USD/EUR to a beneficiary, settled
+   * by Avenia. Contract from the API 13/14 final report; not yet on `main`, so
+   * the frontend uses typed mocks (apps/web/src/lib/send) until it lands. All
+   * require Bearer; `create` carries an Idempotency-Key (UUID v4, reused on
+   * retry). Do not hand-edit openapi.json — regenerate when the routes ship.
+   */
+  send: {
+    /** GET -> { channels: [{ currency, available, ... }] } (available gates each card) */
+    channels: "/v1/send/channels",
+    /** GET -> saved beneficiaries; POST -> create; DELETE (id) -> remove */
+    beneficiaries: "/v1/send/beneficiaries",
+    /** DELETE (Bearer) -> removes one saved beneficiary */
+    beneficiary: (id: string) => `/v1/send/beneficiaries/${id}`,
+    /** GET -> two-level purpose codes (finalidade); the official list comes from Avenia */
+    purposeCodes: "/v1/send/purpose-codes",
+    /**
+     * POST { currency, sendAmount|receiveAmount, ... } -> { quoteId, lines,
+     * referenceRate, expiresAt, isEstimate, balanceBrl, enoughBalance,
+     * invoiceRequired }. A line with value 0 is not displayed.
+     */
+    quote: "/v1/send/quote",
+    /** POST (Idempotency-Key) { quoteId, beneficiaryId, ... } -> created send; GET -> list */
+    root: "/v1/send",
+    /** GET (Bearer) -> one send detail */
+    detail: (id: string) => `/v1/send/${id}`,
+    /** GET (Bearer) -> receipt payload for the send */
+    receipt: (id: string) => `/v1/send/${id}/receipt`,
+  },
+  /**
    * FX rates (Cotações). Responses are not typed in the committed openapi.json;
    * the frontend normalizers (apps/web/src/lib/rates) map the real keys.
    */

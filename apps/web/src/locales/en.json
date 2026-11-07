@@ -305,5 +305,28 @@
         "finish": "Finish"
       }
     }
+  },
+  "enviar": {
+    "title": "Send",
+    "subtitle": "Choose the payment currency",
+    "kyc": {
+      "message": "Complete identity verification to send.",
+      "cta": "Go to verification"
+    },
+    "card": {
+      "title": "Send in {currency}",
+      "unavailable": "Enablement handled by Avenia",
+      "desc": {
+        "BRL": "Pix or bank account in Brazil",
+        "USD": "Bank transfer to the USA (Wire)",
+        "EUR": "SEPA transfer to the euro area"
+      }
+    },
+    "footer": {
+      "executedByAvenia": "Payments executed by Avenia, our payments partner."
+    },
+    "error": {
+      "body": "We couldn't load this page. Check your connection and try again."
+    }
   }
 }

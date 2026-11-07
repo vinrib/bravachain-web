@@ -305,5 +305,28 @@
         "finish": "Concluir"
       }
     }
+  },
+  "enviar": {
+    "title": "Enviar",
+    "subtitle": "Escolha a moeda do pagamento",
+    "kyc": {
+      "message": "Conclua a verificação de identidade para enviar.",
+      "cta": "Ir para verificação"
+    },
+    "card": {
+      "title": "Enviar em {currency}",
+      "unavailable": "Habilitação feita pela Avenia",
+      "desc": {
+        "BRL": "Pix ou conta bancária no Brasil",
+        "USD": "Transferência bancária para os EUA (Wire)",
+        "EUR": "Transferência SEPA para a zona do euro"
+      }
+    },
+    "footer": {
+      "executedByAvenia": "Pagamentos executados pela Avenia, parceira de pagamentos."
+    },
+    "error": {
+      "body": "Não foi possível carregar esta página. Verifique sua conexão e tente novamente."
+    }
   }
 }

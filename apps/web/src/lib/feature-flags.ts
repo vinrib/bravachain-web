@@ -31,4 +31,12 @@ export const featureFlags = {
   cotacoesChart: process.env.NEXT_PUBLIC_FEATURE_COTACOES_CHART === "true",
   /** "Depósito" (PIX deposit) section. */
   deposito: process.env.NEXT_PUBLIC_FEATURE_DEPOSITO === "true",
+  /**
+   * "Enviar" (outbound remittance in BRL/USD/EUR) section. Default OFF.
+   * Ship as Preview-only first: set NEXT_PUBLIC_FEATURE_ENVIAR=true in the
+   * Preview environment; turning it on in Production is a separate decision
+   * (requires a redeploy). Gates the menu item, the Início balance-card button,
+   * and the whole /enviar/* route tree (404 when off).
+   */
+  enviar: process.env.NEXT_PUBLIC_FEATURE_ENVIAR === "true",
 } as const;
