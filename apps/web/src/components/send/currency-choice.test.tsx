@@ -78,6 +78,18 @@ describe("CurrencyChoice", () => {
     expect(push).not.toHaveBeenCalled();
   });
 
+  it("treats a currency missing from the response as unavailable (not shown as available)", async () => {
+    channelsResult = Promise.resolve([
+      { currency: "BRL", available: true, rail: "PIX" },
+      { currency: "USD", available: true, rail: "WIRE" },
+      // EUR omitted entirely by the API.
+    ]);
+    renderChoice();
+    const eur = await screen.findByRole("button", { name: /Enviar em EUR/ });
+    expect((eur as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.getByText("Habilitação feita pela Avenia")).toBeTruthy();
+  });
+
   it("with verification pending, shows the notice and disables every card", async () => {
     kyc = { data: { status: "pending" }, loading: false };
     renderChoice();

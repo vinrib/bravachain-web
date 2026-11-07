@@ -94,9 +94,10 @@ export function CurrencyChoice() {
                   key={currency}
                   currency={currency}
                   selectable={selectable}
-                  // Grey "Habilitação feita pela Avenia" only when the channel
-                  // itself is off — not when the whole screen is KYC-gated.
-                  unavailable={!kycPending && channel?.available === false}
+                  // Grey "Habilitação feita pela Avenia" whenever the channel is
+                  // not available:true (off or absent) — but not when the whole
+                  // screen is KYC-gated, which has its own notice.
+                  unavailable={!kycPending && channel?.available !== true}
                   title={t("card.title", { currency })}
                   description={t(`card.desc.${currency}`)}
                   unavailableLabel={t("card.unavailable")}
@@ -139,7 +140,7 @@ function CurrencyCard({
       aria-disabled={!selectable}
       className={[
         "group flex min-h-[200px] flex-col items-start gap-3 rounded-2xl border p-6 text-left outline-none transition-colors",
-        "focus-visible:ring-3 focus-visible:ring-ring/40",
+        "focus-visible:ring-2 focus-visible:ring-ring/40",
         selectable
           ? "cursor-pointer border-border bg-card hover:border-primary"
           : "cursor-default border-border bg-muted",
