@@ -26,6 +26,33 @@ export interface SendChannel {
   rail: SendRail;
 }
 
+/**
+ * The BRL rail is chosen by the user at registration (Pix key vs. bank account);
+ * USD is always Wire and EUR always SEPA. `brlKind` distinguishes the two BRL
+ * registration forms.
+ */
+export type BrlKind = "pix" | "conta";
+
+/** Which registration form to render / validate. */
+export type BeneficiaryFormKind = BrlKind | "USD" | "EUR";
+
+/**
+ * A saved beneficiary as the API returns it for the list: only a masked summary
+ * (never full account/key data) is kept client-side. `line` is the masked
+ * one-line summary the API builds; `rail` is an informational label.
+ */
+export interface BeneficiarySummary {
+  id: string;
+  currency: SendCurrency;
+  /** Short pill label for the list: "Pix" | "Conta" | "Wire" | "SEPA". */
+  railLabel: string;
+  /** Initials for the avatar (e.g. "HC"). */
+  initials: string;
+  name: string;
+  /** Masked summary line, e.g. "Lead Bank · conta ••••4821". */
+  line: string;
+}
+
 export const SEND_CURRENCIES: readonly SendCurrency[] = ["BRL", "USD", "EUR"];
 
 /** URL slug <-> currency (routes live under /enviar/<slug>). */

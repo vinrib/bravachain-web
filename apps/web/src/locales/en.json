@@ -327,6 +327,36 @@
     },
     "error": {
       "body": "We couldn't load this page. Check your connection and try again."
+    },
+    "flow": {
+      "title": "Send in {currency}",
+      "back": "Back",
+      "stepOf": "Step {n} of {total}",
+      "comingSoon": "This step is coming soon.",
+      "subtitle": {
+        "beneficiario": "Who are you sending to?",
+        "cadastro": "Enter the recipient's details",
+        "valor": "How much are you sending?",
+        "detalhes": "Transfer details",
+        "revisao": "Review before confirming",
+        "status": "Transfer status"
+      }
+    },
+    "steps": {
+      "beneficiario": "Beneficiary",
+      "valor": "Amount",
+      "detalhes": "Details",
+      "revisao": "Review",
+      "status": "Status"
+    },
+    "beneficiary": {
+      "searchLabel": "Search recipients",
+      "register": "Add beneficiary",
+      "savedCount": "Saved beneficiaries · {currency}",
+      "emptyTitle": "No beneficiaries in {currency}",
+      "emptyDesc": "Add your first beneficiary to send in {currency}.",
+      "emptySearchTitle": "No results",
+      "emptySearchDesc": "Check the name or add a new beneficiary."
     }
   }
 }

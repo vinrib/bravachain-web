@@ -9,8 +9,14 @@
  */
 import { endpoints } from "@bravachain/api-client";
 import { apiFetch } from "@/lib/client-api";
-import { MOCK_CHANNELS } from "./mocks";
-import { SEND_CURRENCIES, type SendChannel, type SendCurrency, type SendRail } from "./types";
+import { MOCK_BENEFICIARIES, MOCK_CHANNELS } from "./mocks";
+import {
+  SEND_CURRENCIES,
+  type BeneficiarySummary,
+  type SendChannel,
+  type SendCurrency,
+  type SendRail,
+} from "./types";
 
 /** Flip to `true` once /v1/send/* is live on the backend. */
 const SEND_API_READY = false;
@@ -54,4 +60,45 @@ export function getSendChannels(): Promise<SendChannel[]> {
     return apiFetch<unknown>(endpoints.send.channels).then(normalizeChannels);
   }
   return mockDelay(MOCK_CHANNELS.map((c) => ({ ...c })));
+}
+
+const str = (v: unknown): string => (typeof v === "string" ? v : "");
+
+function normalizeBeneficiaries(raw: unknown, currency: SendCurrency): BeneficiarySummary[] {
+  const r = obj(raw);
+  const list = Array.isArray(r.beneficiaries)
+    ? r.beneficiaries
+    : Array.isArray(raw)
+      ? raw
+      : [];
+  return list.map((item, i) => {
+    const b = obj(item);
+    const name = str(b.name);
+    return {
+      id: str(b.id) || `${currency}-${i}`,
+      currency: isCurrency(b.currency) ? b.currency : currency,
+      railLabel: str(b.railLabel) || str(b.rail),
+      initials: str(b.initials) || initialsOf(name),
+      name,
+      line: str(b.line),
+    } satisfies BeneficiarySummary;
+  });
+}
+
+/** Two-letter initials from a name, for the list avatar. */
+export function initialsOf(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  const first = parts[0]?.[0] ?? "";
+  const second = parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? "") : "";
+  return (first + second).toUpperCase() || "—";
+}
+
+/** Saved beneficiaries for a currency (masked summaries only). */
+export function getBeneficiaries(currency: SendCurrency): Promise<BeneficiarySummary[]> {
+  if (SEND_API_READY) {
+    return apiFetch<unknown>(endpoints.send.beneficiaries).then((raw) =>
+      normalizeBeneficiaries(raw, currency).filter((b) => b.currency === currency),
+    );
+  }
+  return mockDelay(MOCK_BENEFICIARIES[currency].map((b) => ({ ...b })));
 }

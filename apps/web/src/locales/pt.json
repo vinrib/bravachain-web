@@ -327,6 +327,36 @@
     },
     "error": {
       "body": "Não foi possível carregar esta página. Verifique sua conexão e tente novamente."
+    },
+    "flow": {
+      "title": "Enviar em {currency}",
+      "back": "Voltar",
+      "stepOf": "Etapa {n} de {total}",
+      "comingSoon": "Esta etapa chega em breve.",
+      "subtitle": {
+        "beneficiario": "Para quem você vai enviar?",
+        "cadastro": "Cadastre os dados de quem vai receber",
+        "valor": "Quanto você vai enviar?",
+        "detalhes": "Detalhes do envio",
+        "revisao": "Revise antes de confirmar",
+        "status": "Status do envio"
+      }
+    },
+    "steps": {
+      "beneficiario": "Beneficiário",
+      "valor": "Valor",
+      "detalhes": "Detalhes",
+      "revisao": "Revisão",
+      "status": "Status"
+    },
+    "beneficiary": {
+      "searchLabel": "Buscar destinatários",
+      "register": "Cadastrar beneficiário",
+      "savedCount": "Beneficiários salvos · {currency}",
+      "emptyTitle": "Nenhum beneficiário em {currency}",
+      "emptyDesc": "Cadastre o primeiro beneficiário para enviar em {currency}.",
+      "emptySearchTitle": "Nenhum resultado",
+      "emptySearchDesc": "Confira o nome ou cadastre um novo beneficiário."
     }
   }
 }
