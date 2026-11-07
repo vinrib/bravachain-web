@@ -12,6 +12,7 @@ import { apiFetch } from "@/lib/client-api";
 import { MOCK_BENEFICIARIES, MOCK_CHANNELS } from "./mocks";
 import {
   SEND_CURRENCIES,
+  type BeneficiaryFormKind,
   type BeneficiarySummary,
   type SendChannel,
   type SendCurrency,
@@ -101,4 +102,54 @@ export function getBeneficiaries(currency: SendCurrency): Promise<BeneficiarySum
     );
   }
   return mockDelay(MOCK_BENEFICIARIES[currency].map((b) => ({ ...b })));
+}
+
+const RAIL_LABEL: Record<BeneficiaryFormKind, string> = {
+  pix: "Pix",
+  conta: "Conta",
+  USD: "Wire",
+  EUR: "SEPA",
+};
+
+const last4 = (s: string): string => s.replace(/\s/g, "").slice(-4);
+
+/** Masked one-line summary for the list, built from the raw registration input. */
+function summaryLine(kind: BeneficiaryFormKind, v: Record<string, string>): string {
+  if (kind === "pix") return `Pix · ${v.ch ?? ""}`.trim();
+  if (kind === "conta") {
+    const bank = (v.bc ?? "").replace(/^\d+\s*—\s*/, "") || "Banco";
+    return `${bank} · Ag ${v.ag ?? ""} · CC ${v.cc ?? ""}`;
+  }
+  if (kind === "USD") return `${v.bk ?? "Banco"} · conta ••••${last4(v.ac ?? "")}`;
+  const iban = (v.iban ?? "").replace(/\s/g, "");
+  return `IBAN ${iban.slice(0, 4)} •••• ${iban.slice(-4)}`;
+}
+
+/**
+ * Creates a beneficiary. The mock returns only the masked summary (full
+ * account/key data never leaves the registration form); the real endpoint
+ * likewise returns the saved summary.
+ */
+export function createBeneficiary(input: {
+  kind: BeneficiaryFormKind;
+  currency: SendCurrency;
+  values: Record<string, string>;
+}): Promise<BeneficiarySummary> {
+  const { kind, currency, values } = input;
+  const name = (values.nm ?? "").trim();
+  const summary: BeneficiarySummary = {
+    id: `${currency}-new-${Date.now()}`,
+    currency,
+    railLabel: RAIL_LABEL[kind],
+    initials: initialsOf(name),
+    name,
+    line: summaryLine(kind, values),
+  };
+  if (SEND_API_READY) {
+    return apiFetch<unknown>(endpoints.send.beneficiaries, {
+      method: "POST",
+      body: JSON.stringify({ kind, currency, ...values }),
+    }).then((raw) => normalizeBeneficiaries({ beneficiaries: [raw] }, currency)[0] ?? summary);
+  }
+  return mockDelay(summary);
 }

@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { ArrowLeft } from "lucide-react";
 import { StepProgress } from "./step-progress";
 import { BeneficiaryStep } from "./beneficiary-step";
+import { BeneficiaryForm } from "./beneficiary-form";
 import type { BeneficiarySummary, SendCurrency } from "@/lib/send/types";
 
 /**
@@ -77,8 +78,16 @@ export function SendFlow({ currency }: { currency: SendCurrency }) {
           }}
           onRegister={() => setStep("cadastro")}
         />
+      ) : step === "cadastro" ? (
+        <BeneficiaryForm
+          currency={currency}
+          onSaved={(b) => {
+            setBeneficiary(b);
+            setStep("valor");
+          }}
+        />
       ) : (
-        // TODO Fatia 3+: Cadastro, Valor, Detalhes, Revisão, Status.
+        // TODO Fatia 4+: Valor, Detalhes, Revisão, Status.
         <ComingSoon label={t("flow.comingSoon")} onBack={back} backLabel={t("flow.back")} />
       )}
     </div>
