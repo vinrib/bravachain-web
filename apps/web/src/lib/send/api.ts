@@ -302,6 +302,25 @@ export function createSend(
   return mockDelay({ id: `snd_${Date.now()}`, status: "processando" as SendStatus });
 }
 
+/** Mock progression: a send settles after a few polls. */
+const mockPolls = new Map<string, number>();
+
+/** True once a send has reached a terminal state. */
+export function isFinalSendStatus(status: SendStatus): boolean {
+  return status === "concluido" || status === "recusado" || status === "falha";
+}
+
+/** Current status of a send (polled until terminal). */
+export function getSend(id: string): Promise<SendResult> {
+  if (SEND_API_READY) {
+    return apiFetch<unknown>(endpoints.send.detail(id)).then(normalizeSend);
+  }
+  const n = (mockPolls.get(id) ?? 0) + 1;
+  mockPolls.set(id, n);
+  const status: SendStatus = n >= 3 ? "concluido" : "processando";
+  return mockDelay({ id, status });
+}
+
 export function createBeneficiary(input: {
   kind: BeneficiaryFormKind;
   currency: SendCurrency;

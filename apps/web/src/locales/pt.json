@@ -504,6 +504,32 @@
       "confirm": "Confirmar envio",
       "confirming": "Confirmando…",
       "emptyValue": "—"
+    },
+    "status": {
+      "badgeProcessing": "Em processamento",
+      "badgeDone": "Concluído",
+      "badgeRefused": "Recusado pela Avenia",
+      "badgeFailed": "Falha ao enviar",
+      "titleProcessing": "Pedido encaminhado à Avenia",
+      "subProcessing": "Acompanhe o andamento aqui e no Extrato.",
+      "titleDone": "Envio concluído",
+      "subDone": "A Avenia informou a conclusão do pagamento.",
+      "titleRefused": "Recusado pela Avenia",
+      "subRefused": "Motivo informado pela Avenia: {reason}",
+      "refusedDefaultReason": "os dados do beneficiário não conferem com o banco de destino.",
+      "titleFailed": "Falha ao enviar",
+      "subFailed": "O pedido não chegou à Avenia. Confira o extrato e tente enviar novamente.",
+      "tlReceived": "Pedido recebido",
+      "tlProcessing": "Em processamento pela Avenia",
+      "tlProcessingSub": "A Avenia executa e liquida o pagamento.",
+      "tlDone": "Concluído",
+      "tlDoneSub": "Informado pela Avenia",
+      "tlRefused": "Recusado pela Avenia",
+      "tlFailedSub": "O pedido não chegou à Avenia.",
+      "viewStatement": "Ver no extrato",
+      "downloadReceipt": "Baixar comprovante",
+      "newSend": "Novo envio",
+      "retry": "Tentar novamente"
     }
   }
 }

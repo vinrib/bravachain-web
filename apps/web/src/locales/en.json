@@ -504,6 +504,32 @@
       "confirm": "Confirm transfer",
       "confirming": "Confirming…",
       "emptyValue": "—"
+    },
+    "status": {
+      "badgeProcessing": "Processing",
+      "badgeDone": "Completed",
+      "badgeRefused": "Refused by Avenia",
+      "badgeFailed": "Send failed",
+      "titleProcessing": "Request sent to Avenia",
+      "subProcessing": "Track progress here and in the Statement.",
+      "titleDone": "Transfer completed",
+      "subDone": "Avenia reported the payment is complete.",
+      "titleRefused": "Refused by Avenia",
+      "subRefused": "Reason reported by Avenia: {reason}",
+      "refusedDefaultReason": "the beneficiary details don't match the destination bank.",
+      "titleFailed": "Send failed",
+      "subFailed": "The request didn't reach Avenia. Check the statement and try sending again.",
+      "tlReceived": "Request received",
+      "tlProcessing": "Processing at Avenia",
+      "tlProcessingSub": "Avenia executes and settles the payment.",
+      "tlDone": "Completed",
+      "tlDoneSub": "Reported by Avenia",
+      "tlRefused": "Refused by Avenia",
+      "tlFailedSub": "The request didn't reach Avenia.",
+      "viewStatement": "View in statement",
+      "downloadReceipt": "Download receipt",
+      "newSend": "New transfer",
+      "retry": "Try again"
     }
   }
 }
