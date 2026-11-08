@@ -79,6 +79,16 @@ export function DepositCardIcon({ className }: IconProps) {
   );
 }
 
+/** Enviar — upward arrow (outbound remittance). */
+export function SendIcon({ className }: IconProps) {
+  return (
+    <NavSvg className={className}>
+      <path d="M12 19V5" />
+      <path d="m6 11 6-6 6 6" />
+    </NavSvg>
+  );
+}
+
 /** Configurações — gear. */
 export function SettingsIcon({ className }: IconProps) {
   return (
