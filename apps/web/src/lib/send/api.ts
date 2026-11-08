@@ -27,6 +27,8 @@ import {
   type SendCurrency,
   type SendQuote,
   type SendRail,
+  type SendResult,
+  type SendStatus,
 } from "./types";
 
 /** Flip to `true` once /v1/send/* is live on the backend. */
@@ -259,6 +261,45 @@ export function getPurposeCodes(): Promise<PurposeCategory[]> {
     return apiFetch<unknown>(endpoints.send.purposeCodes).then(normalizePurposeCategories);
   }
   return mockDelay(MOCK_PURPOSE_CATEGORIES.map((c) => ({ ...c, items: [...c.items] })));
+}
+
+const SEND_STATUSES: readonly SendStatus[] = ["processando", "concluido", "recusado", "falha"];
+const asStatus = (v: unknown): SendStatus =>
+  typeof v === "string" && (SEND_STATUSES as readonly string[]).includes(v)
+    ? (v as SendStatus)
+    : "processando";
+
+function normalizeSend(raw: unknown): SendResult {
+  const r = obj(raw);
+  return {
+    id: str(r.id) || str(r.sendId),
+    status: asStatus(r.status),
+    reason: typeof r.reason === "string" ? r.reason : null,
+  };
+}
+
+/**
+ * Confirms the send. The caller passes a UUID v4 Idempotency-Key generated on
+ * click and reused on retry, so a double-click or a retried request is
+ * de-duplicated by the backend.
+ */
+export function createSend(
+  input: {
+    quoteId: string;
+    beneficiaryId: string;
+    message: string;
+    purposeCode: string | null;
+  },
+  idempotencyKey: string,
+): Promise<SendResult> {
+  if (SEND_API_READY) {
+    return apiFetch<unknown>(endpoints.send.root, {
+      method: "POST",
+      headers: { "Idempotency-Key": idempotencyKey },
+      body: JSON.stringify(input),
+    }).then(normalizeSend);
+  }
+  return mockDelay({ id: `snd_${Date.now()}`, status: "processando" as SendStatus });
 }
 
 export function createBeneficiary(input: {

@@ -9,11 +9,13 @@ import { BeneficiaryStep } from "./beneficiary-step";
 import { BeneficiaryForm } from "./beneficiary-form";
 import { AmountStep } from "./amount-step";
 import { DetailsStep } from "./details-step";
+import { ReviewStep } from "./review-step";
 import type {
   BeneficiarySummary,
   SendCurrency,
   SendDetails,
   SendQuote,
+  SendResult,
 } from "@/lib/send/types";
 
 /**
@@ -42,7 +44,8 @@ export function SendFlow({ currency }: { currency: SendCurrency }) {
   const [step, setStep] = useState<Step>("beneficiario");
   const [beneficiary, setBeneficiary] = useState<BeneficiarySummary | null>(null);
   const [quote, setQuote] = useState<SendQuote | null>(null);
-  const [, setDetails] = useState<SendDetails | null>(null);
+  const [details, setDetails] = useState<SendDetails | null>(null);
+  const [, setSend] = useState<SendResult | null>(null);
 
   const steps = PROGRESS_ORDER.map((s) => t(`steps.${s}`));
   const idx = progressIndex(step);
@@ -115,8 +118,19 @@ export function SendFlow({ currency }: { currency: SendCurrency }) {
             setStep("revisao");
           }}
         />
+      ) : step === "revisao" && beneficiary && quote && details ? (
+        <ReviewStep
+          currency={currency}
+          beneficiary={beneficiary}
+          quote={quote}
+          details={details}
+          onConfirmed={(s) => {
+            setSend(s);
+            setStep("status");
+          }}
+        />
       ) : (
-        // TODO Fatia 6+: Revisão, Status.
+        // TODO Fatia 7: Status.
         <ComingSoon label={t("flow.comingSoon")} onBack={back} backLabel={t("flow.back")} />
       )}
     </div>

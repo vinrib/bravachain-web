@@ -494,6 +494,16 @@
       "invoiceAttached": "attached",
       "invoiceRemove": "Remove",
       "continue": "Continue"
+    },
+    "review": {
+      "from": "FROM",
+      "to": "TO",
+      "accountBalance": "Account balance",
+      "purposeRowLabel": "Purpose",
+      "settledByAvenia": "The payment is executed and settled by Avenia.",
+      "confirm": "Confirm transfer",
+      "confirming": "Confirming…",
+      "emptyValue": "—"
     }
   }
 }

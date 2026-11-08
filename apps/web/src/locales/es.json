@@ -494,6 +494,16 @@
       "invoiceAttached": "adjuntado",
       "invoiceRemove": "Quitar",
       "continue": "Continuar"
+    },
+    "review": {
+      "from": "DE",
+      "to": "PARA",
+      "accountBalance": "Saldo de la cuenta",
+      "purposeRowLabel": "Finalidad",
+      "settledByAvenia": "El pago es ejecutado y liquidado por Avenia.",
+      "confirm": "Confirmar envío",
+      "confirming": "Confirmando…",
+      "emptyValue": "—"
     }
   }
 }

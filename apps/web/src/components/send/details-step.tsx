@@ -63,7 +63,14 @@ export function DetailsStep({
       setFinError(true);
       return;
     }
-    onContinue({ message: message.trim(), purposeCode, invoiceAttached: Boolean(fileName) });
+    const purposeName =
+      categories.flatMap((c) => c.items).find((i) => i.code === purposeCode)?.name ?? null;
+    onContinue({
+      message: message.trim(),
+      purposeCode,
+      purposeName,
+      invoiceAttached: Boolean(fileName),
+    });
   }
 
   return (

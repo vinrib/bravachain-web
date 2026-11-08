@@ -105,8 +105,20 @@ export interface SendDetails {
   message: string;
   /** Selected purpose code; null until chosen (required for USD/EUR). */
   purposeCode: string | null;
+  /** Resolved purpose name (for the review summary); null when none chosen. */
+  purposeName: string | null;
   /** True once an invoice file is attached (only when invoiceRequired). */
   invoiceAttached: boolean;
+}
+
+/** Lifecycle status of a send (from the API; no Bravachain decision). */
+export type SendStatus = "processando" | "concluido" | "recusado" | "falha";
+
+/** A created/listed send. `reason` carries Avenia's message when recusado/falha. */
+export interface SendResult {
+  id: string;
+  status: SendStatus;
+  reason?: string | null;
 }
 
 /** Which side the user fixed, and the typed amount for that side. */
