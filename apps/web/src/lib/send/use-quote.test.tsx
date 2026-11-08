@@ -34,6 +34,7 @@ const quote = (id: string): SendQuote => ({
   balanceBrl: 1,
   enoughBalance: true,
   invoiceRequired: false,
+  messageApplied: true,
 });
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 

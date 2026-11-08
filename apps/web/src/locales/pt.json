@@ -469,6 +469,31 @@
       "commission": "Comissão Bravachain",
       "received": "Valor que o beneficiário recebe",
       "continue": "Continuar"
+    },
+    "details": {
+      "messageLabelPix": "Mensagem do Pix",
+      "messageLabel": "Mensagem de depósito",
+      "optional": "opcional",
+      "messageHint": "Aparece no extrato de quem recebe.",
+      "messageNotApplied": "Esta mensagem pode não aparecer para quem recebe.",
+      "messagePlaceholder": "Ex.: INV-2026-0418",
+      "purposeLabel": "Finalidade do envio",
+      "purposeRequired": "Obrigatório",
+      "purposePlaceholder": "Selecione a finalidade",
+      "purposeSearch": "Buscar por categoria, código ou finalidade",
+      "purposeCount": "{count, plural, one {# item} other {# itens}}",
+      "purposeIllustrative": "Códigos ilustrativos · a lista oficial vem da Avenia.",
+      "purposeEmpty": "Nenhuma finalidade encontrada.",
+      "purposeError": "Selecione a finalidade para continuar.",
+      "close": "Fechar",
+      "invoiceLabel": "Anexar nota fiscal",
+      "invoiceBadge": "Condicional · exibido quando o trilho exigir",
+      "invoiceDrop": "Arraste o arquivo ou clique para anexar",
+      "invoiceFormats": "PDF, JPG ou PNG · até 10 MB",
+      "invoiceError": "Formato não aceito. Envie um PDF, JPG ou PNG de até 10 MB.",
+      "invoiceAttached": "anexado",
+      "invoiceRemove": "Remover",
+      "continue": "Continuar"
     }
   }
 }

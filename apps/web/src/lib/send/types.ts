@@ -82,6 +82,31 @@ export interface SendQuote {
   balanceBrl: number;
   enoughBalance: boolean;
   invoiceRequired: boolean;
+  /** When the API says false, the deposit message may not reach the recipient. */
+  messageApplied: boolean;
+}
+
+/** A purpose code (finalidade) within a category. */
+export interface PurposeItem {
+  code: string;
+  name: string;
+  /** Category name (used as the second line when searching across categories). */
+  category: string;
+}
+
+/** A finalidade category with its codes (two-level picker). */
+export interface PurposeCategory {
+  name: string;
+  items: PurposeItem[];
+}
+
+/** The details the user fills on the Detalhes step. */
+export interface SendDetails {
+  message: string;
+  /** Selected purpose code; null until chosen (required for USD/EUR). */
+  purposeCode: string | null;
+  /** True once an invoice file is attached (only when invoiceRequired). */
+  invoiceAttached: boolean;
 }
 
 /** Which side the user fixed, and the typed amount for that side. */

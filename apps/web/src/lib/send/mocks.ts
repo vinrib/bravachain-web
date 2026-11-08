@@ -7,7 +7,12 @@
  * "channel unavailable" card, flip an entry's `available` to `false` here or
  * stub `getSendChannels` in a test.
  */
-import type { BeneficiarySummary, SendChannel, SendCurrency } from "./types";
+import type {
+  BeneficiarySummary,
+  PurposeCategory,
+  SendChannel,
+  SendCurrency,
+} from "./types";
 
 /** Mock BRL balance for quotes (major units). Only the API decides sufficiency. */
 export const MOCK_BALANCE_BRL = 248315.4;
@@ -21,6 +26,59 @@ export const QUOTE_FEES: Record<SendCurrency, [number, number, number]> = {
   USD: [48, 55.4, 202],
   EUR: [48, 6.42, 202],
 };
+
+/**
+ * Illustrative purpose codes (finalidade), two levels. The official list comes
+ * from Avenia via GET /v1/send/purpose-codes; these mirror the design sample.
+ */
+export const MOCK_PURPOSE_CATEGORIES: PurposeCategory[] = [
+  {
+    name: "Comércio exterior",
+    items: [
+      { code: "12995", name: "Compra ou venda de mercadoria", category: "Comércio exterior" },
+      { code: "12010", name: "Exportação de mercadorias", category: "Comércio exterior" },
+      { code: "12020", name: "Importação — pagamento antecipado", category: "Comércio exterior" },
+    ],
+  },
+  {
+    name: "Viagens internacionais",
+    items: [
+      { code: "27002", name: "Viagens a negócios", category: "Viagens internacionais" },
+      { code: "27031", name: "Despesas com educação", category: "Viagens internacionais" },
+    ],
+  },
+  {
+    name: "Transferências unilaterais",
+    items: [
+      { code: "37015", name: "Manutenção de residentes", category: "Transferências unilaterais" },
+      { code: "37020", name: "Doações", category: "Transferências unilaterais" },
+    ],
+  },
+  {
+    name: "Serviços diversos",
+    items: [
+      { code: "47555", name: "Serviços de consultoria", category: "Serviços diversos" },
+      { code: "47505", name: "Serviços de tecnologia da informação", category: "Serviços diversos" },
+      { code: "47120", name: "Serviços de publicidade", category: "Serviços diversos" },
+    ],
+  },
+  {
+    name: "Capitais brasileiros",
+    items: [
+      { code: "50011", name: "Investimento direto no exterior", category: "Capitais brasileiros" },
+    ],
+  },
+  {
+    name: "Capitais estrangeiros",
+    items: [
+      { code: "65050", name: "Retorno de investimento estrangeiro", category: "Capitais estrangeiros" },
+    ],
+  },
+  {
+    name: "Outros",
+    items: [{ code: "99999", name: "Outras finalidades", category: "Outros" }],
+  },
+];
 
 export const MOCK_CHANNELS: SendChannel[] = [
   { currency: "BRL", available: true, rail: "PIX" },

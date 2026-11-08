@@ -13,6 +13,7 @@ import {
   MOCK_BALANCE_BRL,
   MOCK_BENEFICIARIES,
   MOCK_CHANNELS,
+  MOCK_PURPOSE_CATEGORIES,
   QUOTE_FEES,
   QUOTE_RATE,
 } from "./mocks";
@@ -20,6 +21,7 @@ import {
   SEND_CURRENCIES,
   type BeneficiaryFormKind,
   type BeneficiarySummary,
+  type PurposeCategory,
   type QuoteInput,
   type SendChannel,
   type SendCurrency,
@@ -171,7 +173,9 @@ function computeMockQuote(input: QuoteInput): SendQuote {
     isEstimate: true,
     balanceBrl: MOCK_BALANCE_BRL,
     enoughBalance: sendAmount <= MOCK_BALANCE_BRL,
-    invoiceRequired: false,
+    // Invoice is required above a sample threshold; the message always applies.
+    invoiceRequired: currency !== "BRL" && sendAmount >= 50000,
+    messageApplied: true,
   };
 }
 
@@ -193,6 +197,7 @@ function normalizeQuote(raw: unknown): SendQuote {
     balanceBrl: num(r.balanceBrl),
     enoughBalance: r.enoughBalance === true,
     invoiceRequired: r.invoiceRequired === true,
+    messageApplied: r.messageApplied !== false,
   };
 }
 
@@ -229,6 +234,31 @@ export function getQuote(input: QuoteInput, signal?: AbortSignal): Promise<SendQ
     );
   }
   return mockDelay(quote);
+}
+
+function normalizePurposeCategories(raw: unknown): PurposeCategory[] {
+  const r = obj(raw);
+  const list = Array.isArray(r.categories) ? r.categories : Array.isArray(raw) ? raw : [];
+  return list.map((cat) => {
+    const c = obj(cat);
+    const name = str(c.name);
+    const items = Array.isArray(c.items) ? c.items : [];
+    return {
+      name,
+      items: items.map((it) => {
+        const i = obj(it);
+        return { code: str(i.code), name: str(i.name), category: str(i.category) || name };
+      }),
+    } satisfies PurposeCategory;
+  });
+}
+
+/** Two-level purpose codes (finalidade). Official list is Avenia's. */
+export function getPurposeCodes(): Promise<PurposeCategory[]> {
+  if (SEND_API_READY) {
+    return apiFetch<unknown>(endpoints.send.purposeCodes).then(normalizePurposeCategories);
+  }
+  return mockDelay(MOCK_PURPOSE_CATEGORIES.map((c) => ({ ...c, items: [...c.items] })));
 }
 
 export function createBeneficiary(input: {

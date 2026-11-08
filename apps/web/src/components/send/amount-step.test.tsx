@@ -26,6 +26,7 @@ function makeQuote(over: Partial<SendQuote> = {}): SendQuote {
     balanceBrl: 248315.4,
     enoughBalance: true,
     invoiceRequired: false,
+    messageApplied: true,
     ...over,
   };
 }

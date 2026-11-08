@@ -469,6 +469,31 @@
       "commission": "Bravachain commission",
       "received": "Amount the beneficiary receives",
       "continue": "Continue"
+    },
+    "details": {
+      "messageLabelPix": "Pix message",
+      "messageLabel": "Deposit message",
+      "optional": "optional",
+      "messageHint": "Shows on the recipient's statement.",
+      "messageNotApplied": "This message may not reach the recipient.",
+      "messagePlaceholder": "e.g. INV-2026-0418",
+      "purposeLabel": "Purpose of the transfer",
+      "purposeRequired": "Required",
+      "purposePlaceholder": "Select the purpose",
+      "purposeSearch": "Search by category, code or purpose",
+      "purposeCount": "{count, plural, one {# item} other {# items}}",
+      "purposeIllustrative": "Illustrative codes · the official list comes from Avenia.",
+      "purposeEmpty": "No purpose found.",
+      "purposeError": "Select the purpose to continue.",
+      "close": "Close",
+      "invoiceLabel": "Attach invoice",
+      "invoiceBadge": "Conditional · shown when the rail requires it",
+      "invoiceDrop": "Drag the file or click to attach",
+      "invoiceFormats": "PDF, JPG or PNG · up to 10 MB",
+      "invoiceError": "Format not accepted. Send a PDF, JPG or PNG up to 10 MB.",
+      "invoiceAttached": "attached",
+      "invoiceRemove": "Remove",
+      "continue": "Continue"
     }
   }
 }
