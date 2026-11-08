@@ -14,6 +14,7 @@ import {
   MOCK_BENEFICIARIES,
   MOCK_CHANNELS,
   MOCK_PURPOSE_CATEGORIES,
+  MOCK_SENDS,
   QUOTE_FEES,
   QUOTE_RATE,
 } from "./mocks";
@@ -25,8 +26,10 @@ import {
   type QuoteInput,
   type SendChannel,
   type SendCurrency,
+  type SendListItem,
   type SendQuote,
   type SendRail,
+  type SendReceipt,
   type SendResult,
   type SendStatus,
 } from "./types";
@@ -319,6 +322,61 @@ export function getSend(id: string): Promise<SendResult> {
   mockPolls.set(id, n);
   const status: SendStatus = n >= 3 ? "concluido" : "processando";
   return mockDelay({ id, status });
+}
+
+function normalizeSendList(raw: unknown): SendListItem[] {
+  const r = obj(raw);
+  const list = Array.isArray(r.sends) ? r.sends : Array.isArray(raw) ? raw : [];
+  return list.map((item) => {
+    const s = obj(item);
+    return {
+      id: str(s.id),
+      currency: isCurrency(s.currency) ? s.currency : "USD",
+      beneficiaryName: str(s.beneficiaryName),
+      amountBrl: num(s.amountBrl),
+      receiveAmount: s.receiveAmount == null ? null : num(s.receiveAmount),
+      status: asStatus(s.status),
+      createdAt: str(s.createdAt),
+    } satisfies SendListItem;
+  });
+}
+
+/** Sends for the Extrato "Envios" filter. */
+export function getSends(): Promise<SendListItem[]> {
+  if (SEND_API_READY) {
+    return apiFetch<unknown>(endpoints.send.root).then(normalizeSendList);
+  }
+  return mockDelay(MOCK_SENDS.map((s) => ({ ...s })));
+}
+
+/** Full receipt for one send (screen + print). */
+export function getSendReceipt(id: string): Promise<SendReceipt> {
+  if (SEND_API_READY) {
+    return apiFetch<unknown>(endpoints.send.receipt(id)).then(
+      (raw) => raw as SendReceipt,
+    );
+  }
+  const item = MOCK_SENDS.find((s) => s.id === id) ?? MOCK_SENDS[0]!;
+  const [aveniaFee, railFee, bravachainCommission] = QUOTE_FEES[item.currency];
+  const receiveAmount =
+    item.receiveAmount ?? round2(item.amountBrl - aveniaFee - railFee - bravachainCommission);
+  const line =
+    MOCK_BENEFICIARIES[item.currency].find((b) => b.name === item.beneficiaryName)?.line ?? "";
+  const nonBrl = item.currency !== "BRL";
+  return mockDelay({
+    id: item.id,
+    identifier: `AVN-${item.createdAt.split("/").reverse().join("")}-${item.id.toUpperCase()}`,
+    createdAt: item.createdAt,
+    currency: item.currency,
+    beneficiaryName: item.beneficiaryName,
+    beneficiaryLine: line,
+    lines: { sendAmount: item.amountBrl, aveniaFee, railFee, bravachainCommission, receiveAmount },
+    referenceRate: QUOTE_RATE[item.currency],
+    message: nonBrl ? "INV-2026-0418" : "",
+    purposeCode: nonBrl ? "12995" : null,
+    purposeName: nonBrl ? "Compra ou venda de mercadoria" : null,
+    status: item.status,
+  });
 }
 
 export function createBeneficiary(input: {

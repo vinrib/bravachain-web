@@ -530,6 +530,18 @@
       "downloadReceipt": "Descargar comprobante",
       "newSend": "Nuevo envío",
       "retry": "Inténtalo de nuevo"
+    },
+    "statement": {
+      "sendLine": "Envío {currency} · {date}",
+      "exampleNote": "Valores de ejemplo.",
+      "empty": "Aún no hay envíos",
+      "emptyDesc": "Tus envíos aparecerán aquí.",
+      "loadError": "No se pudieron cargar los envíos. Inténtalo de nuevo."
+    },
+    "receipt": {
+      "identifier": "Identificador de la operación",
+      "date": "Fecha de la solicitud",
+      "disclaimer": "Documento informativo. No es un comprobante fiscal."
     }
   }
 }

@@ -121,6 +121,37 @@ export interface SendResult {
   reason?: string | null;
 }
 
+/** A row in the Extrato "Envios" filter. */
+export interface SendListItem {
+  id: string;
+  currency: SendCurrency;
+  beneficiaryName: string;
+  /** BRL debited (positive; shown as "− R$ …"). */
+  amountBrl: number;
+  /** Destination amount; null for BRL (shows the rail instead). */
+  receiveAmount: number | null;
+  status: SendStatus;
+  /** Display date, e.g. "04/11/2026". */
+  createdAt: string;
+}
+
+/** Full send receipt (screen + print). No claim of legal validity. */
+export interface SendReceipt {
+  id: string;
+  /** Avenia operation identifier. */
+  identifier: string;
+  createdAt: string;
+  currency: SendCurrency;
+  beneficiaryName: string;
+  beneficiaryLine: string;
+  lines: SendQuoteLines;
+  referenceRate: number;
+  message: string;
+  purposeCode: string | null;
+  purposeName: string | null;
+  status: SendStatus;
+}
+
 /** Which side the user fixed, and the typed amount for that side. */
 export interface QuoteInput {
   currency: SendCurrency;

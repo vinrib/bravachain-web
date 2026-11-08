@@ -530,6 +530,18 @@
       "downloadReceipt": "Download receipt",
       "newSend": "New transfer",
       "retry": "Try again"
+    },
+    "statement": {
+      "sendLine": "{currency} transfer · {date}",
+      "exampleNote": "Example values.",
+      "empty": "No transfers yet",
+      "emptyDesc": "Your transfers will show up here.",
+      "loadError": "Couldn't load transfers. Try again."
+    },
+    "receipt": {
+      "identifier": "Operation identifier",
+      "date": "Request date",
+      "disclaimer": "Informational document. Not a tax receipt."
     }
   }
 }

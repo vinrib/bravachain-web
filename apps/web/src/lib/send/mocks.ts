@@ -12,6 +12,7 @@ import type {
   PurposeCategory,
   SendChannel,
   SendCurrency,
+  SendListItem,
 } from "./types";
 
 /** Mock BRL balance for quotes (major units). Only the API decides sufficiency. */
@@ -78,6 +79,15 @@ export const MOCK_PURPOSE_CATEGORIES: PurposeCategory[] = [
     name: "Outros",
     items: [{ code: "99999", name: "Outras finalidades", category: "Outros" }],
   },
+];
+
+/** Example sends for the Extrato "Envios" filter (example values, never real). */
+export const MOCK_SENDS: SendListItem[] = [
+  { id: "snd-1", currency: "USD", beneficiaryName: "Harbor Coffee Imports LLC", amountBrl: 10000, receiveAmount: 1749.93, status: "concluido", createdAt: "04/11/2026" },
+  { id: "snd-2", currency: "EUR", beneficiaryName: "Maison Verte SARL", amountBrl: 6420, receiveAmount: 960.06, status: "processando", createdAt: "04/11/2026" },
+  { id: "snd-3", currency: "BRL", beneficiaryName: "Transportes Litoral Ltda", amountBrl: 2500, receiveAmount: null, status: "concluido", createdAt: "03/11/2026" },
+  { id: "snd-4", currency: "USD", beneficiaryName: "Northpoint Packaging Inc.", amountBrl: 15000, receiveAmount: 2652.45, status: "recusado", createdAt: "31/10/2026" },
+  { id: "snd-5", currency: "EUR", beneficiaryName: "Kaffeehaus GmbH", amountBrl: 4200, receiveAmount: 614.26, status: "falha", createdAt: "30/10/2026" },
 ];
 
 export const MOCK_CHANNELS: SendChannel[] = [
