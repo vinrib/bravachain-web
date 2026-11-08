@@ -7,7 +7,8 @@ import { ArrowLeft } from "lucide-react";
 import { StepProgress } from "./step-progress";
 import { BeneficiaryStep } from "./beneficiary-step";
 import { BeneficiaryForm } from "./beneficiary-form";
-import type { BeneficiarySummary, SendCurrency } from "@/lib/send/types";
+import { AmountStep } from "./amount-step";
+import type { BeneficiarySummary, SendCurrency, SendQuote } from "@/lib/send/types";
 
 /**
  * Internal flow steps. `beneficiario` and `cadastro` share progress position 0
@@ -33,10 +34,13 @@ export function SendFlow({ currency }: { currency: SendCurrency }) {
   const t = useTranslations("enviar");
   const router = useRouter();
   const [step, setStep] = useState<Step>("beneficiario");
-  const [, setBeneficiary] = useState<BeneficiarySummary | null>(null);
+  const [beneficiary, setBeneficiary] = useState<BeneficiarySummary | null>(null);
+  const [, setQuote] = useState<SendQuote | null>(null);
 
   const steps = PROGRESS_ORDER.map((s) => t(`steps.${s}`));
   const idx = progressIndex(step);
+  // Valor uses a two-column layout; give it room on desktop.
+  const containerWidth = step === "valor" ? "max-w-5xl" : "max-w-3xl";
 
   function back() {
     const target = BACK[step];
@@ -45,7 +49,7 @@ export function SendFlow({ currency }: { currency: SendCurrency }) {
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-5">
+    <div className={`mx-auto ${containerWidth} space-y-5`}>
       <div className="flex items-center gap-2">
         <button
           type="button"
@@ -86,8 +90,17 @@ export function SendFlow({ currency }: { currency: SendCurrency }) {
             setStep("valor");
           }}
         />
+      ) : step === "valor" ? (
+        <AmountStep
+          currency={currency}
+          beneficiaryName={beneficiary?.name ?? ""}
+          onContinue={(q) => {
+            setQuote(q);
+            setStep("detalhes");
+          }}
+        />
       ) : (
-        // TODO Fatia 4+: Valor, Detalhes, Revisão, Status.
+        // TODO Fatia 5+: Detalhes, Revisão, Status.
         <ComingSoon label={t("flow.comingSoon")} onBack={back} backLabel={t("flow.back")} />
       )}
     </div>

@@ -53,6 +53,45 @@ export interface BeneficiarySummary {
   line: string;
 }
 
+/**
+ * Quote line amounts, all in major units (decimals, per the backend's money
+ * convention). BRL fields are in reais; `receiveAmount` is in the destination
+ * currency. A line that is 0 is NOT displayed (business rule).
+ */
+export interface SendQuoteLines {
+  sendAmount: number;
+  aveniaFee: number;
+  railFee: number;
+  bravachainCommission: number;
+  receiveAmount: number;
+}
+
+/**
+ * A quote from POST /v1/send/quote. Everything shown to the user comes from
+ * here — the front never computes its own ceiling. `enoughBalance` and any
+ * refusal are the API's/Avenia's word, not Bravachain's.
+ */
+export interface SendQuote {
+  quoteId: string;
+  lines: SendQuoteLines;
+  /** 1 destination unit = `referenceRate` BRL (1 for BRL). */
+  referenceRate: number;
+  /** ISO expiry; null when the quote does not expire (BRL). */
+  expiresAt: string | null;
+  isEstimate: boolean;
+  balanceBrl: number;
+  enoughBalance: boolean;
+  invoiceRequired: boolean;
+}
+
+/** Which side the user fixed, and the typed amount for that side. */
+export interface QuoteInput {
+  currency: SendCurrency;
+  /** "send" fixes the BRL you pay; "receive" fixes the destination amount. */
+  side: "send" | "receive";
+  amount: number;
+}
+
 export const SEND_CURRENCIES: readonly SendCurrency[] = ["BRL", "USD", "EUR"];
 
 /** URL slug <-> currency (routes live under /enviar/<slug>). */

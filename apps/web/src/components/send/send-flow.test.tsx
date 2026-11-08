@@ -17,6 +17,12 @@ vi.mock("@/lib/send/api", () => ({
   getBeneficiaries: () => Promise.resolve(LIST),
 }));
 
+// The Valor step renders AmountStep; stub its quoting hook so the flow test
+// stays focused on navigation (idle → just the amount cards, no quote call).
+vi.mock("@/lib/send/use-quote", () => ({
+  useQuote: () => ({ status: "idle", quote: null, error: null, refresh: () => {} }),
+}));
+
 import { SendFlow } from "./send-flow";
 
 function renderFlow() {
@@ -49,7 +55,8 @@ describe("SendFlow", () => {
     const row = await screen.findByText("Harbor Coffee Imports LLC");
     fireEvent.click(row.closest("button")!);
     expect(screen.getByText("Quanto você vai enviar?")).toBeTruthy();
-    expect(screen.getByText("Esta etapa chega em breve.")).toBeTruthy();
+    // Valor step (AmountStep) is now rendered — its send card label is present.
+    expect(screen.getByText("Você envia exatamente")).toBeTruthy();
   });
 
   it("goes to 'Cadastre os dados de quem vai receber' from 'Cadastrar beneficiário'", async () => {

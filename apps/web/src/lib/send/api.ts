@@ -8,14 +8,22 @@
  * defensively (same pattern as lib/deposit, lib/rates, lib/receive).
  */
 import { endpoints } from "@bravachain/api-client";
-import { apiFetch } from "@/lib/client-api";
-import { MOCK_BENEFICIARIES, MOCK_CHANNELS } from "./mocks";
+import { apiFetch, ApiError } from "@/lib/client-api";
+import {
+  MOCK_BALANCE_BRL,
+  MOCK_BENEFICIARIES,
+  MOCK_CHANNELS,
+  QUOTE_FEES,
+  QUOTE_RATE,
+} from "./mocks";
 import {
   SEND_CURRENCIES,
   type BeneficiaryFormKind,
   type BeneficiarySummary,
+  type QuoteInput,
   type SendChannel,
   type SendCurrency,
+  type SendQuote,
   type SendRail,
 } from "./types";
 
@@ -130,6 +138,99 @@ function summaryLine(kind: BeneficiaryFormKind, v: Record<string, string>): stri
  * account/key data never leaves the registration form); the real endpoint
  * likewise returns the saved summary.
  */
+const round2 = (n: number): number => Math.round(n * 100) / 100;
+const num = (v: unknown, fallback = 0): number => {
+  const n = typeof v === "number" ? v : typeof v === "string" ? Number(v) : NaN;
+  return Number.isFinite(n) ? n : fallback;
+};
+
+/** Builds the example quote (never real) matching the Web 12 sample values. */
+function computeMockQuote(input: QuoteInput): SendQuote {
+  const { currency, side, amount } = input;
+  const rate = QUOTE_RATE[currency];
+  const [aveniaFee, railFee, bravachainCommission] = QUOTE_FEES[currency];
+  const feeSum = aveniaFee + railFee + bravachainCommission;
+
+  let sendAmount: number;
+  let receiveAmount: number;
+  if (currency === "BRL" || side === "send") {
+    sendAmount = amount;
+    const net = Math.max(0, round2(sendAmount - feeSum));
+    receiveAmount = currency === "BRL" ? net : round2(net / rate);
+  } else {
+    receiveAmount = amount;
+    sendAmount = round2(round2(receiveAmount * rate) + feeSum);
+  }
+
+  return {
+    quoteId: `q_${Date.now()}`,
+    lines: { sendAmount, aveniaFee, railFee, bravachainCommission, receiveAmount },
+    referenceRate: rate,
+    // BRL does not expire (no FX); USD/EUR hold for 5 min.
+    expiresAt: currency === "BRL" ? null : new Date(Date.now() + 300_000).toISOString(),
+    isEstimate: true,
+    balanceBrl: MOCK_BALANCE_BRL,
+    enoughBalance: sendAmount <= MOCK_BALANCE_BRL,
+    invoiceRequired: false,
+  };
+}
+
+function normalizeQuote(raw: unknown): SendQuote {
+  const r = obj(raw);
+  const l = obj(r.lines);
+  return {
+    quoteId: str(r.quoteId),
+    lines: {
+      sendAmount: num(l.sendAmount),
+      aveniaFee: num(l.aveniaFee),
+      railFee: num(l.railFee),
+      bravachainCommission: num(l.bravachainCommission),
+      receiveAmount: num(l.receiveAmount),
+    },
+    referenceRate: num(r.referenceRate, 1),
+    expiresAt: typeof r.expiresAt === "string" ? r.expiresAt : null,
+    isEstimate: r.isEstimate !== false,
+    balanceBrl: num(r.balanceBrl),
+    enoughBalance: r.enoughBalance === true,
+    invoiceRequired: r.invoiceRequired === true,
+  };
+}
+
+/**
+ * Quote for the amount step. The front shows exactly what this returns —
+ * including `enoughBalance`; it never validates its own ceiling.
+ */
+/** Mock-only cap that stands in for an Avenia-informed limit (not a Bravachain rule). */
+const MOCK_AVENIA_LIMIT_BRL = 1_000_000;
+
+export function getQuote(input: QuoteInput, signal?: AbortSignal): Promise<SendQuote> {
+  if (SEND_API_READY) {
+    return apiFetch<unknown>(endpoints.send.quote, {
+      method: "POST",
+      body: JSON.stringify(input),
+      signal,
+    }).then(normalizeQuote);
+  }
+  const quote = computeMockQuote(input);
+  if (quote.lines.sendAmount > MOCK_AVENIA_LIMIT_BRL) {
+    // Surfaced to the user as "A Avenia informou: …" — Avenia's limit, not ours.
+    return new Promise((_, reject) =>
+      setTimeout(
+        () =>
+          reject(
+            new ApiError(
+              422,
+              "o valor ultrapassa o limite disponível para esta conta. Ajuste o valor para continuar.",
+              "AVENIA_LIMIT",
+            ),
+          ),
+        MOCK_LATENCY_MS,
+      ),
+    );
+  }
+  return mockDelay(quote);
+}
+
 export function createBeneficiary(input: {
   kind: BeneficiaryFormKind;
   currency: SendCurrency;

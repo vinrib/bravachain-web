@@ -9,6 +9,19 @@
  */
 import type { BeneficiarySummary, SendChannel, SendCurrency } from "./types";
 
+/** Mock BRL balance for quotes (major units). Only the API decides sufficiency. */
+export const MOCK_BALANCE_BRL = 248315.4;
+
+/** Reference rate: 1 destination unit = N BRL. */
+export const QUOTE_RATE: Record<SendCurrency, number> = { BRL: 1, USD: 5.54, EUR: 6.42 };
+
+/** [aveniaFee, railFee, bravachainCommission] in BRL (major units). */
+export const QUOTE_FEES: Record<SendCurrency, [number, number, number]> = {
+  BRL: [2, 1, 5],
+  USD: [48, 55.4, 202],
+  EUR: [48, 6.42, 202],
+};
+
 export const MOCK_CHANNELS: SendChannel[] = [
   { currency: "BRL", available: true, rail: "PIX" },
   { currency: "USD", available: true, rail: "WIRE" },
