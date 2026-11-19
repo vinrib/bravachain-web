@@ -47,7 +47,19 @@ export function RecentPayments() {
 
   return (
     <div>
-      <div className="mb-2 flex items-center justify-between px-1">
+      {/* Mobile heading (Web 14 — "Transações recentes" + pill "Ver todas"). */}
+      <div className="mb-2 flex items-center justify-between px-1 md:hidden">
+        <h2 className="text-base font-semibold text-foreground">Transações recentes</h2>
+        <Link
+          href="/extrato"
+          className="rounded-full border border-border px-3 py-1 text-xs font-medium text-foreground hover:bg-muted"
+        >
+          Ver todas
+        </Link>
+      </div>
+
+      {/* Desktop heading — unchanged. */}
+      <div className="mb-2 hidden items-center justify-between px-1 md:flex">
         <h2 className="text-base font-semibold text-foreground">Pagamentos recentes</h2>
         <Link href="/extrato" className="text-sm font-medium text-primary hover:underline">
           Ver extrato

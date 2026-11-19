@@ -77,6 +77,25 @@ export function MyAccounts() {
     (a) => a.currency === "USD" || a.currency === "EUR",
   );
 
+  const cards = [
+    // BRL highlight — real balance.
+    <div key="BRL" className="rounded-2xl bg-[#011a0f] p-5 text-white shadow-sm">
+      <div className="flex items-center gap-2">
+        <CurrencyFlag currency="BRL" size={24} />
+        <span className="text-sm font-semibold">BRL</span>
+      </div>
+      <p className="mt-2 font-serif text-2xl font-bold tabular-nums">
+        {balance.loading
+          ? "…"
+          : formatMoney(balance.data?.available ?? 0, {
+              currency: balance.data?.currency ?? "BRL",
+            })}
+      </p>
+      <p className="mt-1 text-xs text-white/60">Disponível para saque via PIX</p>
+    </div>,
+    ...foreign.map((a) => <ForeignCard key={a.currency} account={a} />),
+  ];
+
   return (
     <div>
       <div className="mb-2 flex items-center justify-between px-1">
@@ -88,26 +107,21 @@ export function MyAccounts() {
         )}
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {/* BRL highlight — real balance */}
-        <div className="rounded-2xl bg-[#011a0f] p-5 text-white shadow-sm">
-          <div className="flex items-center gap-2">
-            <CurrencyFlag currency="BRL" size={24} />
-            <span className="text-sm font-semibold">BRL</span>
+      {/* Mobile: horizontal snap carousel, next card peeking at the edge. */}
+      <div
+        data-testid="accounts-mobile"
+        className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 md:hidden"
+      >
+        {cards.map((card, i) => (
+          <div key={i} className="min-w-[78%] shrink-0 snap-start">
+            {card}
           </div>
-          <p className="mt-2 font-serif text-2xl font-bold tabular-nums">
-            {balance.loading
-              ? "…"
-              : formatMoney(balance.data?.available ?? 0, {
-                  currency: balance.data?.currency ?? "BRL",
-                })}
-          </p>
-          <p className="mt-1 text-xs text-white/60">Disponível para saque via PIX</p>
-        </div>
-
-        {foreign.map((a) => (
-          <ForeignCard key={a.currency} account={a} />
         ))}
+      </div>
+
+      {/* Tablet/desktop: unchanged grid. */}
+      <div data-testid="accounts-desktop" className="hidden gap-3 md:grid md:grid-cols-2 lg:grid-cols-3">
+        {cards}
       </div>
     </div>
   );

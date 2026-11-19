@@ -26,6 +26,19 @@
     "receive": "Receive",
     "copyright": "© 2025 Bravachain"
   },
+  "home": {
+    "nav": {
+      "home": "Home",
+      "send": "Send",
+      "saquePix": "PIX withdrawal",
+      "extrato": "Statement"
+    },
+    "actions": {
+      "deposit": "Deposit",
+      "send": "Send",
+      "receive": "Receive"
+    }
+  },
   "settings": {
     "preferences": "Preferences",
     "language": "Language",

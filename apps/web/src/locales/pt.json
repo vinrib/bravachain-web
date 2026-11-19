@@ -26,6 +26,19 @@
     "receive": "Receber",
     "copyright": "© 2025 Bravachain"
   },
+  "home": {
+    "nav": {
+      "home": "Início",
+      "send": "Enviar",
+      "saquePix": "Saque PIX",
+      "extrato": "Extrato"
+    },
+    "actions": {
+      "deposit": "Depósito",
+      "send": "Enviar",
+      "receive": "Receber"
+    }
+  },
   "settings": {
     "preferences": "Preferências",
     "language": "Idioma",
