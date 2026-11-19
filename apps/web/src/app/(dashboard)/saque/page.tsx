@@ -27,8 +27,12 @@ import { WithdrawHistory } from "@/components/dashboard/withdraw-history";
 import { WithdrawPreview } from "@/components/withdraw/withdraw-preview";
 import { useWithdrawPreview } from "@/lib/withdraw/use-preview";
 import { derivePixWithdrawalFee } from "@/lib/withdraw/preview";
+import {
+  withdrawSubmitFeedback,
+  type CreatePixWithdrawResponse,
+} from "@/lib/withdraw/submit-feedback";
 import { useToast } from "@/components/toast-provider";
-import { PIX_RETURN_WARNING_FULL, PIX_RETURN_WARNING_SHORT } from "@/lib/pix-warning";
+import { PIX_RETURN_WARNING_FULL } from "@/lib/pix-warning";
 
 const PIX_KEY_LABELS: Record<string, string> = {
   cpf: "CPF",
@@ -40,7 +44,7 @@ const PIX_KEY_LABELS: Record<string, string> = {
 
 export default function SaquePage() {
   const router = useRouter();
-  const { success } = useToast();
+  const { success, info } = useToast();
   const balance = useBalance();
   const kyc = useKycState();
 
@@ -100,18 +104,25 @@ export default function SaquePage() {
     setSubmitting(true);
     try {
       // Single attempt — the withdrawal is never retried automatically.
-      await apiFetch(endpoints.withdrawals.createPix, {
-        method: "POST",
-        body: JSON.stringify({
-          amountBrla: amount,
-          pixKey: normalizePixKey(pixKey),
-          pixKeyType: toBackendPixKeyType(pixKeyType),
-        }),
-      });
-      success(
-        "Saque solicitado!",
-        `${formatMoney(amount)} a caminho via PIX. ${PIX_RETURN_WARNING_SHORT}`,
+      const response = await apiFetch<CreatePixWithdrawResponse>(
+        endpoints.withdrawals.createPix,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            amountBrla: amount,
+            pixKey: normalizePixKey(pixKey),
+            pixKeyType: toBackendPixKeyType(pixKeyType),
+          }),
+        },
       );
+      // `apiFetch` only surfaces the body, not the HTTP status, so the 201
+      // vs 202 distinction comes from `status` in the body (API PR #105).
+      const feedback = withdrawSubmitFeedback(response);
+      if (feedback.variant === "info") {
+        info(feedback.title, feedback.message);
+      } else {
+        success(feedback.title, feedback.message);
+      }
       router.push("/extrato");
       router.refresh();
     } catch (err) {

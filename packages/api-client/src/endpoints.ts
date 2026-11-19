@@ -131,7 +131,14 @@ export const endpoints = {
     sendEmail: (withdrawalId: string) => `/v1/receipts/${withdrawalId}/send-email`,
   },
   withdrawals: {
-    /** POST (Bearer, KYB-approved) { amountBrla, pixKey, pixKeyType } */
+    /**
+     * POST (Bearer, KYB-approved) { amountBrla, pixKey, pixKeyType } ->
+     * 201 { withdrawalId, status: 'PROCESSING' } (accepted, under way) |
+     * 202 { withdrawalId, status: 'PENDING', message } (accepted, provider
+     * outcome not known yet — not an error, do not retry) | 503
+     * WITHDRAW_PROVIDER_ERROR (definitive rejection; the amount is returned).
+     * Poll GET below for status.
+     */
     createPix: "/v1/withdraw/pix",
     /**
      * POST (Bearer) { amountBrla, pixKeyType? } -> { amountBrla, feeBrl,
