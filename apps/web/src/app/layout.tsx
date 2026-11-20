@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Instrument_Sans, Merriweather, IBM_Plex_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ToastProvider } from "@/components/toast-provider";
@@ -28,6 +28,13 @@ const plexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: "Bravachain",
   description: "Plataforma financeira descentralizada",
+};
+
+// `viewport-fit=cover` lets the app paint under the notch/status bar so the
+// mobile bottom nav and the Início hero can pad themselves with
+// `env(safe-area-inset-*)` instead of leaving that area blank.
+export const viewport: Viewport = {
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

@@ -1,137 +1,79 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { LogOut, MoreHorizontal, X } from "lucide-react";
+import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useLogout } from "@/lib/hooks";
-import { Spinner } from "@/components/ui/spinner";
-import { navItems, isActive, type NavItem } from "./nav-items";
+import { mobileNavLinks, isActive, type MobileNavLink } from "./nav-items";
+import { QuickActionsSheet } from "@/components/dashboard/quick-actions-sheet";
 
-// The four primary slots (in order); the rest go under "Mais".
-const PRIMARY_HREFS = ["/", "/instrucoes-de-recebimento", "/saque", "/extrato"] as const;
-
+/**
+ * Mobile bottom bar (Web 14 — Marcia Alves mockup): five positions, reading
+ * Início · Pagamentos · (+) · Extrato · Empresa. The central "+" is an elevated
+ * circular button that opens the quick-actions sheet; the other four are links
+ * (see `mobileNavLinks`). Hidden on md+ (the sidebar takes over).
+ */
 export function BottomNav() {
   const pathname = usePathname();
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const { signingOut, handleLogout } = useLogout();
+  const t = useTranslations("home.nav");
+  const [actionsOpen, setActionsOpen] = useState(false);
 
-  // navItems already respects the feature flags (disabled screens are absent).
-  const primary: NavItem[] = PRIMARY_HREFS.map((h) =>
-    navItems.find((i) => i.href === h),
-  ).filter((i): i is NavItem => Boolean(i));
-  const more: NavItem[] = navItems.filter((i) => !PRIMARY_HREFS.includes(i.href as (typeof PRIMARY_HREFS)[number]));
+  const [first, second, ...rest] = mobileNavLinks;
+  const left = [first, second].filter(Boolean) as MobileNavLink[];
+  const right = rest;
 
-  const moreActive = more.some((i) => isActive(pathname, i.href));
-
-  // Close the sheet on route change, and on Esc.
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSheetOpen(false);
-  }, [pathname]);
-  useEffect(() => {
-    if (!sheetOpen) return;
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setSheetOpen(false);
-    }
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [sheetOpen]);
-
-  function slotClass(active: boolean) {
-    return cn(
-      "flex min-h-[44px] flex-1 flex-col items-center justify-center gap-0.5 border-t-2 py-2 transition-colors",
-      active
-        ? "border-primary text-foreground"
-        : "border-transparent text-muted-foreground active:text-foreground",
+  function Slot({ link }: { link: MobileNavLink }) {
+    const { href, labelKey, icon: Icon } = link;
+    const active = isActive(pathname, href);
+    return (
+      <Link
+        href={href}
+        aria-current={active ? "page" : undefined}
+        className={cn(
+          "flex min-h-[44px] flex-1 flex-col items-center justify-center gap-1 py-2 text-muted-foreground transition-colors active:text-foreground",
+          active && "text-primary",
+        )}
+      >
+        <Icon className="h-5 w-5 shrink-0" aria-hidden />
+        <span className={cn("truncate text-[11px] leading-none", active && "font-semibold")}>
+          {t(labelKey)}
+        </span>
+      </Link>
     );
   }
 
   return (
     <>
       <nav
-        className="fixed bottom-0 left-0 right-0 z-40 flex border-t border-border bg-card pb-[env(safe-area-inset-bottom)] md:hidden"
+        className="fixed bottom-0 left-0 right-0 z-40 flex items-stretch border-t border-border bg-card pb-[env(safe-area-inset-bottom)] md:hidden"
         aria-label="Navegação principal"
       >
-        {primary.map(({ href, label, icon: Icon }) => {
-          const active = isActive(pathname, href);
-          return (
-            <Link key={href} href={href} className={slotClass(active)}>
-              <Icon className={cn("h-5 w-5 shrink-0", active && "text-primary")} />
-              <span className={cn("w-full truncate px-1 text-center text-[11px] leading-none", active && "font-semibold")}>
-                {label}
-              </span>
-            </Link>
-          );
-        })}
+        {left.map((link) => (
+          <Slot key={link.key} link={link} />
+        ))}
 
-        {more.length > 0 && (
+        {/* Elevated central "+" — opens the quick-actions sheet. */}
+        <div className="flex w-16 shrink-0 items-start justify-center">
           <button
             type="button"
-            onClick={() => setSheetOpen(true)}
+            onClick={() => setActionsOpen(true)}
+            aria-label={t("openActions")}
             aria-haspopup="dialog"
-            aria-expanded={sheetOpen}
-            className={slotClass(moreActive)}
+            aria-expanded={actionsOpen}
+            className="-mt-5 flex h-14 w-14 items-center justify-center rounded-full bg-[#011a0f] text-white shadow-lg ring-4 ring-card transition-colors hover:bg-[#0b3b2e] dark:bg-primary dark:text-primary-foreground"
           >
-            <MoreHorizontal className={cn("h-5 w-5 shrink-0", moreActive && "text-primary")} />
-            <span className={cn("text-[11px] leading-none", moreActive && "font-semibold")}>Mais</span>
+            <Plus className="h-6 w-6" aria-hidden />
           </button>
-        )}
+        </div>
+
+        {right.map((link) => (
+          <Slot key={link.key} link={link} />
+        ))}
       </nav>
 
-      {sheetOpen && (
-        <div className="fixed inset-0 z-50 md:hidden" role="dialog" aria-modal="true" aria-label="Mais opções">
-          <button
-            type="button"
-            aria-label="Fechar"
-            className="absolute inset-0 bg-black/40"
-            onClick={() => setSheetOpen(false)}
-          />
-          <div className="absolute inset-x-0 bottom-0 rounded-t-2xl bg-card pb-[env(safe-area-inset-bottom)] shadow-xl">
-            <div className="flex items-center justify-between border-b border-border px-4 py-3">
-              <p className="text-sm font-semibold text-foreground">Mais</p>
-              <button
-                type="button"
-                onClick={() => setSheetOpen(false)}
-                aria-label="Fechar"
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="p-2">
-              {more.map(({ href, label, icon: Icon }) => {
-                const active = isActive(pathname, href);
-                return (
-                  <Link
-                    key={href}
-                    href={href}
-                    className={cn(
-                      "flex min-h-[44px] items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
-                      active
-                        ? "bg-[#011a0f] text-white dark:bg-primary dark:text-primary-foreground"
-                        : "text-foreground hover:bg-muted",
-                    )}
-                  >
-                    <Icon className="h-5 w-5 shrink-0" />
-                    {label}
-                  </Link>
-                );
-              })}
-              <button
-                type="button"
-                onClick={handleLogout}
-                disabled={signingOut}
-                className="flex min-h-[44px] w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-60"
-              >
-                {signingOut ? <Spinner size="sm" /> : <LogOut className="h-5 w-5 shrink-0" />}
-                Sair
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <QuickActionsSheet open={actionsOpen} onClose={() => setActionsOpen(false)} />
     </>
   );
 }

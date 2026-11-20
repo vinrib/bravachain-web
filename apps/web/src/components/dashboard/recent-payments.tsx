@@ -10,9 +10,24 @@ import { TransactionRowSkeleton } from "@/components/ui/skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/state";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { getStatement } from "@/lib/statement/api";
-import { statementStatusView } from "@/lib/statement/status";
+import { statementStatusView, type StatusTone } from "@/lib/statement/status";
 import { formatForeign, initials, rowTitle, formatRowDate } from "@/lib/statement/display";
 import type { StatementRow } from "@/lib/statement/types";
+
+/** Text color for the mobile status line (colored text, not a pill). */
+function toneTextClass(tone: StatusTone): string {
+  switch (tone) {
+    case "success":
+      return "text-[#0b6b4f] dark:text-[#7be0b0]";
+    case "error":
+      return "text-[#b03030] dark:text-[#e07a7a]";
+    case "neutral":
+      return "text-muted-foreground";
+    default:
+      // processing / review both read "Em processamento" → amber.
+      return "text-[#8a5310] dark:text-[#d79a3a]";
+  }
+}
 
 /** "Pagamentos recentes" on Início — latest rows from /v1/statement (real data). */
 export function RecentPayments() {
@@ -47,7 +62,19 @@ export function RecentPayments() {
 
   return (
     <div>
-      <div className="mb-2 flex items-center justify-between px-1">
+      {/* Mobile heading (Web 14 — "Transações recentes" + pill "Ver todas"). */}
+      <div className="mb-2 flex items-center justify-between px-1 md:hidden">
+        <h2 className="text-base font-semibold text-foreground">Transações recentes</h2>
+        <Link
+          href="/extrato"
+          className="rounded-full border border-border px-3 py-1 text-xs font-medium text-foreground hover:bg-muted"
+        >
+          Ver todas
+        </Link>
+      </div>
+
+      {/* Desktop heading — unchanged. */}
+      <div className="mb-2 hidden items-center justify-between px-1 md:flex">
         <h2 className="text-base font-semibold text-foreground">Pagamentos recentes</h2>
         <Link href="/extrato" className="text-sm font-medium text-primary hover:underline">
           Ver extrato
@@ -77,6 +104,12 @@ export function RecentPayments() {
             const status = statementStatusView(row.status);
             const { title } = rowTitle(row);
             const { date } = formatRowDate(row.createdAt);
+            // Mobile status line (mockup): inbound funds that settled read
+            // "Disponível · <data>" in green; everything else uses the real
+            // status label, colored by tone. Never a promised timeframe.
+            const baseLabel =
+              status.final && status.tone === "success" && inbound ? "Disponível" : status.label;
+            const mobileStatus = status.final ? `${baseLabel} · ${date}` : baseLabel;
             return (
               <div key={row.id} className="flex items-center gap-3 px-4 py-3">
                 <span
@@ -89,25 +122,35 @@ export function RecentPayments() {
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-foreground">{title}</p>
-                  <p className="truncate text-xs text-muted-foreground">
+                  {/* Mobile: colored status text under the name (mockup). */}
+                  <p className={cn("truncate text-xs md:hidden", toneTextClass(status.tone))}>
+                    {mobileStatus}
+                  </p>
+                  {/* Desktop: foreign/date sub-line — unchanged. */}
+                  <p className="hidden truncate text-xs text-muted-foreground md:block">
                     {[inbound ? formatForeign(row) : null, date].filter(Boolean).join(" · ")}
                   </p>
                 </div>
                 <div className="shrink-0 text-right">
                   <p
                     className={cn(
-                      "text-sm font-semibold tabular-nums",
-                      inbound ? "text-[#0b6b4f] dark:text-[#7be0b0]" : "text-foreground",
+                      "whitespace-nowrap text-sm font-semibold tabular-nums",
+                      // Mobile (mockup): plain dark value, no +/− sign. Desktop:
+                      // keep the signed, green/dark convention (see the span).
+                      "text-foreground",
+                      inbound ? "md:text-[#0b6b4f] md:dark:text-[#7be0b0]" : "md:text-foreground",
                     )}
                   >
-                    {inbound ? "+ " : "− "}
+                    <span className="hidden md:inline">{inbound ? "+ " : "− "}</span>
                     {formatMoney(Math.abs(row.amountBrl))}
                   </p>
-                  <div className="mt-0.5 flex justify-end">
+                  {/* Desktop: status pill under the value — unchanged. */}
+                  <div className="mt-0.5 hidden justify-end md:flex">
                     <StatusBadge label={status.label} tone={status.tone} />
                   </div>
                 </div>
-                <span className="shrink-0 text-muted-foreground">
+                {/* Desktop-only trailing arrow (mockup has none on mobile). */}
+                <span className="hidden shrink-0 text-muted-foreground md:inline">
                   {inbound ? <ArrowDownLeft className="h-4 w-4 text-[#12a46b]" /> : null}
                 </span>
               </div>
