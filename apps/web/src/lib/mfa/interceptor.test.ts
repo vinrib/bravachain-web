@@ -3,7 +3,7 @@ import { shouldEnrollRedirect } from "./interceptor";
 
 describe("shouldEnrollRedirect", () => {
   it("redirects on a 403 MFA_ENROLLMENT_REQUIRED from outside the wizard", () => {
-    expect(shouldEnrollRedirect(403, "MFA_ENROLLMENT_REQUIRED", "/admin/clientes")).toBe(
+    expect(shouldEnrollRedirect(403, "MFA_ENROLLMENT_REQUIRED", "/admin/seguranca")).toBe(
       true,
     );
     expect(shouldEnrollRedirect(403, "MFA_ENROLLMENT_REQUIRED", "/")).toBe(true);
