@@ -29,14 +29,22 @@
   "home": {
     "nav": {
       "home": "Inicio",
-      "send": "Enviar",
+      "pagamentos": "Pagos",
       "saquePix": "Retiro PIX",
-      "extrato": "Extracto"
+      "extrato": "Extracto",
+      "empresa": "Empresa",
+      "openActions": "Abrir acciones"
     },
     "actions": {
       "deposit": "Depósito",
-      "send": "Enviar",
+      "transfer": "Transferir",
       "receive": "Recibir"
+    },
+    "quick": {
+      "title": "Acciones rápidas",
+      "receive": "Recibir",
+      "saquePix": "Retiro PIX",
+      "enviar": "Enviar"
     }
   },
   "settings": {

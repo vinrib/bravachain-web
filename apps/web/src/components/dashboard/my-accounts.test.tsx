@@ -23,55 +23,61 @@ afterEach(() => {
   getAccounts.mockReset();
 });
 
-describe("MyAccounts (Web 14 — mobile carousel + unchanged desktop grid)", () => {
-  // Cards render once per layout (mobile carousel + desktop grid, CSS-toggled
-  // — see the dual-render test below), so these scope to the desktop grid as
-  // the single source of truth for "which cards exist".
-  it("shows only the real BRL card when the API returns no dedicated account", async () => {
-    getAccounts.mockResolvedValue({ accounts: [], pendingCurrencies: [] });
+describe("MyAccounts (Web 14 v3 — mobile USD/EUR only, desktop grid unchanged)", () => {
+  it("mobile carousel shows USD/EUR cards and NO big BRL card", async () => {
+    getAccounts.mockResolvedValue({
+      accounts: [
+        { currency: "USD", accountNumber: "3123456789" },
+        { currency: "EUR", iban: "DE89370400440532013000" },
+      ],
+      pendingCurrencies: [],
+    });
+    render(<MyAccounts />);
+    const mobile = within(await screen.findByTestId("accounts-mobile"));
+    expect(await mobile.findByText("USD")).toBeTruthy();
+    expect(mobile.getByText("EUR")).toBeTruthy();
+    expect(mobile.queryByText("BRL")).toBeNull();
+  });
+
+  it("desktop grid KEEPS the BRL card plus USD/EUR (unchanged)", async () => {
+    getAccounts.mockResolvedValue({
+      accounts: [{ currency: "USD", accountNumber: "3123456789" }],
+      pendingCurrencies: [],
+    });
     render(<MyAccounts />);
     const desktop = within(await screen.findByTestId("accounts-desktop"));
     expect(await desktop.findByText("BRL")).toBeTruthy();
-    expect(desktop.queryByText("USD")).toBeNull();
-    expect(desktop.queryByText("EUR")).toBeNull();
+    expect(desktop.getByText("USD")).toBeTruthy();
   });
 
-  it("adds a USD/EUR card only when the API returns that dedicated account — never invented", async () => {
-    getAccounts.mockResolvedValue({
-      accounts: [{ currency: "EUR", iban: "DE89370400440532013000" }],
-      pendingCurrencies: ["USD"],
-    });
+  it("mobile shows an empty-state card (no invented number, no BRL) when the API returns no foreign account", async () => {
+    getAccounts.mockResolvedValue({ accounts: [], pendingCurrencies: [] });
     render(<MyAccounts />);
-    const desktop = within(screen.getByTestId("accounts-desktop"));
-    expect(await desktop.findByText("EUR")).toBeTruthy();
-    expect(desktop.queryByText("USD")).toBeNull();
+    const mobile = within(await screen.findByTestId("accounts-mobile"));
+    expect(mobile.queryByText("USD")).toBeNull();
+    expect(mobile.queryByText("EUR")).toBeNull();
+    expect(mobile.queryByText("BRL")).toBeNull();
+    // An empty-state card is present, with no masked/fake number.
+    expect(mobile.getByText("Contas internacionais")).toBeTruthy();
+    expect(mobile.queryByText(/••••/)).toBeNull();
   });
 
-  it("masks the IBAN — never shows the full number", async () => {
+  it("masks the IBAN in the mobile card — never the full number", async () => {
     getAccounts.mockResolvedValue({
       accounts: [{ currency: "EUR", iban: "DE89370400440532013000" }],
       pendingCurrencies: [],
     });
     render(<MyAccounts />);
-    const desktop = within(screen.getByTestId("accounts-desktop"));
-    const masked = await desktop.findByText(/••••/);
+    const mobile = within(await screen.findByTestId("accounts-mobile"));
+    const masked = await mobile.findByText(/••••/);
     expect(masked.textContent).not.toContain("DE89370400440532013000");
     expect(masked.textContent).toMatch(/3000$/);
   });
 
-  it("renders the same cards in both the mobile carousel and the desktop grid", async () => {
-    getAccounts.mockResolvedValue({
-      accounts: [{ currency: "USD", accountNumber: "0001234567" }],
-      pendingCurrencies: [],
-    });
+  it("shows a 'Ver todas' link to /dados-de-conta on mobile", async () => {
+    getAccounts.mockResolvedValue({ accounts: [], pendingCurrencies: [] });
     render(<MyAccounts />);
-    await screen.findAllByText("USD");
-
-    const mobile = screen.getByTestId("accounts-mobile");
-    const desktop = screen.getByTestId("accounts-desktop");
-    expect(within(mobile).getAllByText("BRL").length).toBe(1);
-    expect(within(mobile).getAllByText("USD").length).toBe(1);
-    expect(within(desktop).getAllByText("BRL").length).toBe(1);
-    expect(within(desktop).getAllByText("USD").length).toBe(1);
+    const verTodas = await screen.findByRole("link", { name: "Ver todas" });
+    expect(verTodas.getAttribute("href")).toBe("/dados-de-conta");
   });
 });

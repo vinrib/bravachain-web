@@ -29,14 +29,22 @@
   "home": {
     "nav": {
       "home": "Home",
-      "send": "Send",
+      "pagamentos": "Payments",
       "saquePix": "PIX withdrawal",
-      "extrato": "Statement"
+      "extrato": "Statement",
+      "empresa": "Company",
+      "openActions": "Open actions"
     },
     "actions": {
       "deposit": "Deposit",
-      "send": "Send",
+      "transfer": "Transfer",
       "receive": "Receive"
+    },
+    "quick": {
+      "title": "Quick actions",
+      "receive": "Receive",
+      "saquePix": "PIX withdrawal",
+      "enviar": "Send"
     }
   },
   "settings": {

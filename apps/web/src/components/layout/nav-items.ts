@@ -1,4 +1,4 @@
-import { LineChart } from "lucide-react";
+import { LineChart, CircleArrowDown, Building2 } from "lucide-react";
 import { featureFlags } from "@/lib/feature-flags";
 import { PixIcon } from "@/components/icons/pix-icon";
 import {
@@ -64,31 +64,29 @@ export function isActive(pathname: string, href: string): boolean {
   return href === "/" ? pathname === "/" : pathname.startsWith(href);
 }
 
-export interface MobileNavSlot {
+export interface MobileNavLink {
   key: string;
   href: string;
   /** Key relative to the `home.nav` locale namespace (e.g. `t(labelKey)` with `useTranslations("home.nav")`). */
   labelKey: string;
   /** Rendered `aria-hidden` — the slot's visible label already names the link. */
   icon: React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
-  /** Fixed position in the bar — lower renders first. */
-  position: number;
 }
 
 /**
- * The 4-item mobile bottom nav (Web 14): Início, Enviar, Saque PIX, Extrato.
- * Deliberately separate from `navItems` above — the sidebar keeps every
- * flagged route and its own (untranslated) labels; this bar only ever shows
- * these 4 fixed slots, always labeled via the `home.nav` locale namespace.
+ * The four link slots of the mobile bottom bar (Web 14 — Marcia Alves mockup):
+ * Início, Pagamentos, Extrato, Empresa. The elevated central "+" is NOT a link
+ * (it opens the quick-actions sheet) and is rendered by `BottomNav` between
+ * slots 2 and 3, so the bar reads Início · Pagamentos · (+) · Extrato · Empresa.
  *
- * Position 2 ("Enviar") is reserved for PR #37 (`feat/enviar`), not merged
- * into `main` as of this branch — so `NEXT_PUBLIC_FEATURE_ENVIAR` and
- * `/enviar` don't exist here yet. When it lands, add:
- *   { key: "send", href: "/enviar", labelKey: "send", icon: SendIcon, position: 2 }
- * gated by `featureFlags.enviar`, and nothing else in BottomNav needs to change.
+ * Deliberately separate from `navItems` above — the sidebar keeps every flagged
+ * route and its own labels; this bar is these four fixed slots only, labeled via
+ * the `home.nav` locale namespace. Routes chosen per the task: Pagamentos →
+ * `/saque` (Saque PIX) and Empresa → `/configuracoes` (there is no `/empresa`).
  */
-export const mobileNavSlots: MobileNavSlot[] = [
-  { key: "home", href: "/", labelKey: "home", icon: HomeIcon, position: 1 },
-  { key: "saque", href: "/saque", labelKey: "saquePix", icon: PixIcon, position: 3 },
-  { key: "extrato", href: "/extrato", labelKey: "extrato", icon: StatementIcon, position: 4 },
-].sort((a, b) => a.position - b.position);
+export const mobileNavLinks: MobileNavLink[] = [
+  { key: "home", href: "/", labelKey: "home", icon: HomeIcon },
+  { key: "pagamentos", href: "/saque", labelKey: "pagamentos", icon: CircleArrowDown },
+  { key: "extrato", href: "/extrato", labelKey: "extrato", icon: StatementIcon },
+  { key: "empresa", href: "/configuracoes", labelKey: "empresa", icon: Building2 },
+];

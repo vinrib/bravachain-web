@@ -31,4 +31,12 @@ export const featureFlags = {
   cotacoesChart: process.env.NEXT_PUBLIC_FEATURE_COTACOES_CHART === "true",
   /** "Depósito" (PIX deposit) section. */
   deposito: process.env.NEXT_PUBLIC_FEATURE_DEPOSITO === "true",
+  /**
+   * "Enviar" (outbound remittance) section. Flag + `/enviar` routes land with
+   * PR #37 (`feat/enviar`), not merged into this branch — so this is off here
+   * and the Início header's "Transferir" button and the quick-actions "Enviar"
+   * entry render disabled/omitted until it ships. Expect a small merge conflict
+   * on this line with PR #37, which defines the same flag.
+   */
+  enviar: process.env.NEXT_PUBLIC_FEATURE_ENVIAR === "true",
 } as const;

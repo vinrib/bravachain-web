@@ -51,16 +51,19 @@ export function EmProcessamento() {
       href="/extrato"
       className="flex items-center justify-between gap-3 rounded-2xl bg-[#fbf0df] px-4 py-3.5 transition-colors hover:bg-[#f7e8cf] dark:bg-[#c77a18]/15 dark:hover:bg-[#c77a18]/20"
     >
-      <div className="flex items-center gap-2.5">
+      <div className="flex min-w-0 items-center gap-2.5">
         <span className="h-2 w-2 shrink-0 rounded-full bg-[#c77a18]" />
-        <div>
+        <div className="min-w-0">
           <p className="text-xs font-medium text-[#8a5310] dark:text-[#d79a3a]">
             Em processamento
           </p>
-          <p className="font-serif text-lg font-bold tabular-nums text-[#8a5310] dark:text-[#d79a3a]">
-            ≈ {formatMoney(total)}
+          <p className="truncate font-serif text-lg font-bold tabular-nums text-[#8a5310] dark:text-[#d79a3a]">
+            {/* Desktop keeps the "≈" (approximate sum); mobile matches the mockup. */}
+            <span className="hidden md:inline">≈ </span>
+            {formatMoney(total)}
           </p>
-          <p className="text-xs text-[#8a5310]/80 dark:text-[#d79a3a]/80">
+          {/* Count sub-line is desktop-only — the mockup band is just label + value. */}
+          <p className="hidden text-xs text-[#8a5310]/80 dark:text-[#d79a3a]/80 md:block">
             {count} {count === 1 ? "pagamento sendo convertido" : "pagamentos sendo convertidos"}
           </p>
         </div>

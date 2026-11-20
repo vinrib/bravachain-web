@@ -50,8 +50,12 @@ export default function DashboardPage() {
       {/* KYB prompt when not approved (real status) */}
       {kyc.data && !approved && <KycBanner status={kyc.data.status} />}
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-        <div className="space-y-6">
+      {/* grid-cols-1 (a 1fr / min-0 track) + min-w-0 keep the single mobile
+          column from stretching to its content's min-content width — without
+          them the implicit `auto` track grows past the viewport and `main`'s
+          overflow-x clips the right edge (cut-off transaction values). */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
+        <div className="min-w-0 space-y-6">
           <div className="hidden md:block">
             <WelcomeBalanceCard />
           </div>

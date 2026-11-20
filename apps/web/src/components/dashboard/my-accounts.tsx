@@ -18,6 +18,7 @@ function masked(account: DedicatedAccount): string | null {
   return account.iban ? `IBAN •••• ${tail}` : `•••• ${tail}`;
 }
 
+/** Desktop card (unchanged from before): receiving instructions for USD/EUR. */
 function ForeignCard({ account }: { account: DedicatedAccount }) {
   return (
     <Card className="relative">
@@ -52,12 +53,57 @@ function ForeignCard({ account }: { account: DedicatedAccount }) {
   );
 }
 
-/** "Minhas contas" (artboard 3a/4a): BRL balance (highlight) + USD/EUR receiving
- *  instructions. Never a USD/EUR balance. EUR appears only when it's a ready
- *  dedicated account (present in /v1/receive/accounts). */
+/** Compact mobile card (Marcia Alves mockup): ~183×146, flag + code, serif
+ *  "Instruções de recebimento", masked mono line. Links to the receiving
+ *  instructions for that currency. */
+function ForeignCardMobile({ account }: { account: DedicatedAccount }) {
+  return (
+    <Link
+      href="/instrucoes-de-recebimento"
+      className="flex h-[146px] w-[183px] shrink-0 snap-start flex-col rounded-2xl border border-border bg-card p-4 shadow-sm transition-colors hover:bg-muted/40"
+    >
+      <div className="flex items-center gap-2">
+        <CurrencyFlag currency={account.currency} size={25} />
+        <span className="text-sm font-semibold text-foreground">{account.currency}</span>
+      </div>
+      <p className="mt-2 font-serif text-base font-bold leading-snug text-foreground">
+        Instruções de recebimento
+      </p>
+      <div className="mt-auto flex items-center gap-1.5 text-xs text-muted-foreground">
+        <Landmark className="h-3.5 w-3.5 shrink-0" />
+        <span className="truncate font-mono">{masked(account) ?? account.bankName ?? "—"}</span>
+      </div>
+    </Link>
+  );
+}
+
+/** Empty-state mobile card — same footprint, no invented number. */
+function EmptyCardMobile() {
+  return (
+    <div className="flex h-[146px] w-[183px] shrink-0 snap-start flex-col justify-center rounded-2xl border border-dashed border-border bg-card p-4 text-xs text-muted-foreground">
+      <p className="font-serif text-base font-bold leading-snug text-foreground">Contas internacionais</p>
+      <p className="mt-1">As contas em dólar e euro aparecem aqui quando estiverem prontas.</p>
+    </div>
+  );
+}
+
+function SkeletonCardMobile() {
+  return (
+    <div className="h-[146px] w-[183px] shrink-0 snap-start animate-pulse rounded-2xl border border-border bg-muted/40" />
+  );
+}
+
+/**
+ * "Minhas contas" (Web 14 v3). Mobile: a snap carousel of USD/EUR receiving
+ * cards only — the BRL balance already lives in the hero, so no BRL card here
+ * (that was the v2 mistake). USD/EUR appear only when `/v1/receive/accounts`
+ * returns them; otherwise an empty-state card with no invented number. Desktop
+ * (md+) keeps its original grid: the BRL highlight plus USD/EUR.
+ */
 export function MyAccounts() {
   const balance = useBalance();
   const [accounts, setAccounts] = useState<AccountsResponse | null>(null);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -66,7 +112,10 @@ export function MyAccounts() {
         if (active) setAccounts(d);
       })
       .catch(() => {
-        /* no dedicated account yet — just show the BRL card */
+        /* no dedicated account yet — mobile shows the empty-state card */
+      })
+      .finally(() => {
+        if (active) setLoaded(true);
       });
     return () => {
       active = false;
@@ -77,8 +126,8 @@ export function MyAccounts() {
     (a) => a.currency === "USD" || a.currency === "EUR",
   );
 
-  const cards = [
-    // BRL highlight — real balance.
+  // Desktop (unchanged): BRL highlight + foreign cards.
+  const desktopCards = [
     <div key="BRL" className="rounded-2xl bg-[#011a0f] p-5 text-white shadow-sm">
       <div className="flex items-center gap-2">
         <CurrencyFlag currency="BRL" size={24} />
@@ -100,28 +149,43 @@ export function MyAccounts() {
     <div>
       <div className="mb-2 flex items-center justify-between px-1">
         <h2 className="text-base font-semibold text-foreground">Minhas contas</h2>
+        {/* Mobile: always a link (mockup). Desktop: unchanged (flag-gated). */}
+        <Link
+          href="/dados-de-conta"
+          className="text-sm font-medium text-primary hover:underline md:hidden"
+        >
+          Ver todas
+        </Link>
         {featureFlags.dadosConta && (
-          <Link href="/dados-de-conta" className="text-sm font-medium text-primary hover:underline">
+          <Link
+            href="/dados-de-conta"
+            className="hidden text-sm font-medium text-primary hover:underline md:inline"
+          >
             Ver todas
           </Link>
         )}
       </div>
 
-      {/* Mobile: horizontal snap carousel, next card peeking at the edge. */}
+      {/* Mobile: USD/EUR only, snap carousel with the next card peeking. */}
       <div
         data-testid="accounts-mobile"
-        className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 md:hidden"
+        className="-mx-4 flex snap-x snap-mandatory gap-[11px] overflow-x-auto px-4 pb-1 md:hidden"
       >
-        {cards.map((card, i) => (
-          <div key={i} className="min-w-[78%] shrink-0 snap-start">
-            {card}
-          </div>
-        ))}
+        {!loaded ? (
+          <>
+            <SkeletonCardMobile />
+            <SkeletonCardMobile />
+          </>
+        ) : foreign.length > 0 ? (
+          foreign.map((a) => <ForeignCardMobile key={a.currency} account={a} />)
+        ) : (
+          <EmptyCardMobile />
+        )}
       </div>
 
       {/* Tablet/desktop: unchanged grid. */}
       <div data-testid="accounts-desktop" className="hidden gap-3 md:grid md:grid-cols-2 lg:grid-cols-3">
-        {cards}
+        {desktopCards}
       </div>
     </div>
   );
