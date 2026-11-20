@@ -8,6 +8,7 @@ import {
   RatesIcon,
   ReceiveIcon,
   DepositCardIcon,
+  SendIcon,
   SettingsIcon,
 } from "@/components/icons/nav-icons";
 
@@ -45,6 +46,11 @@ export const navItems: NavItem[] = [
           icon: ReceiveIcon,
         },
       ]
+    : []),
+  // Behind NEXT_PUBLIC_FEATURE_ENVIAR (default off). "Enviar" (seta para cima)
+  // vai logo abaixo de "Instruções de recebimento" e acima de "Saque PIX".
+  ...(featureFlags.enviar
+    ? [{ href: "/enviar", label: "Enviar", icon: SendIcon }]
     : []),
   { href: "/saque", label: "Saque PIX", icon: PixIcon },
   { href: "/extrato", label: "Extrato", icon: StatementIcon },
