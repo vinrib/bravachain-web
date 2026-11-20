@@ -56,36 +56,15 @@ export const endpoints = {
     mfaRegenerate: "/v1/auth/mfa/recovery-codes/regenerate",
   },
   /**
-   * ADMIN-only area (compliance review #82, admin controls #83, listings PR C).
-   * All require Bearer + ADMIN on the backend; the web gates by role too.
-   * #92 removed every decision/limit route (decision, grandfathered, pix-
-   * withdrawal approval) — Bravachain does not approve, reject, or limit
-   * clients or operations; only Avenia decides. This area is read-only plus
-   * internal annotations (review notes, owners, document access).
+   * ADMIN-only area: admin-user management (list/search/promote/demote, MFA
+   * reset) and the admin's own MFA enrollment. All require Bearer + ADMIN on
+   * the backend; the web gates by role too. There is no client or operation
+   * review/decision route here — Bravachain does not approve, reject, or
+   * limit clients or operations; only Avenia decides. The compliance-review
+   * queue (clients, owners, documents) was removed entirely per board
+   * directive (2026-10-31); reintroducing it requires a new ADR.
    */
   admin: {
-    /** GET ?q&reviewStatus&risk&pep&page&pageSize -> { items, page, pageSize, total } */
-    complianceClients: "/v1/admin/compliance/clients",
-    /** GET -> full review (owners w/ CPF, documents) */
-    complianceClient: (userId: string) => `/v1/admin/compliance/clients/${userId}`,
-    /** PUT (UpsertReview) -> stores an internal annotation only; never changes status/eligibility */
-    complianceReview: (userId: string) =>
-      `/v1/admin/compliance/clients/${userId}/review`,
-    /** PUT (ReplaceOwners) — replaces the whole beneficial-owner list */
-    complianceOwners: (userId: string) =>
-      `/v1/admin/compliance/clients/${userId}/owners`,
-    /** POST (CreateOwner) -> full detail */
-    complianceOwnerCreate: (userId: string) =>
-      `/v1/admin/compliance/clients/${userId}/beneficial-owners`,
-    /** PATCH (UpdateOwner) / DELETE ({ reason }) -> full detail */
-    complianceOwner: (userId: string, ownerId: string) =>
-      `/v1/admin/compliance/clients/${userId}/beneficial-owners/${ownerId}`,
-    /** POST -> { cpf } (audited reveal; Cache-Control: no-store; 20/min per admin → 429) */
-    complianceOwnerRevealCpf: (userId: string, ownerId: string) =>
-      `/v1/admin/compliance/clients/${userId}/beneficial-owners/${ownerId}/reveal-cpf`,
-    /** POST -> { url, expiresAt } (audited short-lived signed URL; Cache-Control: no-store) */
-    complianceDocumentAccess: (userId: string, documentId: string) =>
-      `/v1/admin/compliance/clients/${userId}/documents/${documentId}/access`,
     /** GET ?role=ADMIN&page&pageSize -> { items, page, pageSize, total } */
     users: "/v1/admin/users",
     /** GET ?email= (min 3) -> { items } (max 5) */
@@ -131,7 +110,14 @@ export const endpoints = {
     sendEmail: (withdrawalId: string) => `/v1/receipts/${withdrawalId}/send-email`,
   },
   withdrawals: {
-    /** POST (Bearer, KYB-approved) { amountBrla, pixKey, pixKeyType } */
+    /**
+     * POST (Bearer, KYB-approved) { amountBrla, pixKey, pixKeyType } ->
+     * 201 { withdrawalId, status: 'PROCESSING' } (accepted, under way) |
+     * 202 { withdrawalId, status: 'PENDING', message } (accepted, provider
+     * outcome not known yet — not an error, do not retry) | 503
+     * WITHDRAW_PROVIDER_ERROR (definitive rejection; the amount is returned).
+     * Poll GET below for status.
+     */
     createPix: "/v1/withdraw/pix",
     /**
      * POST (Bearer) { amountBrla, pixKeyType? } -> { amountBrla, feeBrl,
@@ -185,6 +171,35 @@ export const endpoints = {
     pixQrCode: "/v1/pix/qrcode",
     /** GET -> { txid, status, ... } */
     pixStatus: (txid: string) => `/v1/pix/status/${txid}`,
+  },
+  /**
+   * Outbound remittance ("Enviar"): send BRL/USD/EUR to a beneficiary, settled
+   * by Avenia. Contract from the API 13/14 final report; not yet on `main`, so
+   * the frontend uses typed mocks (apps/web/src/lib/send) until it lands. All
+   * require Bearer; `create` carries an Idempotency-Key (UUID v4, reused on
+   * retry). Do not hand-edit openapi.json — regenerate when the routes ship.
+   */
+  send: {
+    /** GET -> { channels: [{ currency, available, ... }] } (available gates each card) */
+    channels: "/v1/send/channels",
+    /** GET -> saved beneficiaries; POST -> create; DELETE (id) -> remove */
+    beneficiaries: "/v1/send/beneficiaries",
+    /** DELETE (Bearer) -> removes one saved beneficiary */
+    beneficiary: (id: string) => `/v1/send/beneficiaries/${id}`,
+    /** GET -> two-level purpose codes (finalidade); the official list comes from Avenia */
+    purposeCodes: "/v1/send/purpose-codes",
+    /**
+     * POST { currency, sendAmount|receiveAmount, ... } -> { quoteId, lines,
+     * referenceRate, expiresAt, isEstimate, balanceBrl, enoughBalance,
+     * invoiceRequired }. A line with value 0 is not displayed.
+     */
+    quote: "/v1/send/quote",
+    /** POST (Idempotency-Key) { quoteId, beneficiaryId, ... } -> created send; GET -> list */
+    root: "/v1/send",
+    /** GET (Bearer) -> one send detail */
+    detail: (id: string) => `/v1/send/${id}`,
+    /** GET (Bearer) -> receipt payload for the send */
+    receipt: (id: string) => `/v1/send/${id}/receipt`,
   },
   /**
    * FX rates (Cotações). Responses are not typed in the committed openapi.json;

@@ -4,8 +4,10 @@ import { useState } from "react";
 import { StatementView, type StatementScope } from "./statement-view";
 import { ReceiptsView } from "./receipts-view";
 import { TabsPill, type TabItem } from "@/components/ui/tabs-pill";
+import { featureFlags } from "@/lib/feature-flags";
+import { SendsView } from "@/components/send/sends-view";
 
-type Tab = StatementScope | "comprovantes";
+type Tab = StatementScope | "comprovantes" | "envios";
 
 /** Extrato with "Em andamento" / "Histórico" / "Comprovantes" tabs (artboard 9a). */
 export function ExtratoTabs({ showReceipts = false }: { showReceipts?: boolean }) {
@@ -15,6 +17,8 @@ export function ExtratoTabs({ showReceipts = false }: { showReceipts?: boolean }
   const tabs: Array<TabItem<Tab>> = [
     { value: "andamento", label: "Em andamento", badge: counts.andamento },
     { value: "historico", label: "Histórico", badge: counts.historico },
+    // "Envios" behind NEXT_PUBLIC_FEATURE_ENVIAR (default off).
+    ...(featureFlags.enviar ? [{ value: "envios" as Tab, label: "Envios" }] : []),
     ...(showReceipts
       ? [{ value: "comprovantes" as Tab, label: "Comprovantes" }]
       : []),
@@ -31,7 +35,9 @@ export function ExtratoTabs({ showReceipts = false }: { showReceipts?: boolean }
 
       <TabsPill tabs={tabs} value={tab} onChange={setTab} />
 
-      {tab === "comprovantes" ? (
+      {tab === "envios" ? (
+        <SendsView />
+      ) : tab === "comprovantes" ? (
         <ReceiptsView embedded />
       ) : (
         <StatementView

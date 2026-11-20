@@ -3,23 +3,18 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Users, ShieldCheck, KeyRound, ArrowLeft } from "lucide-react";
+import { ShieldCheck, KeyRound, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
-import {
-  ADMIN_CLIENTS,
-  ADMIN_SECURITY,
-  MFA_ENROLLMENT_PATH,
-} from "@/lib/mfa/routes";
+import { ADMIN_SECURITY, MFA_ENROLLMENT_PATH } from "@/lib/mfa/routes";
 
 interface AdminNavItem {
   href: string;
-  labelKey: "clients" | "security" | "mfa";
+  labelKey: "security" | "mfa";
   icon: React.ComponentType<{ className?: string }>;
 }
 
 const ITEMS: AdminNavItem[] = [
-  { href: ADMIN_CLIENTS, labelKey: "clients", icon: Users },
   { href: ADMIN_SECURITY, labelKey: "security", icon: ShieldCheck },
   { href: MFA_ENROLLMENT_PATH, labelKey: "mfa", icon: KeyRound },
 ];
