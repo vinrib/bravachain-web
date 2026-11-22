@@ -20,15 +20,21 @@ export const featureFlags = {
   recibos: process.env.NEXT_PUBLIC_FEATURE_RECIBOS === "true",
   /** "Dashboard financeiro" section. */
   dashboard: process.env.NEXT_PUBLIC_FEATURE_DASHBOARD === "true",
-  /** "Cotações" (FX rates) section. */
+  /** "Cotações" (PTAX reference quotes) section. Default OFF. */
   cotacoes: process.env.NEXT_PUBLIC_FEATURE_COTACOES === "true",
   /**
-   * History chart + Mín/Máx/Média/% on Cotações. Default OFF: the backend only
-   * has ~2 weeks of real daily data, the plotted dataPoints are downsampled
-   * (3M → 2 points, 1Y → 1), stats don't match the plotted series, and future
-   * dates are carried forward. Keep off until the history series is complete.
+   * History chart + Mín/Máx/Média/Abertura on Cotações (backed by `/v1/ptax/history`).
+   * Default OFF.
    */
   cotacoesChart: process.env.NEXT_PUBLIC_FEATURE_COTACOES_CHART === "true",
+  /**
+   * Reference calculator on Cotações (backed by `/v1/ptax/convert`; auto-hides on
+   * server 404 `{ code: "feature_disabled" }`). Default OFF.
+   */
+  cotacoesCalculadora:
+    process.env.NEXT_PUBLIC_FEATURE_COTACOES_CALCULADORA === "true",
+  /** Legacy price alerts widget on Cotações. Default OFF. */
+  cotacoesAlertas: process.env.NEXT_PUBLIC_FEATURE_COTACOES_ALERTAS === "true",
   /** "Depósito" (PIX deposit) section. */
   deposito: process.env.NEXT_PUBLIC_FEATURE_DEPOSITO === "true",
   /**

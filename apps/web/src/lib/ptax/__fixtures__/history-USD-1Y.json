@@ -1,0 +1,2253 @@
+{
+  "currency": "USD",
+  "pair": "USD_BRL",
+  "period": "1Y",
+  "side": "sell",
+  "source": "Banco Central do Brasil — PTAX",
+  "asOf": "2026-11-19T16:04:18.325Z",
+  "isStale": false,
+  "points": [
+    {
+      "date": "2025-11-24",
+      "timestamp": "2025-11-24T16:02:26.741Z",
+      "value": "5.394800",
+      "buy": "5.394200",
+      "sell": "5.394800",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-11-25",
+      "timestamp": "2025-11-25T16:05:27.685Z",
+      "value": "5.384100",
+      "buy": "5.383500",
+      "sell": "5.384100",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-11-26",
+      "timestamp": "2025-11-26T16:03:30.935Z",
+      "value": "5.369400",
+      "buy": "5.368800",
+      "sell": "5.369400",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-11-27",
+      "timestamp": "2025-11-27T16:07:26.522Z",
+      "value": "5.349000",
+      "buy": "5.348400",
+      "sell": "5.349000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-11-28",
+      "timestamp": "2025-11-28T16:10:31.721Z",
+      "value": "5.333800",
+      "buy": "5.333200",
+      "sell": "5.333800",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-12-01",
+      "timestamp": "2025-12-01T16:07:36.236Z",
+      "value": "5.346900",
+      "buy": "5.346300",
+      "sell": "5.346900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-12-02",
+      "timestamp": "2025-12-02T16:07:03.239Z",
+      "value": "5.346500",
+      "buy": "5.345900",
+      "sell": "5.346500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-12-03",
+      "timestamp": "2025-12-03T16:05:25.575Z",
+      "value": "5.311400",
+      "buy": "5.310800",
+      "sell": "5.311400",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-12-04",
+      "timestamp": "2025-12-04T16:08:17.839Z",
+      "value": "5.295200",
+      "buy": "5.294600",
+      "sell": "5.295200",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-12-05",
+      "timestamp": "2025-12-05T16:09:08.512Z",
+      "value": "5.340500",
+      "buy": "5.339900",
+      "sell": "5.340500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-12-08",
+      "timestamp": "2025-12-08T16:03:07.424Z",
+      "value": "5.424900",
+      "buy": "5.424300",
+      "sell": "5.424900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-12-09",
+      "timestamp": "2025-12-09T16:11:26.737Z",
+      "value": "5.457000",
+      "buy": "5.456400",
+      "sell": "5.457000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-12-10",
+      "timestamp": "2025-12-10T16:10:04.980Z",
+      "value": "5.465600",
+      "buy": "5.465000",
+      "sell": "5.465600",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-12-11",
+      "timestamp": "2025-12-11T16:03:26.528Z",
+      "value": "5.423700",
+      "buy": "5.423100",
+      "sell": "5.423700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-12-12",
+      "timestamp": "2025-12-12T16:06:27.227Z",
+      "value": "5.401100",
+      "buy": "5.400500",
+      "sell": "5.401100",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-12-15",
+      "timestamp": "2025-12-15T16:09:27.230Z",
+      "value": "5.392900",
+      "buy": "5.392300",
+      "sell": "5.392900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-12-16",
+      "timestamp": "2025-12-16T16:07:25.964Z",
+      "value": "5.450500",
+      "buy": "5.449900",
+      "sell": "5.450500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-12-17",
+      "timestamp": "2025-12-17T16:03:29.544Z",
+      "value": "5.509300",
+      "buy": "5.508700",
+      "sell": "5.509300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-12-18",
+      "timestamp": "2025-12-18T16:11:26.110Z",
+      "value": "5.528300",
+      "buy": "5.527700",
+      "sell": "5.528300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-12-19",
+      "timestamp": "2025-12-19T16:03:35.584Z",
+      "value": "5.516000",
+      "buy": "5.515400",
+      "sell": "5.516000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-12-22",
+      "timestamp": "2025-12-22T16:03:26.125Z",
+      "value": "5.538900",
+      "buy": "5.538300",
+      "sell": "5.538900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-12-23",
+      "timestamp": "2025-12-23T16:04:26.622Z",
+      "value": "5.564300",
+      "buy": "5.563700",
+      "sell": "5.564300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-12-24",
+      "timestamp": "2025-12-24T14:07:45.216Z",
+      "value": "5.535000",
+      "buy": "5.534200",
+      "sell": "5.535000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-12-26",
+      "timestamp": "2025-12-26T16:07:27.597Z",
+      "value": "5.541300",
+      "buy": "5.540700",
+      "sell": "5.541300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-12-29",
+      "timestamp": "2025-12-29T16:10:01.131Z",
+      "value": "5.573900",
+      "buy": "5.573300",
+      "sell": "5.573900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-12-30",
+      "timestamp": "2025-12-30T16:12:00.341Z",
+      "value": "5.502400",
+      "buy": "5.501800",
+      "sell": "5.502400",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-12-31",
+      "timestamp": "2025-12-31T13:06:24.183Z",
+      "value": "5.502400",
+      "buy": "5.501800",
+      "sell": "5.502400",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-01-02",
+      "timestamp": "2026-01-02T16:03:33.254Z",
+      "value": "5.437200",
+      "buy": "5.436600",
+      "sell": "5.437200",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-01-05",
+      "timestamp": "2026-01-05T16:10:14.896Z",
+      "value": "5.435100",
+      "buy": "5.434500",
+      "sell": "5.435100",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-01-06",
+      "timestamp": "2026-01-06T16:12:07.358Z",
+      "value": "5.379700",
+      "buy": "5.379100",
+      "sell": "5.379700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-01-07",
+      "timestamp": "2026-01-07T16:06:27.001Z",
+      "value": "5.388000",
+      "buy": "5.387400",
+      "sell": "5.388000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-01-08",
+      "timestamp": "2026-01-08T16:04:28.616Z",
+      "value": "5.386000",
+      "buy": "5.385400",
+      "sell": "5.386000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-01-09",
+      "timestamp": "2026-01-09T16:09:29.054Z",
+      "value": "5.370700",
+      "buy": "5.370100",
+      "sell": "5.370700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-01-12",
+      "timestamp": "2026-01-12T16:08:29.056Z",
+      "value": "5.376000",
+      "buy": "5.375400",
+      "sell": "5.376000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-01-13",
+      "timestamp": "2026-01-13T16:08:54.165Z",
+      "value": "5.376400",
+      "buy": "5.375800",
+      "sell": "5.376400",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-01-14",
+      "timestamp": "2026-01-14T16:04:32.411Z",
+      "value": "5.379500",
+      "buy": "5.378900",
+      "sell": "5.379500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-01-15",
+      "timestamp": "2026-01-15T16:05:25.660Z",
+      "value": "5.384600",
+      "buy": "5.384000",
+      "sell": "5.384600",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-01-16",
+      "timestamp": "2026-01-16T16:04:26.486Z",
+      "value": "5.379800",
+      "buy": "5.379200",
+      "sell": "5.379800",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-01-19",
+      "timestamp": "2026-01-19T16:07:27.662Z",
+      "value": "5.365300",
+      "buy": "5.364700",
+      "sell": "5.365300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-01-20",
+      "timestamp": "2026-01-20T16:02:30.787Z",
+      "value": "5.379000",
+      "buy": "5.378400",
+      "sell": "5.379000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-01-21",
+      "timestamp": "2026-01-21T16:04:32.866Z",
+      "value": "5.336800",
+      "buy": "5.336200",
+      "sell": "5.336800",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-01-22",
+      "timestamp": "2026-01-22T16:07:26.401Z",
+      "value": "5.311800",
+      "buy": "5.311200",
+      "sell": "5.311800",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-01-23",
+      "timestamp": "2026-01-23T16:09:25.549Z",
+      "value": "5.287900",
+      "buy": "5.287200",
+      "sell": "5.287900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-01-26",
+      "timestamp": "2026-01-26T16:09:03.031Z",
+      "value": "5.276000",
+      "buy": "5.275400",
+      "sell": "5.276000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-01-27",
+      "timestamp": "2026-01-27T16:08:25.783Z",
+      "value": "5.239200",
+      "buy": "5.238600",
+      "sell": "5.239200",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-01-28",
+      "timestamp": "2026-01-28T16:10:27.392Z",
+      "value": "5.183800",
+      "buy": "5.183200",
+      "sell": "5.183800",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-01-29",
+      "timestamp": "2026-01-29T16:08:22.928Z",
+      "value": "5.195600",
+      "buy": "5.195000",
+      "sell": "5.195600",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-01-30",
+      "timestamp": "2026-01-30T16:05:28.730Z",
+      "value": "5.230100",
+      "buy": "5.229500",
+      "sell": "5.230100",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-02-02",
+      "timestamp": "2026-02-02T16:07:27.937Z",
+      "value": "5.258700",
+      "buy": "5.258100",
+      "sell": "5.258700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-02-03",
+      "timestamp": "2026-02-03T16:11:27.228Z",
+      "value": "5.223600",
+      "buy": "5.223000",
+      "sell": "5.223600",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-02-04",
+      "timestamp": "2026-02-04T16:10:28.563Z",
+      "value": "5.235900",
+      "buy": "5.235300",
+      "sell": "5.235900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-02-05",
+      "timestamp": "2026-02-05T16:05:29.335Z",
+      "value": "5.258000",
+      "buy": "5.257400",
+      "sell": "5.258000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-02-06",
+      "timestamp": "2026-02-06T16:10:27.461Z",
+      "value": "5.234100",
+      "buy": "5.233500",
+      "sell": "5.234100",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-02-09",
+      "timestamp": "2026-02-09T16:09:27.409Z",
+      "value": "5.194300",
+      "buy": "5.193700",
+      "sell": "5.194300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-02-10",
+      "timestamp": "2026-02-10T16:10:27.358Z",
+      "value": "5.202100",
+      "buy": "5.201500",
+      "sell": "5.202100",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-02-11",
+      "timestamp": "2026-02-11T16:03:28.474Z",
+      "value": "5.183600",
+      "buy": "5.183000",
+      "sell": "5.183600",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-02-12",
+      "timestamp": "2026-02-12T16:04:38.193Z",
+      "value": "5.167400",
+      "buy": "5.166800",
+      "sell": "5.167400",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-02-13",
+      "timestamp": "2026-02-13T16:04:28.071Z",
+      "value": "5.228800",
+      "buy": "5.228200",
+      "sell": "5.228800",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-02-18",
+      "timestamp": "2026-02-18T18:40:28.762Z",
+      "value": "5.234900",
+      "buy": "5.234300",
+      "sell": "5.234900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-02-19",
+      "timestamp": "2026-02-19T16:11:26.862Z",
+      "value": "5.225700",
+      "buy": "5.225000",
+      "sell": "5.225700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-02-20",
+      "timestamp": "2026-02-20T16:02:26.431Z",
+      "value": "5.200600",
+      "buy": "5.200000",
+      "sell": "5.200600",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-02-23",
+      "timestamp": "2026-02-23T16:02:28.425Z",
+      "value": "5.163500",
+      "buy": "5.162900",
+      "sell": "5.163500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-02-24",
+      "timestamp": "2026-02-24T16:04:29.024Z",
+      "value": "5.168200",
+      "buy": "5.167600",
+      "sell": "5.168200",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-02-25",
+      "timestamp": "2026-02-25T16:05:27.648Z",
+      "value": "5.144000",
+      "buy": "5.143400",
+      "sell": "5.144000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-02-26",
+      "timestamp": "2026-02-26T16:06:33.355Z",
+      "value": "5.138200",
+      "buy": "5.137600",
+      "sell": "5.138200",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-02-27",
+      "timestamp": "2026-02-27T16:02:27.158Z",
+      "value": "5.149500",
+      "buy": "5.148900",
+      "sell": "5.149500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-03-02",
+      "timestamp": "2026-03-02T16:09:26.433Z",
+      "value": "5.200100",
+      "buy": "5.199500",
+      "sell": "5.200100",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-03-03",
+      "timestamp": "2026-03-03T16:10:27.879Z",
+      "value": "5.287000",
+      "buy": "5.286400",
+      "sell": "5.287000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-03-04",
+      "timestamp": "2026-03-04T16:07:27.146Z",
+      "value": "5.209100",
+      "buy": "5.208500",
+      "sell": "5.209100",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-03-05",
+      "timestamp": "2026-03-05T16:03:29.746Z",
+      "value": "5.244700",
+      "buy": "5.244100",
+      "sell": "5.244700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-03-06",
+      "timestamp": "2026-03-06T16:10:27.630Z",
+      "value": "5.287800",
+      "buy": "5.287200",
+      "sell": "5.287800",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-03-09",
+      "timestamp": "2026-03-09T16:10:27.585Z",
+      "value": "5.213900",
+      "buy": "5.213300",
+      "sell": "5.213900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-03-10",
+      "timestamp": "2026-03-10T16:09:26.345Z",
+      "value": "5.162200",
+      "buy": "5.161600",
+      "sell": "5.162200",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-03-11",
+      "timestamp": "2026-03-11T16:04:25.916Z",
+      "value": "5.159600",
+      "buy": "5.159000",
+      "sell": "5.159600",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-03-12",
+      "timestamp": "2026-03-12T16:10:28.891Z",
+      "value": "5.205100",
+      "buy": "5.204500",
+      "sell": "5.205100",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-03-13",
+      "timestamp": "2026-03-13T16:03:28.538Z",
+      "value": "5.254100",
+      "buy": "5.253500",
+      "sell": "5.254100",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-03-16",
+      "timestamp": "2026-03-16T16:08:25.116Z",
+      "value": "5.264700",
+      "buy": "5.264100",
+      "sell": "5.264700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-03-17",
+      "timestamp": "2026-03-17T16:09:32.836Z",
+      "value": "5.202200",
+      "buy": "5.201600",
+      "sell": "5.202200",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-03-18",
+      "timestamp": "2026-03-18T16:08:32.572Z",
+      "value": "5.211200",
+      "buy": "5.210600",
+      "sell": "5.211200",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-03-19",
+      "timestamp": "2026-03-19T16:02:27.336Z",
+      "value": "5.258700",
+      "buy": "5.258100",
+      "sell": "5.258700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-03-20",
+      "timestamp": "2026-03-20T16:11:27.571Z",
+      "value": "5.280000",
+      "buy": "5.279300",
+      "sell": "5.280000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-03-23",
+      "timestamp": "2026-03-23T16:11:28.202Z",
+      "value": "5.244000",
+      "buy": "5.243400",
+      "sell": "5.244000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-03-24",
+      "timestamp": "2026-03-24T16:09:28.963Z",
+      "value": "5.259900",
+      "buy": "5.259300",
+      "sell": "5.259900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-03-25",
+      "timestamp": "2026-03-25T16:08:33.947Z",
+      "value": "5.227500",
+      "buy": "5.226900",
+      "sell": "5.227500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-03-26",
+      "timestamp": "2026-03-26T16:11:08.561Z",
+      "value": "5.230800",
+      "buy": "5.230200",
+      "sell": "5.230800",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-03-27",
+      "timestamp": "2026-03-27T16:11:42.090Z",
+      "value": "5.237600",
+      "buy": "5.237000",
+      "sell": "5.237600",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-03-30",
+      "timestamp": "2026-03-30T16:10:27.787Z",
+      "value": "5.235300",
+      "buy": "5.234700",
+      "sell": "5.235300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-03-31",
+      "timestamp": "2026-03-31T16:04:22.650Z",
+      "value": "5.219400",
+      "buy": "5.218800",
+      "sell": "5.219400",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-04-01",
+      "timestamp": "2026-04-01T16:06:27.728Z",
+      "value": "5.160600",
+      "buy": "5.160000",
+      "sell": "5.160600",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-04-02",
+      "timestamp": "2026-04-02T16:10:26.900Z",
+      "value": "5.165500",
+      "buy": "5.164900",
+      "sell": "5.165500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-04-06",
+      "timestamp": "2026-04-06T16:06:24.727Z",
+      "value": "5.153200",
+      "buy": "5.152600",
+      "sell": "5.153200",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-04-07",
+      "timestamp": "2026-04-07T16:08:26.061Z",
+      "value": "5.162500",
+      "buy": "5.161900",
+      "sell": "5.162500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-04-08",
+      "timestamp": "2026-04-08T16:02:28.785Z",
+      "value": "5.089900",
+      "buy": "5.089300",
+      "sell": "5.089900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-04-09",
+      "timestamp": "2026-04-09T16:10:29.554Z",
+      "value": "5.082100",
+      "buy": "5.081500",
+      "sell": "5.082100",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-04-10",
+      "timestamp": "2026-04-10T16:04:25.374Z",
+      "value": "5.022900",
+      "buy": "5.022300",
+      "sell": "5.022900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-04-13",
+      "timestamp": "2026-04-13T16:04:53.632Z",
+      "value": "5.024400",
+      "buy": "5.023800",
+      "sell": "5.024400",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-04-14",
+      "timestamp": "2026-04-14T16:03:27.481Z",
+      "value": "4.980600",
+      "buy": "4.980000",
+      "sell": "4.980600",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-04-15",
+      "timestamp": "2026-04-15T16:06:25.977Z",
+      "value": "4.992800",
+      "buy": "4.992200",
+      "sell": "4.992800",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-04-16",
+      "timestamp": "2026-04-16T16:03:28.563Z",
+      "value": "5.000700",
+      "buy": "5.000100",
+      "sell": "5.000700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-04-17",
+      "timestamp": "2026-04-17T16:09:27.062Z",
+      "value": "4.969500",
+      "buy": "4.968900",
+      "sell": "4.969500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-04-20",
+      "timestamp": "2026-04-20T16:02:26.336Z",
+      "value": "4.984400",
+      "buy": "4.983800",
+      "sell": "4.984400",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-04-22",
+      "timestamp": "2026-04-22T16:11:28.361Z",
+      "value": "4.965300",
+      "buy": "4.964700",
+      "sell": "4.965300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-04-23",
+      "timestamp": "2026-04-23T16:03:26.089Z",
+      "value": "4.953900",
+      "buy": "4.953300",
+      "sell": "4.953900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-04-24",
+      "timestamp": "2026-04-24T16:06:16.172Z",
+      "value": "5.008300",
+      "buy": "5.007700",
+      "sell": "5.008300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-04-27",
+      "timestamp": "2026-04-27T16:06:14.100Z",
+      "value": "4.970000",
+      "buy": "4.969400",
+      "sell": "4.970000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-04-28",
+      "timestamp": "2026-04-28T16:10:26.457Z",
+      "value": "4.987800",
+      "buy": "4.987200",
+      "sell": "4.987800",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-04-29",
+      "timestamp": "2026-04-29T16:11:25.357Z",
+      "value": "4.998500",
+      "buy": "4.997900",
+      "sell": "4.998500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-04-30",
+      "timestamp": "2026-04-30T16:06:27.523Z",
+      "value": "4.988600",
+      "buy": "4.988000",
+      "sell": "4.988600",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-05-04",
+      "timestamp": "2026-05-04T16:09:25.789Z",
+      "value": "4.958700",
+      "buy": "4.958100",
+      "sell": "4.958700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-05-05",
+      "timestamp": "2026-05-05T16:04:25.969Z",
+      "value": "4.924200",
+      "buy": "4.923600",
+      "sell": "4.924200",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-05-06",
+      "timestamp": "2026-05-06T16:08:27.861Z",
+      "value": "4.927400",
+      "buy": "4.926800",
+      "sell": "4.927400",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-05-07",
+      "timestamp": "2026-05-07T16:09:28.692Z",
+      "value": "4.917000",
+      "buy": "4.916400",
+      "sell": "4.917000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-05-08",
+      "timestamp": "2026-05-08T16:05:32.403Z",
+      "value": "4.899900",
+      "buy": "4.899300",
+      "sell": "4.899900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-05-11",
+      "timestamp": "2026-05-11T16:08:25.140Z",
+      "value": "4.897300",
+      "buy": "4.896700",
+      "sell": "4.897300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-05-12",
+      "timestamp": "2026-05-12T16:11:27.361Z",
+      "value": "4.897700",
+      "buy": "4.897100",
+      "sell": "4.897700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-05-13",
+      "timestamp": "2026-05-13T16:17:55.038Z",
+      "value": "4.911800",
+      "buy": "4.911200",
+      "sell": "4.911800",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-05-14",
+      "timestamp": "2026-05-14T16:03:15.182Z",
+      "value": "4.980900",
+      "buy": "4.980300",
+      "sell": "4.980900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-05-15",
+      "timestamp": "2026-05-15T16:08:27.392Z",
+      "value": "5.065400",
+      "buy": "5.064800",
+      "sell": "5.065400",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-05-18",
+      "timestamp": "2026-05-18T16:04:25.962Z",
+      "value": "5.009300",
+      "buy": "5.008700",
+      "sell": "5.009300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-05-19",
+      "timestamp": "2026-05-19T16:09:25.933Z",
+      "value": "5.037800",
+      "buy": "5.037200",
+      "sell": "5.037800",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-05-20",
+      "timestamp": "2026-05-20T16:05:27.747Z",
+      "value": "5.030100",
+      "buy": "5.029500",
+      "sell": "5.030100",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-05-21",
+      "timestamp": "2026-05-21T16:08:26.046Z",
+      "value": "5.007700",
+      "buy": "5.007100",
+      "sell": "5.007700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-05-22",
+      "timestamp": "2026-05-22T16:06:26.947Z",
+      "value": "5.014000",
+      "buy": "5.013400",
+      "sell": "5.014000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-05-25",
+      "timestamp": "2026-05-25T16:06:31.065Z",
+      "value": "5.007200",
+      "buy": "5.006600",
+      "sell": "5.007200",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-05-26",
+      "timestamp": "2026-05-26T16:07:25.808Z",
+      "value": "5.021100",
+      "buy": "5.020500",
+      "sell": "5.021100",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-05-27",
+      "timestamp": "2026-05-27T16:02:29.556Z",
+      "value": "5.057900",
+      "buy": "5.057300",
+      "sell": "5.057900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-05-28",
+      "timestamp": "2026-05-28T16:08:16.225Z",
+      "value": "5.051700",
+      "buy": "5.051100",
+      "sell": "5.051700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-05-29",
+      "timestamp": "2026-05-29T16:10:26.610Z",
+      "value": "5.056900",
+      "buy": "5.056300",
+      "sell": "5.056900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-06-01",
+      "timestamp": "2026-06-01T16:11:27.630Z",
+      "value": "5.030300",
+      "buy": "5.029700",
+      "sell": "5.030300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-06-02",
+      "timestamp": "2026-06-02T16:10:30.711Z",
+      "value": "5.016000",
+      "buy": "5.015400",
+      "sell": "5.016000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-06-03",
+      "timestamp": "2026-06-03T16:06:26.540Z",
+      "value": "5.041500",
+      "buy": "5.040900",
+      "sell": "5.041500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-06-05",
+      "timestamp": "2026-06-05T16:03:38.306Z",
+      "value": "5.124400",
+      "buy": "5.123800",
+      "sell": "5.124400",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-06-08",
+      "timestamp": "2026-06-08T16:03:28.848Z",
+      "value": "5.169500",
+      "buy": "5.168900",
+      "sell": "5.169500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-06-09",
+      "timestamp": "2026-06-09T16:12:05.308Z",
+      "value": "5.169300",
+      "buy": "5.168700",
+      "sell": "5.169300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-06-10",
+      "timestamp": "2026-06-10T16:12:50.036Z",
+      "value": "5.176300",
+      "buy": "5.175700",
+      "sell": "5.176300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-06-11",
+      "timestamp": "2026-06-11T16:09:12.111Z",
+      "value": "5.147800",
+      "buy": "5.147200",
+      "sell": "5.147800",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-06-12",
+      "timestamp": "2026-06-12T16:10:48.619Z",
+      "value": "5.082700",
+      "buy": "5.082100",
+      "sell": "5.082700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-06-15",
+      "timestamp": "2026-06-15T16:06:11.540Z",
+      "value": "5.043000",
+      "buy": "5.042400",
+      "sell": "5.043000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-06-16",
+      "timestamp": "2026-06-16T16:08:18.189Z",
+      "value": "5.078000",
+      "buy": "5.077400",
+      "sell": "5.078000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-06-17",
+      "timestamp": "2026-06-17T16:04:39.943Z",
+      "value": "5.064100",
+      "buy": "5.063500",
+      "sell": "5.064100",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-06-18",
+      "timestamp": "2026-06-18T16:11:31.650Z",
+      "value": "5.161300",
+      "buy": "5.160700",
+      "sell": "5.161300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-06-19",
+      "timestamp": "2026-06-19T16:03:25.555Z",
+      "value": "5.144200",
+      "buy": "5.143600",
+      "sell": "5.144200",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-06-22",
+      "timestamp": "2026-06-22T16:06:19.750Z",
+      "value": "5.139500",
+      "buy": "5.138900",
+      "sell": "5.139500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-06-23",
+      "timestamp": "2026-06-23T16:08:03.250Z",
+      "value": "5.174300",
+      "buy": "5.173700",
+      "sell": "5.174300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-06-24",
+      "timestamp": "2026-06-24T16:08:18.606Z",
+      "value": "5.209800",
+      "buy": "5.209200",
+      "sell": "5.209800",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-06-25",
+      "timestamp": "2026-06-25T16:10:22.957Z",
+      "value": "5.189200",
+      "buy": "5.188600",
+      "sell": "5.189200",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-06-26",
+      "timestamp": "2026-06-26T16:04:23.446Z",
+      "value": "5.169500",
+      "buy": "5.168900",
+      "sell": "5.169500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-06-29",
+      "timestamp": "2026-06-29T16:06:58.963Z",
+      "value": "5.171700",
+      "buy": "5.171100",
+      "sell": "5.171700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-06-30",
+      "timestamp": "2026-06-30T16:09:20.564Z",
+      "value": "5.176600",
+      "buy": "5.176000",
+      "sell": "5.176600",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-07-01",
+      "timestamp": "2026-07-01T16:11:18.043Z",
+      "value": "5.195000",
+      "buy": "5.194400",
+      "sell": "5.195000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-07-02",
+      "timestamp": "2026-07-02T16:03:26.947Z",
+      "value": "5.194500",
+      "buy": "5.193900",
+      "sell": "5.194500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-07-03",
+      "timestamp": "2026-07-03T16:08:41.147Z",
+      "value": "5.171700",
+      "buy": "5.171100",
+      "sell": "5.171700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-07-06",
+      "timestamp": "2026-07-06T16:10:16.255Z",
+      "value": "5.167000",
+      "buy": "5.166400",
+      "sell": "5.167000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-07-07",
+      "timestamp": "2026-07-07T16:06:24.657Z",
+      "value": "5.145800",
+      "buy": "5.145200",
+      "sell": "5.145800",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-07-08",
+      "timestamp": "2026-07-08T16:04:28.047Z",
+      "value": "5.155200",
+      "buy": "5.154600",
+      "sell": "5.155200",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-07-09",
+      "timestamp": "2026-07-09T16:04:17.610Z",
+      "value": "5.132900",
+      "buy": "5.132300",
+      "sell": "5.132900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-07-10",
+      "timestamp": "2026-07-10T16:04:16.356Z",
+      "value": "5.108800",
+      "buy": "5.108200",
+      "sell": "5.108800",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-07-13",
+      "timestamp": "2026-07-13T16:02:42.980Z",
+      "value": "5.118300",
+      "buy": "5.117700",
+      "sell": "5.118300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-07-14",
+      "timestamp": "2026-07-14T16:04:39.685Z",
+      "value": "5.074200",
+      "buy": "5.073600",
+      "sell": "5.074200",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-07-15",
+      "timestamp": "2026-07-15T16:10:15.650Z",
+      "value": "5.072700",
+      "buy": "5.072100",
+      "sell": "5.072700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-07-16",
+      "timestamp": "2026-07-16T16:06:22.648Z",
+      "value": "5.097500",
+      "buy": "5.096900",
+      "sell": "5.097500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-07-17",
+      "timestamp": "2026-07-17T16:10:18.709Z",
+      "value": "5.117600",
+      "buy": "5.117000",
+      "sell": "5.117600",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-07-20",
+      "timestamp": "2026-07-20T16:03:16.960Z",
+      "value": "5.089400",
+      "buy": "5.088800",
+      "sell": "5.089400",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-07-21",
+      "timestamp": "2026-07-21T16:07:22.301Z",
+      "value": "5.078000",
+      "buy": "5.077400",
+      "sell": "5.078000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-07-22",
+      "timestamp": "2026-07-22T16:03:20.263Z",
+      "value": "5.063800",
+      "buy": "5.063200",
+      "sell": "5.063800",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-07-23",
+      "timestamp": "2026-07-23T16:11:15.661Z",
+      "value": "5.080700",
+      "buy": "5.080100",
+      "sell": "5.080700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-07-24",
+      "timestamp": "2026-07-24T16:11:23.974Z",
+      "value": "5.066600",
+      "buy": "5.066000",
+      "sell": "5.066600",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-07-27",
+      "timestamp": "2026-07-27T16:05:18.508Z",
+      "value": "5.100500",
+      "buy": "5.099800",
+      "sell": "5.100500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-07-28",
+      "timestamp": "2026-07-28T16:25:31.150Z",
+      "value": "5.117700",
+      "buy": "5.117100",
+      "sell": "5.117700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-07-29",
+      "timestamp": "2026-07-29T16:08:43.534Z",
+      "value": "5.121700",
+      "buy": "5.121100",
+      "sell": "5.121700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-07-30",
+      "timestamp": "2026-07-30T16:07:32.344Z",
+      "value": "5.073900",
+      "buy": "5.073300",
+      "sell": "5.073900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-07-31",
+      "timestamp": "2026-07-31T16:10:31.061Z",
+      "value": "5.077300",
+      "buy": "5.076700",
+      "sell": "5.077300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-08-03",
+      "timestamp": "2026-08-03T16:08:53.347Z",
+      "value": "5.072300",
+      "buy": "5.071700",
+      "sell": "5.072300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-08-04",
+      "timestamp": "2026-08-04T16:05:10.954Z",
+      "value": "5.105300",
+      "buy": "5.104700",
+      "sell": "5.105300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-08-05",
+      "timestamp": "2026-08-05T16:06:43.148Z",
+      "value": "5.115400",
+      "buy": "5.114800",
+      "sell": "5.115400",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-08-06",
+      "timestamp": "2026-08-06T16:04:47.461Z",
+      "value": "5.101700",
+      "buy": "5.101100",
+      "sell": "5.101700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-08-07",
+      "timestamp": "2026-08-07T16:04:19.455Z",
+      "value": "5.090800",
+      "buy": "5.090200",
+      "sell": "5.090800",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-08-10",
+      "timestamp": "2026-08-10T16:10:22.642Z",
+      "value": "5.096300",
+      "buy": "5.095700",
+      "sell": "5.096300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-08-11",
+      "timestamp": "2026-08-11T16:05:15.808Z",
+      "value": "5.128500",
+      "buy": "5.127900",
+      "sell": "5.128500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-08-12",
+      "timestamp": "2026-08-12T16:09:28.609Z",
+      "value": "5.163900",
+      "buy": "5.163200",
+      "sell": "5.163900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-08-13",
+      "timestamp": "2026-08-13T16:09:15.558Z",
+      "value": "5.185900",
+      "buy": "5.185300",
+      "sell": "5.185900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-08-14",
+      "timestamp": "2026-08-14T16:10:22.941Z",
+      "value": "5.223600",
+      "buy": "5.223000",
+      "sell": "5.223600",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-08-17",
+      "timestamp": "2026-08-17T16:04:48.745Z",
+      "value": "5.201400",
+      "buy": "5.200800",
+      "sell": "5.201400",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-08-18",
+      "timestamp": "2026-08-18T16:10:39.550Z",
+      "value": "5.204300",
+      "buy": "5.203700",
+      "sell": "5.204300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-08-19",
+      "timestamp": "2026-08-19T16:07:22.062Z",
+      "value": "5.171400",
+      "buy": "5.170800",
+      "sell": "5.171400",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-08-20",
+      "timestamp": "2026-08-20T16:06:16.554Z",
+      "value": "5.186200",
+      "buy": "5.185600",
+      "sell": "5.186200",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-08-21",
+      "timestamp": "2026-08-21T16:07:28.201Z",
+      "value": "5.162500",
+      "buy": "5.161900",
+      "sell": "5.162500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-08-24",
+      "timestamp": "2026-08-24T16:04:14.216Z",
+      "value": "5.151200",
+      "buy": "5.150600",
+      "sell": "5.151200",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-08-25",
+      "timestamp": "2026-08-25T16:04:44.743Z",
+      "value": "5.149000",
+      "buy": "5.148400",
+      "sell": "5.149000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-08-26",
+      "timestamp": "2026-08-26T16:05:20.847Z",
+      "value": "5.160400",
+      "buy": "5.159800",
+      "sell": "5.160400",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-08-27",
+      "timestamp": "2026-08-27T16:10:22.548Z",
+      "value": "5.164200",
+      "buy": "5.163700",
+      "sell": "5.164200",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-08-28",
+      "timestamp": "2026-08-28T16:11:19.963Z",
+      "value": "5.200500",
+      "buy": "5.199900",
+      "sell": "5.200500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-08-31",
+      "timestamp": "2026-08-31T16:08:57.200Z",
+      "value": "5.181600",
+      "buy": "5.181000",
+      "sell": "5.181600",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-09-01",
+      "timestamp": "2026-09-01T16:06:03.857Z",
+      "value": "5.157000",
+      "buy": "5.156400",
+      "sell": "5.157000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-09-02",
+      "timestamp": "2026-09-02T16:02:37.601Z",
+      "value": "5.127300",
+      "buy": "5.126700",
+      "sell": "5.127300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-09-03",
+      "timestamp": "2026-09-03T16:06:38.232Z",
+      "value": "5.096200",
+      "buy": "5.095600",
+      "sell": "5.096200",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-09-04",
+      "timestamp": "2026-09-04T16:03:59.556Z",
+      "value": "5.125300",
+      "buy": "5.124700",
+      "sell": "5.125300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-09-08",
+      "timestamp": "2026-09-08T16:02:38.447Z",
+      "value": "5.085600",
+      "buy": "5.085000",
+      "sell": "5.085600",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-09-09",
+      "timestamp": "2026-09-09T16:11:35.346Z",
+      "value": "5.097900",
+      "buy": "5.097300",
+      "sell": "5.097900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-09-10",
+      "timestamp": "2026-09-10T16:09:28.700Z",
+      "value": "5.114900",
+      "buy": "5.114300",
+      "sell": "5.114900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-09-11",
+      "timestamp": "2026-09-11T16:07:22.532Z",
+      "value": "5.091800",
+      "buy": "5.091200",
+      "sell": "5.091800",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-09-14",
+      "timestamp": "2026-09-14T16:10:08.144Z",
+      "value": "5.169600",
+      "buy": "5.169000",
+      "sell": "5.169600",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-09-15",
+      "timestamp": "2026-09-15T16:09:19.199Z",
+      "value": "5.149000",
+      "buy": "5.148400",
+      "sell": "5.149000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-09-16",
+      "timestamp": "2026-09-16T16:05:30.358Z",
+      "value": "5.152700",
+      "buy": "5.152000",
+      "sell": "5.152700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-09-17",
+      "timestamp": "2026-09-17T16:03:21.858Z",
+      "value": "5.152100",
+      "buy": "5.151500",
+      "sell": "5.152100",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-09-18",
+      "timestamp": "2026-09-18T16:03:34.742Z",
+      "value": "5.157500",
+      "buy": "5.156900",
+      "sell": "5.157500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-09-21",
+      "timestamp": "2026-09-21T16:06:51.445Z",
+      "value": "5.111700",
+      "buy": "5.111100",
+      "sell": "5.111700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-09-22",
+      "timestamp": "2026-09-22T16:03:30.646Z",
+      "value": "5.116100",
+      "buy": "5.115500",
+      "sell": "5.116100",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-09-23",
+      "timestamp": "2026-09-23T16:04:22.361Z",
+      "value": "5.141400",
+      "buy": "5.140800",
+      "sell": "5.141400",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-09-24",
+      "timestamp": "2026-09-24T16:03:18.656Z",
+      "value": "5.179500",
+      "buy": "5.178900",
+      "sell": "5.179500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-09-25",
+      "timestamp": "2026-09-25T16:10:17.447Z",
+      "value": "5.199100",
+      "buy": "5.198500",
+      "sell": "5.199100",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-09-28",
+      "timestamp": "2026-09-28T16:03:11.358Z",
+      "value": "5.213200",
+      "buy": "5.212600",
+      "sell": "5.213200",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-09-29",
+      "timestamp": "2026-09-29T16:06:06.446Z",
+      "value": "5.220400",
+      "buy": "5.219800",
+      "sell": "5.220400",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-09-30",
+      "timestamp": "2026-09-30T16:11:44.783Z",
+      "value": "5.180900",
+      "buy": "5.180300",
+      "sell": "5.180900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-10-01",
+      "timestamp": "2026-10-01T16:10:35.446Z",
+      "value": "5.207900",
+      "buy": "5.207300",
+      "sell": "5.207900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-10-02",
+      "timestamp": "2026-10-02T16:03:16.256Z",
+      "value": "5.223800",
+      "buy": "5.223200",
+      "sell": "5.223800",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-10-05",
+      "timestamp": "2026-10-05T16:07:36.558Z",
+      "value": "4.985900",
+      "buy": "4.985300",
+      "sell": "4.985900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-10-06",
+      "timestamp": "2026-10-06T16:03:21.267Z",
+      "value": "4.969800",
+      "buy": "4.969200",
+      "sell": "4.969800",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-10-07",
+      "timestamp": "2026-10-07T16:05:23.249Z",
+      "value": "4.993500",
+      "buy": "4.992900",
+      "sell": "4.993500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-10-08",
+      "timestamp": "2026-10-08T16:08:16.814Z",
+      "value": "5.011900",
+      "buy": "5.011300",
+      "sell": "5.011900",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-10-09",
+      "timestamp": "2026-10-09T16:07:30.746Z",
+      "value": "4.989200",
+      "buy": "4.988600",
+      "sell": "4.989200",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-10-13",
+      "timestamp": "2026-10-13T16:04:26.866Z",
+      "value": "5.009600",
+      "buy": "5.009000",
+      "sell": "5.009600",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-10-14",
+      "timestamp": "2026-10-14T16:05:17.833Z",
+      "value": "5.044100",
+      "buy": "5.043500",
+      "sell": "5.044100",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-10-15",
+      "timestamp": "2026-10-15T16:05:33.305Z",
+      "value": "5.052100",
+      "buy": "5.051500",
+      "sell": "5.052100",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-10-16",
+      "timestamp": "2026-10-16T16:04:14.548Z",
+      "value": "5.082600",
+      "buy": "5.082000",
+      "sell": "5.082600",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-10-19",
+      "timestamp": "2026-10-19T16:05:47.209Z",
+      "value": "5.056400",
+      "buy": "5.055800",
+      "sell": "5.056400",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-10-20",
+      "timestamp": "2026-10-20T16:09:36.250Z",
+      "value": "5.014000",
+      "buy": "5.013400",
+      "sell": "5.014000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-10-21",
+      "timestamp": "2026-10-21T16:08:17.041Z",
+      "value": "5.027700",
+      "buy": "5.027000",
+      "sell": "5.027700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-10-22",
+      "timestamp": "2026-10-22T16:12:09.300Z",
+      "value": "5.038300",
+      "buy": "5.037700",
+      "sell": "5.038300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-10-23",
+      "timestamp": "2026-10-23T16:07:14.754Z",
+      "value": "5.037700",
+      "buy": "5.037100",
+      "sell": "5.037700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-10-26",
+      "timestamp": "2026-10-26T16:09:51.106Z",
+      "value": "5.500700",
+      "buy": "5.499800",
+      "sell": "5.500700",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-10-27",
+      "timestamp": "2026-10-27T16:05:26.521Z",
+      "value": "5.334600",
+      "buy": "5.334000",
+      "sell": "5.334600",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-10-28",
+      "timestamp": "2026-10-28T16:05:31.600Z",
+      "value": "5.342000",
+      "buy": "5.341400",
+      "sell": "5.342000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-10-29",
+      "timestamp": "2026-10-29T16:11:53.555Z",
+      "value": "5.374400",
+      "buy": "5.373800",
+      "sell": "5.374400",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-10-30",
+      "timestamp": "2026-10-30T16:04:18.706Z",
+      "value": "5.421200",
+      "buy": "5.420600",
+      "sell": "5.421200",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-11-03",
+      "timestamp": "2026-11-03T16:06:31.943Z",
+      "value": "5.493500",
+      "buy": "5.492900",
+      "sell": "5.493500",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-11-04",
+      "timestamp": "2026-11-04T16:05:19.232Z",
+      "value": "5.477800",
+      "buy": "5.477200",
+      "sell": "5.477800",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-11-05",
+      "timestamp": "2026-11-05T16:06:37.661Z",
+      "value": "5.462100",
+      "buy": "5.461500",
+      "sell": "5.462100",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-11-06",
+      "timestamp": "2026-11-06T16:06:13.966Z",
+      "value": "5.501300",
+      "buy": "5.500700",
+      "sell": "5.501300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-11-09",
+      "timestamp": "2026-11-09T16:11:19.041Z",
+      "value": "5.514600",
+      "buy": "5.514000",
+      "sell": "5.514600",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-11-10",
+      "timestamp": "2026-11-10T16:06:01.353Z",
+      "value": "5.584000",
+      "buy": "5.583400",
+      "sell": "5.584000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-11-11",
+      "timestamp": "2026-11-11T16:02:30.354Z",
+      "value": "5.560600",
+      "buy": "5.560000",
+      "sell": "5.560600",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-11-12",
+      "timestamp": "2026-11-12T16:08:21.353Z",
+      "value": "5.614300",
+      "buy": "5.613700",
+      "sell": "5.614300",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-11-13",
+      "timestamp": "2026-11-13T16:03:27.375Z",
+      "value": "5.651800",
+      "buy": "5.651200",
+      "sell": "5.651800",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-11-16",
+      "timestamp": "2026-11-16T16:06:32.509Z",
+      "value": "5.732400",
+      "buy": "5.731800",
+      "sell": "5.732400",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-11-17",
+      "timestamp": "2026-11-17T16:07:26.015Z",
+      "value": "5.785100",
+      "buy": "5.784500",
+      "sell": "5.785100",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-11-18",
+      "timestamp": "2026-11-18T16:08:44.271Z",
+      "value": "5.810200",
+      "buy": "5.809600",
+      "sell": "5.810200",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2026-11-19",
+      "timestamp": "2026-11-19T16:04:18.325Z",
+      "value": "5.888900",
+      "buy": "5.888300",
+      "sell": "5.888900",
+      "type": "Fechamento",
+      "provisional": false
+    }
+  ],
+  "stats": {
+    "min": "4.897300",
+    "max": "5.888900",
+    "avg": "5.202776",
+    "open": "5.394800",
+    "close": "5.888900",
+    "periodChange": "0.494100",
+    "periodChangePct": "9.158820"
+  },
+  "count": 248
+}

@@ -1,0 +1,52 @@
+{
+  "side": "sell",
+  "source": "Banco Central do Brasil — PTAX",
+  "asOf": "2026-11-19T16:04:18.325Z",
+  "isStale": false,
+  "rates": {
+    "USD": {
+      "currency": "USD",
+      "pair": "USD_BRL",
+      "side": "sell",
+      "value": "5.888900",
+      "buy": "5.888300",
+      "sell": "5.888900",
+      "type": "Fechamento",
+      "provisional": false,
+      "bulletinAt": "2026-11-19T16:04:18.325Z",
+      "bulletinDate": "2026-11-19",
+      "previousClose": {
+        "date": "2026-11-18",
+        "value": "5.810200"
+      },
+      "change": "0.078700",
+      "changePct": "1.354514",
+      "direction": "up",
+      "isStale": false,
+      "asOf": "2026-11-19T16:04:18.325Z",
+      "source": "Banco Central do Brasil — PTAX"
+    },
+    "EUR": {
+      "currency": "EUR",
+      "pair": "EUR_BRL",
+      "side": "sell",
+      "value": "6.467200",
+      "buy": "6.465900",
+      "sell": "6.467200",
+      "type": "Fechamento",
+      "provisional": false,
+      "bulletinAt": "2026-11-19T16:04:18.325Z",
+      "bulletinDate": "2026-11-19",
+      "previousClose": {
+        "date": "2026-11-18",
+        "value": "6.372000"
+      },
+      "change": "0.095200",
+      "changePct": "1.494036",
+      "direction": "up",
+      "isStale": false,
+      "asOf": "2026-11-19T16:04:18.325Z",
+      "source": "Banco Central do Brasil — PTAX"
+    }
+  }
+}

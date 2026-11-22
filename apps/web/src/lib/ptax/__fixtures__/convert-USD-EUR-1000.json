@@ -1,0 +1,12 @@
+{
+  "from": "USD",
+  "to": "EUR",
+  "amount": "1000.000000",
+  "rate": "0.910580",
+  "result": "910.579540",
+  "side": "sell",
+  "bulletinAt": "2026-11-19T16:04:18.325Z",
+  "asOf": "2026-11-19T16:04:18.325Z",
+  "isCross": true,
+  "source": "Banco Central do Brasil — PTAX"
+}
