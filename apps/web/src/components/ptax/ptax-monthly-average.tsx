@@ -19,9 +19,10 @@ import { EmptyState } from "@/components/ui/state";
 import type { PtaxUiCurrency } from "@/lib/ptax/constants";
 import { PTAX_COPY } from "@/lib/ptax/copy";
 import {
-  computeYAxisDomain,
+  computeNiceYAxisTicks,
   formatPtaxDecimal,
   formatPtaxPercent,
+  formatYAxisTick,
   formatYearMonthPtBr,
   toChartScaleNumber,
 } from "@/lib/ptax/format";
@@ -53,14 +54,28 @@ export function PtaxMonthlyAverage({
   onRetry,
 }: PtaxMonthlyAverageProps) {
   const entries = data?.months ?? [];
-  const chartData: MonthlyBarDatum[] = entries.map((entry) => ({
-    label: formatYearMonthPtBr(entry.month),
-    scaleValue: toChartScaleNumber(entry.average),
-    entry,
-  }));
+  const chartData: MonthlyBarDatum[] = entries
+    .map((entry) => ({
+      label: formatYearMonthPtBr(entry.month),
+      scaleValue: toChartScaleNumber(entry.average),
+      entry,
+    }))
+    .filter((d) => Number.isFinite(d.scaleValue));
 
-  const yDomain = computeYAxisDomain(chartData.map((d) => d.scaleValue));
+  const { domain: yDomain, ticks: yTicks } = computeNiceYAxisTicks(
+    chartData.map((d) => d.scaleValue),
+    5,
+    2,
+  );
   const partialEntry = entries.find((m) => m.isPartial) ?? null;
+
+  // Exact 12-month window (first -> last month already present in the API's
+  // own `months` array — not a computed/invented value, same boundary points
+  // used to draw the bars themselves).
+  const windowRangeLabel =
+    entries.length > 0
+      ? `${formatYearMonthPtBr(entries[0]!.month)}${PTAX_COPY.monthlyAverage.windowRangeSeparator}${formatYearMonthPtBr(entries[entries.length - 1]!.month)}`
+      : null;
 
   const pctRaw = data?.latestVsAveragePct ?? null;
   const pctIsUp = pctRaw !== null && !pctRaw.startsWith("-") && /[1-9]/.test(pctRaw);
@@ -94,7 +109,10 @@ export function PtaxMonthlyAverage({
             <Skeleton className="h-[220px] w-full rounded-xl" />
           </div>
         ) : error ? (
-          <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-muted/20 p-6 text-center">
+          <div
+            role="alert"
+            className="flex flex-col items-center gap-3 rounded-xl border border-border bg-muted/20 p-6 text-center"
+          >
             <AlertCircle className="h-6 w-6 text-destructive" />
             <p className="text-xs text-muted-foreground">{error}</p>
             <Button
@@ -126,6 +144,14 @@ export function PtaxMonthlyAverage({
                 >
                   {formatPtaxDecimal(data?.average12m, 4)}
                 </div>
+                {windowRangeLabel && (
+                  <div
+                    data-testid="ptax-monthly-window"
+                    className="mt-0.5 font-mono text-[11px] text-muted-foreground"
+                  >
+                    {windowRangeLabel}
+                  </div>
+                )}
               </div>
               <div className="rounded-xl border border-border bg-muted/30 p-3">
                 <div className="text-[11px] text-muted-foreground">
@@ -181,10 +207,9 @@ export function PtaxMonthlyAverage({
                   />
                   <YAxis
                     domain={yDomain}
+                    ticks={yTicks}
                     width={58}
-                    tickFormatter={(v: number) =>
-                      formatPtaxDecimal(String(v), 2)
-                    }
+                    tickFormatter={(v: number) => formatYAxisTick(v, 2)}
                     tick={{
                       fontSize: 10,
                       fill: "var(--muted-foreground)",
@@ -227,20 +252,20 @@ export function PtaxMonthlyAverage({
               </div>
             )}
 
-            {/* API calculation method note */}
-            {data?.method && (
-              <div className="rounded-xl border border-border bg-muted/30 p-3 text-xs">
-                <div className="font-semibold text-foreground">
-                  {PTAX_COPY.monthlyAverage.methodHeading}
-                </div>
-                <p
-                  data-testid="ptax-monthly-method"
-                  className="mt-1 leading-relaxed text-muted-foreground"
-                >
-                  {data.method}
-                </p>
+            {/* Calculation method note — maintained front-end copy, never the
+                raw API `method` string (kept in the type for API-contract
+                compatibility only; not rendered). */}
+            <div className="rounded-xl border border-border bg-muted/30 p-3 text-xs">
+              <div className="font-semibold text-foreground">
+                {PTAX_COPY.monthlyAverage.methodHeading}
               </div>
-            )}
+              <p
+                data-testid="ptax-monthly-method"
+                className="mt-1 leading-relaxed text-muted-foreground"
+              >
+                {PTAX_COPY.monthlyAverage.methodDescription}
+              </p>
+            </div>
           </>
         )}
       </CardContent>

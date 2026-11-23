@@ -34,8 +34,23 @@ export function PtaxCalculator({ enabled }: PtaxCalculatorProps) {
   const fromId = useId();
   const toId = useId();
 
-  const { data, loading, error, featureDisabled, inputStatus, reload } =
-    usePtaxConvert(from, to, rawAmount, enabled);
+  const {
+    data,
+    loading,
+    error,
+    featureDisabled,
+    inputStatus,
+    normalizedAmount,
+    reload,
+  } = usePtaxConvert(from, to, rawAmount, enabled);
+
+  const consideredDisplayDecimals = (() => {
+    if (!normalizedAmount) return 2;
+    const dotIdx = normalizedAmount.indexOf(".");
+    if (dotIdx === -1) return 2;
+    const fracLen = normalizedAmount.length - dotIdx - 1;
+    return Math.max(2, Math.min(6, fracLen));
+  })();
 
   // Hidden when flag is OFF OR when the API responds 404 { code: 'feature_disabled' }
   if (!enabled || featureDisabled) {
@@ -88,6 +103,16 @@ export function PtaxCalculator({ enabled }: PtaxCalculatorProps) {
             aria-invalid={inputStatus === "invalid"}
             className="font-mono tabular-nums"
           />
+          {inputStatus === "valid" && normalizedAmount && (
+            <p
+              data-testid="ptax-calculator-considered"
+              className="font-mono text-xs text-muted-foreground tabular-nums"
+            >
+              {PTAX_COPY.calculator.consideredAmountLabel}:{" "}
+              {formatPtaxDecimal(normalizedAmount, consideredDisplayDecimals)}{" "}
+              {from}
+            </p>
+          )}
           {inputStatus === "invalid" && (
             <p
               role="alert"
@@ -160,7 +185,12 @@ export function PtaxCalculator({ enabled }: PtaxCalculatorProps) {
         </div>
 
         {/* Result box — displays ONLY API `result` */}
-        <div className="rounded-xl border border-border bg-muted/40 p-4">
+        <div
+          aria-live="polite"
+          aria-atomic="true"
+          data-testid="ptax-calculator-result-region"
+          className="rounded-xl border border-border bg-muted/40 p-4"
+        >
           {inputStatus === "empty" ? (
             <p className="text-xs text-muted-foreground">
               {PTAX_COPY.calculator.emptyPrompt}
@@ -176,6 +206,7 @@ export function PtaxCalculator({ enabled }: PtaxCalculatorProps) {
             </div>
           ) : error ? (
             <div
+              role="alert"
               data-testid="ptax-calculator-error"
               className="flex flex-col items-start gap-2 text-xs"
             >

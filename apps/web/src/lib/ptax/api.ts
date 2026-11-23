@@ -30,9 +30,6 @@ interface CacheEntry<T> {
 // Client-only in-memory caches (never populated during SSR).
 const historyCache = new Map<string, CacheEntry<PtaxHistoryResponse>>();
 const monthlyCache = new Map<string, CacheEntry<PtaxMonthlyAverageResponse>>();
-const inflightHistory = new Map<string, Promise<PtaxHistoryResponse>>();
-const inflightMonthly = new Map<string, Promise<PtaxMonthlyAverageResponse>>();
-let inflightLatest: Promise<PtaxLatestResponse> | null = null;
 
 function isBrowser(): boolean {
   return typeof window !== "undefined";
@@ -42,9 +39,6 @@ function isBrowser(): boolean {
 export function clearPtaxClientCache(): void {
   historyCache.clear();
   monthlyCache.clear();
-  inflightHistory.clear();
-  inflightMonthly.clear();
-  inflightLatest = null;
 }
 
 export function clearPtaxHistoryCacheKey(
@@ -92,36 +86,26 @@ export async function fetchPtaxLatest(
 ): Promise<PtaxLatestResponse> {
   const query = encodeURIComponent(currencies.join(","));
   const path = `/v1/ptax/latest?currencies=${query}`;
-
-  if (!signal && inflightLatest) {
-    return inflightLatest;
-  }
-
-  const req = apiFetch<unknown>(path, { signal }).then(parsePtaxLatestResponse);
-  if (!signal) {
-    inflightLatest = req;
-    req.finally(() => {
-      if (inflightLatest === req) inflightLatest = null;
-    });
-  }
-  return req;
+  const raw = await apiFetch<unknown>(path, { signal });
+  return parsePtaxLatestResponse(raw);
 }
 
+/**
+ * Pure side-effect-free cache read: returns `undefined` when missing or expired,
+ * never mutating the underlying Map (pruning happens in the writer/effect).
+ */
 export function getCachedPtaxHistory(
   currency: PtaxUiCurrency,
   period: PtaxPeriod,
   nowMs: number = Date.now(),
-): PtaxHistoryResponse | null {
-  if (!isBrowser()) return null;
+): PtaxHistoryResponse | undefined {
+  if (!isBrowser()) return undefined;
   const key = `${currency}:${period}`;
   const entry = historyCache.get(key);
   if (entry && entry.expiresAt > nowMs) {
     return entry.data;
   }
-  if (entry) {
-    historyCache.delete(key);
-  }
-  return null;
+  return undefined;
 }
 
 export async function fetchPtaxHistory(
@@ -130,54 +114,45 @@ export async function fetchPtaxHistory(
   options: { signal?: AbortSignal; force?: boolean } = {},
 ): Promise<PtaxHistoryResponse> {
   const key = `${currency}:${period}`;
+  const now = Date.now();
   if (!options.force) {
-    const cached = getCachedPtaxHistory(currency, period);
-    if (cached) return cached;
+    const cached = getCachedPtaxHistory(currency, period, now);
+    if (cached !== undefined) return cached;
   }
-
-  if (!options.signal && !options.force) {
-    const pending = inflightHistory.get(key);
-    if (pending) return pending;
+  // Evict expired entry inside the async effect/writer, never during render
+  const existing = historyCache.get(key);
+  if (existing && (options.force || existing.expiresAt <= now)) {
+    historyCache.delete(key);
   }
 
   const path = `/v1/ptax/history?currency=${encodeURIComponent(currency)}&period=${encodeURIComponent(period)}`;
-  const req = apiFetch<unknown>(path, { signal: options.signal }).then(
-    (raw) => {
-      const parsed = parsePtaxHistoryResponse(raw);
-      if (isBrowser()) {
-        historyCache.set(key, {
-          expiresAt: Date.now() + PTAX_HISTORY_CACHE_TTL_MS,
-          data: parsed,
-        });
-      }
-      return parsed;
-    },
-  );
-
-  if (!options.signal) {
-    inflightHistory.set(key, req);
-    req.finally(() => {
-      if (inflightHistory.get(key) === req) inflightHistory.delete(key);
+  const raw = await apiFetch<unknown>(path, { signal: options.signal });
+  const parsed = parsePtaxHistoryResponse(raw);
+  if (isBrowser()) {
+    historyCache.set(key, {
+      expiresAt: Date.now() + PTAX_HISTORY_CACHE_TTL_MS,
+      data: parsed,
     });
   }
-  return req;
+  return parsed;
 }
 
+/**
+ * Pure side-effect-free cache read: returns `undefined` when missing or expired,
+ * never mutating the underlying Map (pruning happens in the writer/effect).
+ */
 export function getCachedPtaxMonthlyAverage(
   currency: PtaxUiCurrency,
   months = 12,
   nowMs: number = Date.now(),
-): PtaxMonthlyAverageResponse | null {
-  if (!isBrowser()) return null;
+): PtaxMonthlyAverageResponse | undefined {
+  if (!isBrowser()) return undefined;
   const key = `${currency}:${months}`;
   const entry = monthlyCache.get(key);
   if (entry && entry.expiresAt > nowMs) {
     return entry.data;
   }
-  if (entry) {
-    monthlyCache.delete(key);
-  }
-  return null;
+  return undefined;
 }
 
 export async function fetchPtaxMonthlyAverage(
@@ -186,37 +161,27 @@ export async function fetchPtaxMonthlyAverage(
   options: { signal?: AbortSignal; force?: boolean } = {},
 ): Promise<PtaxMonthlyAverageResponse> {
   const key = `${currency}:${months}`;
+  const now = Date.now();
   if (!options.force) {
-    const cached = getCachedPtaxMonthlyAverage(currency, months);
-    if (cached) return cached;
+    const cached = getCachedPtaxMonthlyAverage(currency, months, now);
+    if (cached !== undefined) return cached;
   }
-
-  if (!options.signal && !options.force) {
-    const pending = inflightMonthly.get(key);
-    if (pending) return pending;
+  // Evict expired entry inside the async effect/writer, never during render
+  const existing = monthlyCache.get(key);
+  if (existing && (options.force || existing.expiresAt <= now)) {
+    monthlyCache.delete(key);
   }
 
   const path = `/v1/ptax/monthly-average?currency=${encodeURIComponent(currency)}&months=${encodeURIComponent(String(months))}`;
-  const req = apiFetch<unknown>(path, { signal: options.signal }).then(
-    (raw) => {
-      const parsed = parsePtaxMonthlyAverageResponse(raw);
-      if (isBrowser()) {
-        monthlyCache.set(key, {
-          expiresAt: Date.now() + PTAX_MONTHLY_CACHE_TTL_MS,
-          data: parsed,
-        });
-      }
-      return parsed;
-    },
-  );
-
-  if (!options.signal) {
-    inflightMonthly.set(key, req);
-    req.finally(() => {
-      if (inflightMonthly.get(key) === req) inflightMonthly.delete(key);
+  const raw = await apiFetch<unknown>(path, { signal: options.signal });
+  const parsed = parsePtaxMonthlyAverageResponse(raw);
+  if (isBrowser()) {
+    monthlyCache.set(key, {
+      expiresAt: Date.now() + PTAX_MONTHLY_CACHE_TTL_MS,
+      data: parsed,
     });
   }
-  return req;
+  return parsed;
 }
 
 export async function fetchPtaxConvert(

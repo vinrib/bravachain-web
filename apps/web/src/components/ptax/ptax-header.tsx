@@ -1,7 +1,7 @@
 "use client";
 
-import type { KeyboardEvent } from "react";
-import { AlertTriangle, ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
+import { useRef, type KeyboardEvent } from "react";
+import { AlertTriangle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { CurrencyFlag } from "@/components/ui/flags";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -27,6 +27,7 @@ interface PtaxHeaderProps {
   rate: PtaxLatestItem | null;
   loading: boolean;
   error: string | null;
+  refreshError?: string | null;
   onRetry: () => void;
 }
 
@@ -36,20 +37,32 @@ export function PtaxHeader({
   rate,
   loading,
   error,
+  refreshError = null,
   onRetry,
 }: PtaxHeaderProps) {
+  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
+
   const handleTabKeyDown = (
     e: KeyboardEvent<HTMLButtonElement>,
     idx: number,
   ) => {
-    if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+    let next: number | null = null;
+    if (e.key === "ArrowRight") {
+      next = (idx + 1) % PTAX_UI_CURRENCIES.length;
+    } else if (e.key === "ArrowLeft") {
+      next =
+        (idx - 1 + PTAX_UI_CURRENCIES.length) % PTAX_UI_CURRENCIES.length;
+    } else if (e.key === "Home") {
+      next = 0;
+    } else if (e.key === "End") {
+      next = PTAX_UI_CURRENCIES.length - 1;
+    }
+    if (next !== null) {
       e.preventDefault();
-      const delta = e.key === "ArrowRight" ? 1 : -1;
-      const next =
-        (idx + delta + PTAX_UI_CURRENCIES.length) % PTAX_UI_CURRENCIES.length;
       const nextCurrency = PTAX_UI_CURRENCIES[next];
       if (nextCurrency) {
         onSelectCurrency(nextCurrency);
+        tabRefs.current[next]?.focus();
       }
     }
   };
@@ -69,6 +82,9 @@ export function PtaxHeader({
             return (
               <button
                 key={code}
+                ref={(el) => {
+                  tabRefs.current[idx] = el;
+                }}
                 type="button"
                 role="tab"
                 aria-selected={active}
@@ -100,12 +116,12 @@ export function PtaxHeader({
       </div>
 
       {/* Main value + delta + metadata */}
-      {loading ? (
+      {loading && !rate ? (
         <div className="space-y-3 py-2" data-testid="ptax-header-loading">
           <Skeleton className="h-11 w-48" />
           <Skeleton className="h-4 w-64" />
         </div>
-      ) : error ? (
+      ) : error && !rate ? (
         <ErrorState message={error} onRetry={onRetry} />
       ) : !rate ? (
         <EmptyState
@@ -174,6 +190,17 @@ export function PtaxHeader({
             </div>
           )}
 
+          {refreshError && (
+            <div
+              role="alert"
+              data-testid="ptax-refresh-error"
+              className="flex items-center gap-2 rounded-xl border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground"
+            >
+              <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-warning" />
+              <span>{refreshError}</span>
+            </div>
+          )}
+
           <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
             <span data-testid="ptax-last-update" className="font-mono">
               {PTAX_COPY.header.lastUpdatePrefix}
@@ -208,13 +235,9 @@ function DirectionBadge({
         ? "text-destructive"
         : "text-muted-foreground";
 
-  const Icon =
-    direction === "up"
-      ? ArrowUpRight
-      : direction === "down"
-        ? ArrowDownRight
-        : Minus;
-
+  // A single arrow glyph conveys direction here — do not pair it with a
+  // second (lucide icon) arrow, which previously rendered two overlapping
+  // direction indicators ("↗ ↑") side by side.
   const arrowChar = direction === "up" ? "↑" : direction === "down" ? "↓" : "→";
 
   return (
@@ -225,7 +248,6 @@ function DirectionBadge({
         toneClass,
       )}
     >
-      <Icon className="h-3.5 w-3.5" aria-hidden="true" />
       <span aria-hidden="true">{arrowChar}</span>
       <span>{formatPtaxPercent(changePct)}</span>
       {change !== null && (

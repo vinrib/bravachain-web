@@ -116,9 +116,11 @@ export function formatPtaxPercent(raw: string | null | undefined): string {
 
 /**
  * Normalizes calculator input string without float coercion:
- * - Accepts digits and at most one decimal separator (`,` or `.`).
- * - Max 15 integer digits and max 6 decimal places (mirroring API regex).
- * - Must be strictly positive (> 0).
+ * - Strips leading/trailing whitespace and optional "R$" prefix.
+ * - Accepts pt-BR thousands grouping with comma decimal ("1.000,50", "10.000,00")
+ *   and pt-BR dot-only thousands ("1.000", "1.500", "1.000.000"), or single decimal dot ("1.5", "1000.50").
+ * - Strips leading integer zeros BEFORE enforcing max 15 integer digits and max 6 decimals.
+ * - Must be strictly positive (> 0) and match `/^\d{1,15}(\.\d{1,6})?$/`.
  */
 export type CalculatorAmountNormalization =
   | { status: "empty" }
@@ -128,22 +130,49 @@ export type CalculatorAmountNormalization =
 export function normalizeCalculatorAmount(
   raw: string,
 ): CalculatorAmountNormalization {
-  const trimmed = raw.trim();
-  if (trimmed === "") {
+  const cleaned = raw.trim().replace(/^R\$\s*/i, "").trim();
+  if (cleaned === "") {
     return { status: "empty" };
   }
 
-  // Reject anything containing whitespace inside, signs, letters, or more than one separator
-  if (!/^[0-9.,]+$/.test(trimmed)) {
+  // Reject anything containing whitespace inside, signs, letters, or scientific notation
+  if (!/^[0-9.,]+$/.test(cleaned)) {
     return { status: "invalid" };
   }
 
-  const sepMatches = trimmed.match(/[.,]/g);
-  if (sepMatches && sepMatches.length > 1) {
-    return { status: "invalid" };
+  let normalized: string;
+  if (cleaned.includes(",")) {
+    const parts = cleaned.split(",");
+    if (parts.length !== 2) {
+      return { status: "invalid" };
+    }
+    const [intRaw, fracRaw] = parts;
+    if (!intRaw || !fracRaw || !/^\d{1,6}$/.test(fracRaw)) {
+      return { status: "invalid" };
+    }
+    if (intRaw.includes(".")) {
+      if (!/^\d{1,3}(?:\.\d{3})+$/.test(intRaw)) {
+        return { status: "invalid" };
+      }
+    } else if (!/^\d+$/.test(intRaw)) {
+      return { status: "invalid" };
+    }
+    const intDigits = intRaw.replace(/\./g, "").replace(/^0+(?=\d)/, "");
+    normalized = `${intDigits}.${fracRaw}`;
+  } else if (cleaned.includes(".")) {
+    if (/^\d{1,3}(?:\.\d{3})+$/.test(cleaned)) {
+      normalized = cleaned.replace(/\./g, "").replace(/^0+(?=\d)/, "");
+    } else if (/^\d+\.\d{1,6}$/.test(cleaned)) {
+      const [intRaw, fracRaw] = cleaned.split(".");
+      const intDigits = (intRaw ?? "0").replace(/^0+(?=\d)/, "");
+      normalized = `${intDigits}.${fracRaw}`;
+    } else {
+      return { status: "invalid" };
+    }
+  } else {
+    normalized = cleaned.replace(/^0+(?=\d)/, "");
   }
 
-  const normalized = trimmed.replace(",", ".");
   if (!CALC_VALID_RE.test(normalized)) {
     return { status: "invalid" };
   }
@@ -159,10 +188,31 @@ export function normalizeCalculatorAmount(
 /**
  * Converts a decimal string to a JS number EXCLUSIVELY for chart axis scaling
  * and pixel coordinates — never for financial computation or display.
+ * Returns `NaN` for non-finite inputs so callers drop invalid points instead of
+ * silently plotting 0.
  */
 export function toChartScaleNumber(decimalStr: string): number {
   const n = Number(decimalStr);
-  return Number.isFinite(n) ? n : 0;
+  return Number.isFinite(n) ? n : Number.NaN;
+}
+
+/**
+ * Formats a numeric Y-axis tick label safely for presentation only:
+ * never throws and never emits scientific notation.
+ */
+export function formatYAxisTick(value: number, decimals = 4): string {
+  if (!Number.isFinite(value)) return "—";
+  const safeDecimals = Math.max(0, Math.min(6, Math.trunc(decimals)));
+  if (Math.abs(value) < 1e21) {
+    const fixed = value.toFixed(safeDecimals);
+    const noNegZero = /^-0(?:\.0+)?$/.test(fixed) ? fixed.slice(1) : fixed;
+    return noNegZero.replace(".", ",");
+  }
+  return new Intl.NumberFormat("pt-BR", {
+    useGrouping: false,
+    minimumFractionDigits: safeDecimals,
+    maximumFractionDigits: safeDecimals,
+  }).format(value);
 }
 
 /**
@@ -188,6 +238,192 @@ export function computeYAxisDomain(
   // 1.5% of span when varying; 1.5% of value (fallback 0.05) when flat / single point
   const pad = span > 0 ? span * 0.015 : Math.max(Math.abs(max) * 0.015, 0.05);
   return [min - pad, max + pad];
+}
+
+const MAX_Y_AXIS_TICKS = 8;
+
+function snapNiceStep(rawStep: number, minStep: number): number {
+  const candidate = Math.max(rawStep, minStep);
+  if (!Number.isFinite(candidate) || candidate <= 0) {
+    return Number.NaN;
+  }
+  const exponent = Math.floor(Math.log10(candidate));
+  const power = 10 ** exponent;
+  if (!Number.isFinite(power) || power === 0) {
+    return Number.NaN;
+  }
+  const fraction = candidate / power;
+  const niceFraction =
+    fraction <= 1 ? 1 : fraction <= 2 ? 2 : fraction <= 5 ? 5 : 10;
+  return niceFraction * power;
+}
+
+function bumpNiceStep(step: number): number {
+  const exponent = Math.floor(Math.log10(step));
+  const power = 10 ** exponent;
+  const fraction = step / power;
+  if (fraction < 1.5) return 2 * power;
+  if (fraction < 3.5) return 5 * power;
+  return 10 * power;
+}
+
+function buildFiniteFallbackTicks(min: number, max: number): {
+  domain: [number, number];
+  ticks: number[];
+} {
+  const diff = max - min;
+  if (Number.isFinite(diff) && diff > 0) {
+    const step = diff / 4;
+    if (Number.isFinite(step) && step > 0) {
+      const ticks = [min, min + step, min + 2 * step, min + 3 * step, max];
+      if (ticks.every(Number.isFinite)) {
+        return { domain: [min, max], ticks };
+      }
+    }
+  }
+  return { domain: [min, max], ticks: min === max ? [min, max] : [min, max] };
+}
+
+/**
+ * Computes a "nice", equidistant Y-axis tick ladder from numeric point values,
+ * for visual chart scaling only (never for financial computation).
+ * Guarantees:
+ * - Minimum step compatible with `decimals` (4 decimals -> 0.0001) so formatted
+ *   tick labels never repeat;
+ * - At most 8 ticks;
+ * - Finite `step`, `niceMin`, `niceMax` validated before looping;
+ * - Centered 3–5 ticks with small proportional padding for constant / 1-point series.
+ */
+export function computeNiceYAxisTicks(
+  values: readonly number[],
+  desiredTickCount = 5,
+  decimals = 4,
+): { domain: [number, number]; ticks: number[] } {
+  const finite = values.filter((v) => Number.isFinite(v));
+  const first = finite[0];
+  if (first === undefined) {
+    return { domain: [0, 1], ticks: [0, 1] };
+  }
+
+  let min = first;
+  let max = first;
+  for (const v of finite) {
+    if (v < min) min = v;
+    if (v > max) max = v;
+  }
+
+  const safeDecimals = Math.max(0, Math.min(6, Math.trunc(decimals)));
+  const minStep = 10 ** -safeDecimals;
+  const span = max - min;
+  if (!Number.isFinite(span)) {
+    return buildFiniteFallbackTicks(min, max);
+  }
+
+  // Constant or 1-point series: build small centered proportional range (3..5 ticks)
+  if (span === 0) {
+    const halfSpan = Math.max(Math.abs(max) * 0.01, minStep * 2, 0.01);
+    const effMin = min - halfSpan;
+    const effMax = max + halfSpan;
+    if (!Number.isFinite(effMin) || !Number.isFinite(effMax)) {
+      return buildFiniteFallbackTicks(min, max);
+    }
+    const step = snapNiceStep(
+      (effMax - effMin) / Math.max(desiredTickCount - 1, 2),
+      minStep,
+    );
+    if (!Number.isFinite(step) || step <= 0) {
+      return buildFiniteFallbackTicks(min, max);
+    }
+    const center = Math.round(max / step) * step;
+    const niceMin = center - 2 * step;
+    const niceMax = center + 2 * step;
+    if (!Number.isFinite(niceMin) || !Number.isFinite(niceMax)) {
+      return buildFiniteFallbackTicks(min, max);
+    }
+    const roundingDecimals = Math.max(0, -Math.floor(Math.log10(step)) + 2);
+    const scale = 10 ** roundingDecimals;
+    const round = (n: number) =>
+      Number.isFinite(scale) && Math.abs(n) * scale < Number.MAX_SAFE_INTEGER
+        ? Math.round(n * scale) / scale
+        : n;
+    const ticks = [
+      round(niceMin),
+      round(center - step),
+      round(center),
+      round(center + step),
+      round(niceMax),
+    ];
+    return { domain: [ticks[0]!, ticks[ticks.length - 1]!], ticks };
+  }
+
+  const targetIntervals = Math.max(desiredTickCount - 1, 1);
+  let step = snapNiceStep(span / targetIntervals, minStep);
+  if (!Number.isFinite(step) || step <= 0) {
+    return buildFiniteFallbackTicks(min, max);
+  }
+
+  const computeBounds = (s: number) => {
+    let lo = Math.floor(min / s) * s;
+    let hi = Math.ceil(max / s) * s;
+    if (lo >= min) lo -= s;
+    if (hi <= max) hi += s;
+    return { lo, hi };
+  };
+
+  let { lo: niceMin, hi: niceMax } = computeBounds(step);
+
+  // Enforce max 8 ticks by stepping up the 1-2-5 ladder
+  let bumpGuard = 0;
+  while (
+    Number.isFinite(step) &&
+    Number.isFinite(niceMin) &&
+    Number.isFinite(niceMax) &&
+    Math.round((niceMax - niceMin) / step) + 1 > MAX_Y_AXIS_TICKS &&
+    bumpGuard < 32
+  ) {
+    step = bumpNiceStep(step);
+    ({ lo: niceMin, hi: niceMax } = computeBounds(step));
+    bumpGuard += 1;
+  }
+
+  if (
+    !Number.isFinite(step) ||
+    step <= 0 ||
+    !Number.isFinite(niceMin) ||
+    !Number.isFinite(niceMax) ||
+    !Number.isFinite(niceMax - niceMin)
+  ) {
+    return buildFiniteFallbackTicks(min, max);
+  }
+
+  const roundingDecimals = Math.max(0, -Math.floor(Math.log10(step)) + 2);
+  const scale = 10 ** roundingDecimals;
+  const round = (n: number) =>
+    Number.isFinite(scale) && Math.abs(n) * scale < Number.MAX_SAFE_INTEGER
+      ? Math.round(n * scale) / scale
+      : n;
+
+  const ticks: number[] = [];
+  const tickCount = Math.min(
+    MAX_Y_AXIS_TICKS,
+    Math.max(2, Math.round((niceMax - niceMin) / step) + 1),
+  );
+  for (let i = 0; i < tickCount; i += 1) {
+    const val = round(niceMin + i * step);
+    if (!Number.isFinite(val)) {
+      return buildFiniteFallbackTicks(min, max);
+    }
+    ticks.push(val);
+  }
+
+  const domain: [number, number] = [
+    ticks[0] ?? niceMin,
+    ticks[ticks.length - 1] ?? niceMax,
+  ];
+  if (domain[0] > min || domain[1] < max) {
+    return buildFiniteFallbackTicks(min, max);
+  }
+  return { domain, ticks };
 }
 
 function getBrasiliaParts(isoTimestamp: string): Record<string, string> {
@@ -243,6 +479,39 @@ export function formatHistoryPointLabel(
     return formatBrasiliaTime(point.timestamp);
   }
   return formatIsoDateShort(point.date, period === "1Y");
+}
+
+export interface XAxisTickPlan {
+  value: string;
+  /** False for a repeated label (e.g. two 1D bulletins in the same minute) — render nothing. */
+  show: boolean;
+  /** "start"/"end" for the first/last category so the label never overflows past the chart edge. */
+  textAnchor: "start" | "middle" | "end";
+}
+
+/**
+ * Plans X-axis category tick rendering from the already-formatted labels:
+ * suppresses a label that repeats the previous visible one (keeps only the
+ * first occurrence), and anchors the first/last label inward so neither
+ * overflows the chart's left/right edge. Pure and presentation-only.
+ */
+export function planXAxisTicks(
+  labels: readonly string[],
+): XAxisTickPlan[] {
+  const seen = new Set<string>();
+  const lastIndex = labels.length - 1;
+  return labels.map((value, index) => {
+    const isRepeat = seen.has(value);
+    if (!isRepeat) seen.add(value);
+    // Only the LAST label is anchored away from center ("end", so it grows
+    // leftward and never overflows the right edge). The first label stays
+    // "middle" like every other tick — anchoring it "start" too made it grow
+    // rightward and collide with the next tick's label (visual review
+    // finding on the 1Y chart).
+    const textAnchor: XAxisTickPlan["textAnchor"] =
+      index === lastIndex ? "end" : "middle";
+    return { value, show: !isRepeat, textAnchor };
+  });
 }
 
 /** Formats "YYYY-MM" as "mmm/aa" in pt-BR (e.g. "2026-11" -> "nov/26"). */

@@ -8,8 +8,6 @@ import {
   fetchPtaxHistory,
   fetchPtaxLatest,
   fetchPtaxMonthlyAverage,
-  getCachedPtaxHistory,
-  getCachedPtaxMonthlyAverage,
   isPtaxFeatureDisabledError,
   mapPtaxErrorToMessage,
 } from "./api";
@@ -37,19 +35,27 @@ function isAbortError(err: unknown): boolean {
   );
 }
 
+const FOCUS_COALESCE_MS = 1_000;
+
 /**
  * Fetches `/v1/ptax/latest` on mount, polls every 60s while the tab is visible,
- * pauses when hidden, and refreshes when focus/visibility returns.
- * Never executes during SSR.
+ * pauses when hidden, and refreshes when focus/visibility returns (coalesced
+ * so visibilitychange + focus never fire duplicate requests).
+ * Background refresh errors keep the displayed quote intact and surface
+ * `refreshError` instead of wiping out the screen.
  */
 export function usePtaxLatest() {
   const [data, setData] = useState<PtaxLatestResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshError, setRefreshError] = useState<string | null>(null);
   const [reloadNonce, setReloadNonce] = useState(0);
+  const hasDataRef = useRef(false);
 
   const reload = useCallback(() => {
-    setLoading(true);
+    if (!hasDataRef.current) {
+      setLoading(true);
+    }
     setReloadNonce((n) => n + 1);
   }, []);
 
@@ -57,8 +63,10 @@ export function usePtaxLatest() {
     let active = true;
     let currentController: AbortController | null = null;
     let pollTimer: ReturnType<typeof setInterval> | null = null;
+    let lastLoadAt = 0;
 
     const load = () => {
+      lastLoadAt = Date.now();
       currentController?.abort();
       const controller = new AbortController();
       currentController = controller;
@@ -66,13 +74,19 @@ export function usePtaxLatest() {
       fetchPtaxLatest(PTAX_UI_CURRENCIES, controller.signal)
         .then((res) => {
           if (!active || controller.signal.aborted) return;
+          hasDataRef.current = true;
           setData(res);
           setError(null);
+          setRefreshError(null);
           setLoading(false);
         })
         .catch((err: unknown) => {
           if (!active || controller.signal.aborted || isAbortError(err)) return;
-          setError(mapPtaxErrorToMessage(err));
+          if (hasDataRef.current) {
+            setRefreshError(PTAX_COPY.header.refreshErrorNotice);
+          } else {
+            setError(mapPtaxErrorToMessage(err));
+          }
           setLoading(false);
         });
     };
@@ -103,9 +117,9 @@ export function usePtaxLatest() {
     };
 
     const handleFocus = () => {
-      if (!document.hidden) {
-        load();
-      }
+      if (document.hidden) return;
+      if (Date.now() - lastLoadAt < FOCUS_COALESCE_MS) return;
+      load();
     };
 
     load();
@@ -125,7 +139,7 @@ export function usePtaxLatest() {
     };
   }, [reloadNonce]);
 
-  return { data, loading, error, reload };
+  return { data, loading, error, refreshError, reload };
 }
 
 interface AsyncResultState<T> {
@@ -137,6 +151,7 @@ interface AsyncResultState<T> {
 /**
  * Fetches `/v1/ptax/history?currency&period` with client-side key caching and
  * `AbortController` cancellation on currency/period changes.
+ * Pure during render (cache reads/pruning happen strictly inside the effect).
  */
 export function usePtaxHistory(
   currency: PtaxUiCurrency,
@@ -151,9 +166,6 @@ export function usePtaxHistory(
   });
 
   const requestKey = `${currency}:${period}:${reloadNonce}`;
-  const force = reloadNonce > 0;
-  const cached =
-    enabled && !force ? getCachedPtaxHistory(currency, period) : null;
 
   const reload = useCallback(() => {
     clearPtaxHistoryCacheKey(currency, period);
@@ -161,7 +173,7 @@ export function usePtaxHistory(
   }, [currency, period]);
 
   useEffect(() => {
-    if (!enabled || cached) {
+    if (!enabled) {
       return;
     }
 
@@ -170,7 +182,6 @@ export function usePtaxHistory(
 
     fetchPtaxHistory(currency, period, {
       signal: controller.signal,
-      force,
     })
       .then((res) => {
         if (!active || controller.signal.aborted) return;
@@ -189,12 +200,12 @@ export function usePtaxHistory(
       active = false;
       controller.abort();
     };
-  }, [currency, period, enabled, force, cached, requestKey]);
+  }, [currency, period, enabled, requestKey]);
 
   const settled = result.requestKey === requestKey;
-  const data = cached ?? (settled ? result.data : null);
-  const error = cached ? null : settled ? result.error : null;
-  const loading = enabled && !cached && !settled;
+  const data = enabled && settled ? result.data : null;
+  const error = enabled && settled ? result.error : null;
+  const loading = enabled && !settled;
 
   return { data, loading, error, reload };
 }
@@ -202,6 +213,7 @@ export function usePtaxHistory(
 /**
  * Fetches `/v1/ptax/monthly-average?currency&months=12` once per currency with
  * 10-minute client-side cache and `AbortController`.
+ * Pure during render (cache reads/pruning happen strictly inside the effect).
  */
 export function usePtaxMonthlyAverage(currency: PtaxUiCurrency) {
   const [reloadNonce, setReloadNonce] = useState(0);
@@ -214,8 +226,6 @@ export function usePtaxMonthlyAverage(currency: PtaxUiCurrency) {
   });
 
   const requestKey = `${currency}:12:${reloadNonce}`;
-  const force = reloadNonce > 0;
-  const cached = !force ? getCachedPtaxMonthlyAverage(currency, 12) : null;
 
   const reload = useCallback(() => {
     clearPtaxMonthlyCacheKey(currency, 12);
@@ -223,16 +233,11 @@ export function usePtaxMonthlyAverage(currency: PtaxUiCurrency) {
   }, [currency]);
 
   useEffect(() => {
-    if (cached) {
-      return;
-    }
-
     const controller = new AbortController();
     let active = true;
 
     fetchPtaxMonthlyAverage(currency, 12, {
       signal: controller.signal,
-      force,
     })
       .then((res) => {
         if (!active || controller.signal.aborted) return;
@@ -251,12 +256,12 @@ export function usePtaxMonthlyAverage(currency: PtaxUiCurrency) {
       active = false;
       controller.abort();
     };
-  }, [currency, force, cached, requestKey]);
+  }, [currency, requestKey]);
 
   const settled = result.requestKey === requestKey;
-  const data = cached ?? (settled ? result.data : null);
-  const error = cached ? null : settled ? result.error : null;
-  const loading = !cached && !settled;
+  const data = settled ? result.data : null;
+  const error = settled ? result.error : null;
+  const loading = !settled;
 
   return { data, loading, error, reload };
 }
@@ -344,6 +349,7 @@ export function usePtaxConvert(
     error,
     featureDisabled,
     inputStatus: normalized.status,
+    normalizedAmount: validAmount,
     reload,
   };
 }
