@@ -1,0 +1,66 @@
+{
+  "currency": "EUR",
+  "pair": "EUR_BRL",
+  "period": "1D",
+  "side": "sell",
+  "source": "Banco Central do Brasil — PTAX",
+  "asOf": "2026-11-19T16:04:18.325Z",
+  "isStale": false,
+  "points": [
+    {
+      "date": "2026-11-19",
+      "timestamp": "2026-11-19T13:11:10.714Z",
+      "value": "6.477900",
+      "buy": "6.476700",
+      "sell": "6.477900",
+      "type": "Abertura",
+      "provisional": false
+    },
+    {
+      "date": "2026-11-19",
+      "timestamp": "2026-11-19T14:11:10.407Z",
+      "value": "6.474200",
+      "buy": "6.473000",
+      "sell": "6.474200",
+      "type": "Intermediário",
+      "provisional": false
+    },
+    {
+      "date": "2026-11-19",
+      "timestamp": "2026-11-19T15:11:11.275Z",
+      "value": "6.452400",
+      "buy": "6.450500",
+      "sell": "6.452400",
+      "type": "Intermediário",
+      "provisional": false
+    },
+    {
+      "date": "2026-11-19",
+      "timestamp": "2026-11-19T16:04:18.300Z",
+      "value": "6.490500",
+      "buy": "6.489200",
+      "sell": "6.490500",
+      "type": "Intermediário",
+      "provisional": false
+    },
+    {
+      "date": "2026-11-19",
+      "timestamp": "2026-11-19T16:04:18.325Z",
+      "value": "6.467200",
+      "buy": "6.465900",
+      "sell": "6.467200",
+      "type": "Fechamento",
+      "provisional": false
+    }
+  ],
+  "stats": {
+    "min": "6.452400",
+    "max": "6.490500",
+    "avg": "6.472440",
+    "open": "6.477900",
+    "close": "6.467200",
+    "periodChange": "-0.010700",
+    "periodChangePct": "-0.165177"
+  },
+  "count": 5
+}

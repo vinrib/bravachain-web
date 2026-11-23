@@ -1,0 +1,85 @@
+{
+  "currency": "EUR",
+  "pair": "EUR_BRL",
+  "side": "sell",
+  "months": [
+    {
+      "month": "2025-12",
+      "average": "6.388659",
+      "businessDays": 22,
+      "isPartial": false
+    },
+    {
+      "month": "2026-01",
+      "average": "6.265967",
+      "businessDays": 21,
+      "isPartial": false
+    },
+    {
+      "month": "2026-02",
+      "average": "6.147222",
+      "businessDays": 18,
+      "isPartial": false
+    },
+    {
+      "month": "2026-03",
+      "average": "6.044600",
+      "businessDays": 22,
+      "isPartial": false
+    },
+    {
+      "month": "2026-04",
+      "average": "5.890025",
+      "businessDays": 20,
+      "isPartial": false
+    },
+    {
+      "month": "2026-05",
+      "average": "5.818590",
+      "businessDays": 20,
+      "isPartial": false
+    },
+    {
+      "month": "2026-06",
+      "average": "5.900881",
+      "businessDays": 21,
+      "isPartial": false
+    },
+    {
+      "month": "2026-07",
+      "average": "5.842122",
+      "businessDays": 23,
+      "isPartial": false
+    },
+    {
+      "month": "2026-08",
+      "average": "5.974690",
+      "businessDays": 21,
+      "isPartial": false
+    },
+    {
+      "month": "2026-09",
+      "average": "5.918643",
+      "businessDays": 21,
+      "isPartial": false
+    },
+    {
+      "month": "2026-10",
+      "average": "5.743738",
+      "businessDays": 21,
+      "isPartial": false
+    },
+    {
+      "month": "2026-11",
+      "average": "6.239023",
+      "businessDays": 13,
+      "isPartial": true
+    }
+  ],
+  "average12m": "6.007047",
+  "latestVsAveragePct": "7.660221",
+  "method": "Media aritmetica simples dos valores diarios PTAX (lado venda; ultimo boletim Fechamento de cada dia util ou ultimo boletim provisorio no dia corrente), com arredondamento ROUND_HALF_UP em 6 casas decimais. O campo average12m agrega todos os valores diarios da janela, nao a media das medias mensais.",
+  "asOf": "2026-11-19T16:04:18.325Z",
+  "isStale": false,
+  "source": "Banco Central do Brasil — PTAX"
+}

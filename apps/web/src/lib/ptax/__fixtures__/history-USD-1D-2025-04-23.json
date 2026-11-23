@@ -1,0 +1,75 @@
+{
+  "currency": "USD",
+  "pair": "USD_BRL",
+  "period": "1D",
+  "side": "sell",
+  "source": "Banco Central do Brasil — PTAX",
+  "asOf": "2025-04-23T16:06:30.443Z",
+  "isStale": false,
+  "points": [
+    {
+      "date": "2025-04-23",
+      "timestamp": "2025-04-23T13:05:41.350Z",
+      "value": "5.682700",
+      "buy": "5.682100",
+      "sell": "5.682700",
+      "type": "Abertura",
+      "provisional": false
+    },
+    {
+      "date": "2025-04-23",
+      "timestamp": "2025-04-23T14:03:25.928Z",
+      "value": "5.680500",
+      "buy": "5.679900",
+      "sell": "5.680500",
+      "type": "Intermediário",
+      "provisional": false
+    },
+    {
+      "date": "2025-04-23",
+      "timestamp": "2025-04-23T15:05:24.937Z",
+      "value": "5.691100",
+      "buy": "5.690500",
+      "sell": "5.691100",
+      "type": "Intermediário",
+      "provisional": false
+    },
+    {
+      "date": "2025-04-23",
+      "timestamp": "2025-04-23T16:06:30.416Z",
+      "value": "5.688000",
+      "buy": "5.687400",
+      "sell": "5.688000",
+      "type": "Fechamento",
+      "provisional": false
+    },
+    {
+      "date": "2025-04-23",
+      "timestamp": "2025-04-23T16:06:30.436Z",
+      "value": "5.697700",
+      "buy": "5.697100",
+      "sell": "5.697700",
+      "type": "Intermediário",
+      "provisional": false
+    },
+    {
+      "date": "2025-04-23",
+      "timestamp": "2025-04-23T16:06:30.443Z",
+      "value": "5.688000",
+      "buy": "5.687400",
+      "sell": "5.688000",
+      "type": "Fechamento",
+      "provisional": false
+    }
+  ],
+  "stats": {
+    "min": "5.680500",
+    "max": "5.697700",
+    "avg": "5.688000",
+    "open": "5.682700",
+    "close": "5.688000",
+    "periodChange": "0.005300",
+    "periodChangePct": "0.093266"
+  },
+  "count": 6
+}
