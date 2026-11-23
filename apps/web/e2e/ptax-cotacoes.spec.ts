@@ -193,6 +193,49 @@ for (const width of [390, 1280] as const) {
   }
 }
 
+for (const width of [390, 1280] as const) {
+  test(`1Y last X-axis label stays fully inside the chart at ${width}px (not clipped)`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await mockPtaxBackend(page);
+    await page.goto("/cotacoes", { waitUntil: "networkidle" });
+    await page.getByRole("tab", { name: "1 ano", exact: true }).click();
+
+    const container = page.getByTestId("ptax-chart-container");
+    await expect(container).toBeVisible();
+
+    const containerBox = await container.boundingBox();
+    expect(containerBox).not.toBeNull();
+
+    // Recharts v3 renders axis tick labels through a z-index portal
+    // (`.recharts-zIndex-layer_2000`), so they are NOT nested under
+    // `.recharts-xAxis` in the DOM — find the X-axis ones by their date-like
+    // text content ("dd/mm" or "dd/mm/yy") instead of DOM position.
+    const lastTickBox = await container.evaluate((el) => {
+      const labels = Array.from(
+        el.querySelectorAll(".recharts-cartesian-axis-tick-label"),
+      );
+      const dateLabels = labels.filter((g) =>
+        /^\d{2}\/\d{2}(\/\d{2})?$/.test(g.textContent ?? ""),
+      );
+      const last = dateLabels[dateLabels.length - 1];
+      if (!last) return null;
+      const r = last.getBoundingClientRect();
+      return { left: r.left, right: r.right, width: r.width };
+    });
+
+    expect(lastTickBox).not.toBeNull();
+    expect(lastTickBox!.width).toBeGreaterThan(0);
+    // "Not clipped" = the label's own box is fully within the chart
+    // container's box (small 1px tolerance for sub-pixel rounding).
+    expect(lastTickBox!.left).toBeGreaterThanOrEqual(containerBox!.x - 1);
+    expect(lastTickBox!.right).toBeLessThanOrEqual(
+      containerBox!.x + containerBox!.width + 1,
+    );
+  });
+}
+
 test("hides calculator automatically on 404 feature_disabled and renders explicit empty, error, and 1-point states", async ({
   page,
 }) => {
@@ -207,16 +250,12 @@ test("hides calculator automatically on 404 feature_disabled and renders explici
   await expect(page.getByTestId("ptax-header-value")).toBeVisible();
   await expect(page.getByTestId("ptax-calculator")).toHaveCount(0);
 
-  // 2) Empty state
+  // 2) Empty state — USD still has a live rate (so the header renders
+  // normally and item #8's "single aviso" suppression does NOT kick in);
+  // only the history series for the period is empty.
   await page.unrouteAll();
   await mockPtaxBackend(page, {
-    latestBody: {
-      side: "sell",
-      source: "Banco Central do Brasil — PTAX",
-      asOf: null,
-      isStale: true,
-      rates: { USD: null, EUR: null },
-    },
+    latestBody: fixtures.latest,
     historyBody: {
       currency: "USD",
       pair: "USD_BRL",
@@ -253,19 +292,44 @@ test("hides calculator automatically on 404 feature_disabled and renders explici
     page.getByRole("button", { name: "Tentar de novo" }),
   ).toBeVisible();
 
-  // 4) Single-point 1D state (early day, provisional marker, no crash)
+  // 4) Single-point 1D state (early day, provisional marker, no crash).
+  // `stats` is overridden to match the single remaining point — a sliced
+  // `points` array with the full day's stats left untouched would show
+  // Mín/Máx from bulletins that are no longer in the series (visual-review
+  // finding: a previous ad-hoc capture mixed a stale fixture's full-day
+  // stats with a single carried-over point value).
   const usd1D = fixtures.history.USD["1D"] as {
-    points: Array<Record<string, unknown>>;
+    points: Array<{ value: string } & Record<string, unknown>>;
     stats: Record<string, unknown>;
   };
+  const firstPoint = usd1D.points[0]!;
   const singlePoint = {
     ...usd1D,
-    points: [{ ...usd1D.points[0], provisional: true }],
+    points: [{ ...firstPoint, provisional: true }],
     count: 1,
+    stats: {
+      min: firstPoint.value,
+      max: firstPoint.value,
+      avg: firstPoint.value,
+      open: firstPoint.value,
+      close: firstPoint.value,
+      periodChange: "0.000000",
+      periodChangePct: "0.000000",
+    },
   };
   await page.unrouteAll();
   await mockPtaxBackend(page, { historyBody: singlePoint });
   await page.goto("/cotacoes", { waitUntil: "networkidle" });
   await expect(page.getByTestId("ptax-single-point-notice")).toBeVisible();
   await expect(page.getByTestId("ptax-point-provisional")).toBeVisible();
+
+  // Mín/Máx/Média/Abertura must all read the same value as the one plotted
+  // point — never a stale full-day range left over from before truncation.
+  const minText = await page.getByTestId("ptax-stat-min").textContent();
+  const maxText = await page.getByTestId("ptax-stat-max").textContent();
+  const avgText = await page.getByTestId("ptax-stat-avg").textContent();
+  const openText = await page.getByTestId("ptax-stat-open").textContent();
+  expect(minText).toBe(maxText);
+  expect(minText).toBe(avgText);
+  expect(minText).toBe(openText);
 });

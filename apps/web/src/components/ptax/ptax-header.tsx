@@ -1,7 +1,7 @@
 "use client";
 
 import type { KeyboardEvent } from "react";
-import { AlertTriangle, ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { CurrencyFlag } from "@/components/ui/flags";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -208,13 +208,9 @@ function DirectionBadge({
         ? "text-destructive"
         : "text-muted-foreground";
 
-  const Icon =
-    direction === "up"
-      ? ArrowUpRight
-      : direction === "down"
-        ? ArrowDownRight
-        : Minus;
-
+  // A single arrow glyph conveys direction here — do not pair it with a
+  // second (lucide icon) arrow, which previously rendered two overlapping
+  // direction indicators ("↗ ↑") side by side.
   const arrowChar = direction === "up" ? "↑" : direction === "down" ? "↓" : "→";
 
   return (
@@ -225,7 +221,6 @@ function DirectionBadge({
         toneClass,
       )}
     >
-      <Icon className="h-3.5 w-3.5" aria-hidden="true" />
       <span aria-hidden="true">{arrowChar}</span>
       <span>{formatPtaxPercent(changePct)}</span>
       {change !== null && (

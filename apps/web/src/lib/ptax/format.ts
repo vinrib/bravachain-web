@@ -190,6 +190,71 @@ export function computeYAxisDomain(
   return [min - pad, max + pad];
 }
 
+/**
+ * Computes a "nice", equidistant Y-axis tick ladder from numeric point values,
+ * for visual chart scaling only (never for financial computation). The domain
+ * is snapped outward to the tick step so every real data point sits strictly
+ * inside it — never exactly on the edge — and `domain` always equals
+ * `[ticks[0], ticks[ticks.length - 1]]`, so the rendered grid lines and the
+ * axis bounds can never disagree.
+ */
+export function computeNiceYAxisTicks(
+  values: readonly number[],
+  desiredTickCount = 5,
+): { domain: [number, number]; ticks: number[] } {
+  const finite = values.filter((v) => Number.isFinite(v));
+  const first = finite[0];
+  if (first === undefined) {
+    return { domain: [0, 1], ticks: [0, 1] };
+  }
+
+  let min = first;
+  let max = first;
+  for (const v of finite) {
+    if (v < min) min = v;
+    if (v > max) max = v;
+  }
+
+  const span = max - min;
+  const roughStep =
+    span > 0
+      ? span / Math.max(desiredTickCount - 1, 1)
+      : Math.max(Math.abs(max) * 0.2, 0.01);
+
+  const exponent = Math.floor(Math.log10(roughStep));
+  const fraction = roughStep / 10 ** exponent;
+  const niceFraction =
+    fraction <= 1 ? 1 : fraction <= 2 ? 2 : fraction <= 5 ? 5 : 10;
+  const step = niceFraction * 10 ** exponent;
+
+  let niceMin = Math.floor(min / step) * step;
+  let niceMax = Math.ceil(max / step) * step;
+  // Guarantee strict headroom: if min/max already sit exactly on a step
+  // multiple, push the boundary out by one more step so no point touches
+  // the rendered edge.
+  if (niceMin >= min) niceMin -= step;
+  if (niceMax <= max) niceMax += step;
+
+  const roundingDecimals = Math.max(0, -Math.floor(Math.log10(step)) + 2);
+  const round = (n: number) =>
+    Math.round(n * 10 ** roundingDecimals) / 10 ** roundingDecimals;
+
+  const ticks: number[] = [];
+  let current = niceMin;
+  let guard = 0;
+  while (current <= niceMax + step / 2 && guard < 1000) {
+    ticks.push(round(current));
+    current += step;
+    guard += 1;
+  }
+
+  const domain: [number, number] = [
+    ticks[0] ?? niceMin,
+    ticks[ticks.length - 1] ?? niceMax,
+  ];
+  return { domain, ticks };
+}
+
 function getBrasiliaParts(isoTimestamp: string): Record<string, string> {
   const date = new Date(isoTimestamp);
   const formatter = new Intl.DateTimeFormat("pt-BR", {
@@ -243,6 +308,39 @@ export function formatHistoryPointLabel(
     return formatBrasiliaTime(point.timestamp);
   }
   return formatIsoDateShort(point.date, period === "1Y");
+}
+
+export interface XAxisTickPlan {
+  value: string;
+  /** False for a repeated label (e.g. two 1D bulletins in the same minute) — render nothing. */
+  show: boolean;
+  /** "start"/"end" for the first/last category so the label never overflows past the chart edge. */
+  textAnchor: "start" | "middle" | "end";
+}
+
+/**
+ * Plans X-axis category tick rendering from the already-formatted labels:
+ * suppresses a label that repeats the previous visible one (keeps only the
+ * first occurrence), and anchors the first/last label inward so neither
+ * overflows the chart's left/right edge. Pure and presentation-only.
+ */
+export function planXAxisTicks(
+  labels: readonly string[],
+): XAxisTickPlan[] {
+  const seen = new Set<string>();
+  const lastIndex = labels.length - 1;
+  return labels.map((value, index) => {
+    const isRepeat = seen.has(value);
+    if (!isRepeat) seen.add(value);
+    // Only the LAST label is anchored away from center ("end", so it grows
+    // leftward and never overflows the right edge). The first label stays
+    // "middle" like every other tick — anchoring it "start" too made it grow
+    // rightward and collide with the next tick's label (visual review
+    // finding on the 1Y chart).
+    const textAnchor: XAxisTickPlan["textAnchor"] =
+      index === lastIndex ? "end" : "middle";
+    return { value, show: !isRepeat, textAnchor };
+  });
 }
 
 /** Formats "YYYY-MM" as "mmm/aa" in pt-BR (e.g. "2026-11" -> "nov/26"). */

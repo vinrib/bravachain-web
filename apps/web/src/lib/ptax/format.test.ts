@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  computeNiceYAxisTicks,
   computeYAxisDomain,
   formatBrasiliaDateTime,
   formatBrasiliaTime,
@@ -10,7 +11,9 @@ import {
   formatPtaxSignedDelta,
   formatYearMonthPtBr,
   normalizeCalculatorAmount,
+  planXAxisTicks,
 } from "./format";
+import historyUsd1D from "./__fixtures__/history-USD-1D.json";
 
 describe("ptax/format — pure string decimal rounding & pt-BR formatting", () => {
   it("rounds with exact ROUND_HALF_UP and carry propagation (no float drift)", () => {
@@ -130,5 +133,77 @@ describe("ptax/format — Y-axis visual domain padding", () => {
     const [lo, hi] = computeYAxisDomain([5.8889]);
     expect(lo).toBeLessThan(5.8889);
     expect(hi).toBeGreaterThan(5.8889);
+  });
+});
+
+describe("ptax/format — nice equidistant Y-axis ticks (real 1M/1Y/12-month data)", () => {
+  function expectEquidistantAndContaining(
+    values: readonly number[],
+    { domain, ticks }: { domain: [number, number]; ticks: number[] },
+  ) {
+    expect(ticks.length).toBeGreaterThanOrEqual(2);
+    const step = ticks[1]! - ticks[0]!;
+    expect(step).toBeGreaterThan(0);
+    for (let i = 1; i < ticks.length; i += 1) {
+      expect(ticks[i]! - ticks[i - 1]!).toBeCloseTo(step, 9);
+    }
+    expect(domain[0]).toBe(ticks[0]);
+    expect(domain[1]).toBe(ticks[ticks.length - 1]);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    expect(domain[0]).toBeLessThan(min);
+    expect(domain[1]).toBeGreaterThan(max);
+  }
+
+  it("1M USD real series (min 5.0377 / max 5.8889) stays equidistant and contains every point", () => {
+    const values = [5.0377, 5.530905, 5.8889, 5.037700, 5.888900]; // real stats from history-USD-1M.json
+    expectEquidistantAndContaining(values, computeNiceYAxisTicks(values));
+  });
+
+  it("1Y USD real series (min 4.8973 / max 5.8889) stays equidistant and contains every point", () => {
+    const values = [4.8973, 5.202776, 5.8889, 5.3948]; // real stats from history-USD-1Y.json
+    expectEquidistantAndContaining(values, computeNiceYAxisTicks(values));
+  });
+
+  it("12-month average USD real series (4.9837 .. 5.621277) stays equidistant and contains every bar", () => {
+    const values = [
+      5.453091, 5.338024, 5.200617, 5.231586, 5.033075, 4.9837, 5.127571,
+      5.113948, 5.153162, 5.144724, 5.1294, 5.621277,
+    ]; // real averages from monthly-average-USD.json
+    expectEquidistantAndContaining(values, computeNiceYAxisTicks(values));
+  });
+
+  it("never collapses a flat/single-value series", () => {
+    const { domain, ticks } = computeNiceYAxisTicks([5.8889]);
+    expect(ticks.length).toBeGreaterThanOrEqual(2);
+    expect(domain[0]).toBeLessThan(5.8889);
+    expect(domain[1]).toBeGreaterThan(5.8889);
+  });
+});
+
+describe("ptax/format — X-axis tick plan (real 1D duplicate-minute data)", () => {
+  it("suppresses the repeated hh:mm label from two bulletins issued in the same minute", () => {
+    const labels = historyUsd1D.points.map((p) => formatBrasiliaTime(p.timestamp));
+    // Real fixture: the Fechamento bulletin lands in the same BRT minute as the
+    // previous Intermediário one, so the last two labels are identical.
+    expect(labels).toEqual(["10:11", "11:11", "12:11", "13:04", "13:04"]);
+
+    const plan = planXAxisTicks(labels);
+    expect(plan.map((p) => p.show)).toEqual([true, true, true, true, false]);
+  });
+
+  it("anchors only the last label to end (so it never overflows the right edge); every other label, including the first, stays centered", () => {
+    const plan = planXAxisTicks(["a", "b", "c", "d"]);
+    expect(plan.map((p) => p.textAnchor)).toEqual([
+      "middle",
+      "middle",
+      "middle",
+      "end",
+    ]);
+  });
+
+  it("a single label (both first and last) is anchored end", () => {
+    const plan = planXAxisTicks(["only"]);
+    expect(plan).toEqual([{ value: "only", show: true, textAnchor: "end" }]);
   });
 });

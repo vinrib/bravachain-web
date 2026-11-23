@@ -51,7 +51,7 @@ export const PTAX_COPY = {
       avg: "Média",
       open: "Abertura",
     },
-    referenceLineLabel: "Média",
+    referenceLineLabel: "Média do período",
     tooltip: {
       valueLabel: "Valor",
       bulletinTypeLabel: "Boletim",
@@ -78,6 +78,9 @@ export const PTAX_COPY = {
     partialBadge: "em andamento",
     businessDaysSuffix: " dias úteis",
     methodHeading: "Como é calculado",
+    methodDescription:
+      "Média aritmética simples dos valores diários da PTAX (venda): último boletim de fechamento de cada dia útil e, no dia corrente, o último boletim disponível, ainda provisório. Arredondada em 6 casas decimais. O valor considera todos os dias da janela, não a média das médias mensais.",
+    windowRangeSeparator: " – ",
     emptyTitle: "Sem histórico mensal",
     emptyDescription: "Não há meses disponíveis para cálculo da média.",
     ariaLabelPrefix: "Gráfico de barras da média mensal PTAX de ",
@@ -97,7 +100,7 @@ export const PTAX_COPY = {
     toLabel: "Para",
     swapAriaLabel: "Inverter moedas",
     resultLabel: "Resultado de referência",
-    rateLabel: "Referência aplicada",
+    rateLabel: "Cotação de referência usada no cálculo",
     bulletinTimePrefix: "Boletim de ",
     crossBadge: "Via BRL",
     invalidAmount:

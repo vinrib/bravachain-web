@@ -22,11 +22,13 @@ import {
 } from "@/lib/ptax/constants";
 import { PTAX_COPY } from "@/lib/ptax/copy";
 import {
-  computeYAxisDomain,
+  computeNiceYAxisTicks,
   formatBrasiliaDateTime,
   formatHistoryPointLabel,
   formatPtaxDecimal,
+  planXAxisTicks,
   toChartScaleNumber,
+  type XAxisTickPlan,
 } from "@/lib/ptax/format";
 import type { PtaxHistoryResponse, PtaxSeriesPoint } from "@/lib/ptax/types";
 import { cn } from "@/lib/utils";
@@ -89,7 +91,9 @@ export function PtaxHistoryChart({
   }));
 
   const numericValues = chartData.map((d) => d.scaleValue);
-  const yDomain = computeYAxisDomain(numericValues);
+  const { domain: yDomain, ticks: yTicks } =
+    computeNiceYAxisTicks(numericValues);
+  const xTickPlan = planXAxisTicks(chartData.map((d) => d.label));
   const avgScale =
     data?.stats.avg !== null && data?.stats.avg !== undefined
       ? toChartScaleNumber(data.stats.avg)
@@ -102,6 +106,43 @@ export function PtaxHistoryChart({
     data && points.length > 0 && data.stats.min && data.stats.max
       ? `${PTAX_COPY.chart.ariaLabelTemplate.prefix}${currency}${PTAX_COPY.chart.ariaLabelTemplate.period}${PTAX_COPY.periods.ariaLabels[period]}${PTAX_COPY.chart.ariaLabelTemplate.min}${formatPtaxDecimal(data.stats.min, 4)}${PTAX_COPY.chart.ariaLabelTemplate.max}${formatPtaxDecimal(data.stats.max, 4)}`
       : PTAX_COPY.chart.ariaLabelTemplate.noData;
+
+  const renderXAxisTick = (props: {
+    x?: string | number;
+    y?: string | number;
+    index?: number;
+    payload?: { value: string };
+  }) => {
+    const { x, y, index, payload } = props;
+    const numX = x === undefined ? undefined : Number(x);
+    const numY = y === undefined ? undefined : Number(y);
+    const plan: XAxisTickPlan | undefined =
+      index !== undefined ? xTickPlan[index] : undefined;
+    if (
+      numX === undefined ||
+      numY === undefined ||
+      !Number.isFinite(numX) ||
+      !Number.isFinite(numY) ||
+      !payload ||
+      !plan ||
+      !plan.show
+    ) {
+      return <g key={`x-tick-${index ?? 0}`} />;
+    }
+    return (
+      <text
+        key={`x-tick-${index}`}
+        x={numX}
+        y={numY + 16}
+        textAnchor={plan.textAnchor}
+        fontSize={11}
+        fill="var(--muted-foreground)"
+        fontFamily="var(--font-mono)"
+      >
+        {payload.value}
+      </text>
+    );
+  };
 
   const renderLastDot = (props: DotRenderProps) => {
     const { cx, cy, index, payload } = props;
@@ -228,7 +269,10 @@ export function PtaxHistoryChart({
               <AreaChart
                 key={`${currency}-${period}`}
                 data={chartData}
-                margin={{ top: 12, right: 16, left: 0, bottom: 4 }}
+                // Extra right margin so the end-anchored last X-axis label
+                // (e.g. "19/11/26" on 1Y) has room to render without being
+                // clipped by the chart's right edge.
+                margin={{ top: 12, right: 32, left: 4, bottom: 4 }}
               >
                 <defs>
                   <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
@@ -254,16 +298,13 @@ export function PtaxHistoryChart({
                   type="category"
                   minTickGap={28}
                   interval="preserveStartEnd"
-                  tick={{
-                    fontSize: 11,
-                    fill: "var(--muted-foreground)",
-                    fontFamily: "var(--font-mono)",
-                  }}
+                  tick={renderXAxisTick}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
                   domain={yDomain}
+                  ticks={yTicks}
                   width={68}
                   tickFormatter={(v: number) =>
                     formatPtaxDecimal(String(v), 4)
@@ -288,6 +329,14 @@ export function PtaxHistoryChart({
                       position: "insideTopRight",
                       fill: "var(--muted-foreground)",
                       fontSize: 10,
+                      // Halo so the label stays legible when it sits over the
+                      // area fill / curve instead of the empty background.
+                      style: {
+                        paintOrder: "stroke",
+                        stroke: "var(--card)",
+                        strokeWidth: 4,
+                        strokeLinejoin: "round",
+                      },
                     }}
                   />
                 )}
