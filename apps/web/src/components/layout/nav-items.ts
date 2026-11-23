@@ -62,6 +62,10 @@ export const navItems: NavItem[] = [
   ...(featureFlags.dashboard
     ? [{ href: "/financeiro", label: "Dashboard financeiro", icon: LineChart }]
     : []),
+  // Behind NEXT_PUBLIC_FEATURE_EMPRESA (default off).
+  ...(featureFlags.empresa
+    ? [{ href: "/empresa", label: "Empresa", icon: Building2 }]
+    : []),
   // Settings lives in the sidebar footer; also surfaced in the mobile "Mais" sheet.
   { href: "/configuracoes", label: "Configurações", icon: SettingsIcon },
 ];
@@ -88,11 +92,17 @@ export interface MobileNavLink {
  * Deliberately separate from `navItems` above — the sidebar keeps every flagged
  * route and its own labels; this bar is these four fixed slots only, labeled via
  * the `home.nav` locale namespace. Routes chosen per the task: Pagamentos →
- * `/saque` (Saque PIX) and Empresa → `/configuracoes` (there is no `/empresa`).
+ * `/saque` (Saque PIX) and Empresa → `/empresa` when `featureFlags.empresa` is
+ * on, falling back to `/configuracoes` while the flag is off.
  */
 export const mobileNavLinks: MobileNavLink[] = [
   { key: "home", href: "/", labelKey: "home", icon: HomeIcon },
   { key: "pagamentos", href: "/saque", labelKey: "pagamentos", icon: CircleArrowDown },
   { key: "extrato", href: "/extrato", labelKey: "extrato", icon: StatementIcon },
-  { key: "empresa", href: "/configuracoes", labelKey: "empresa", icon: Building2 },
+  {
+    key: "empresa",
+    href: featureFlags.empresa ? "/empresa" : "/configuracoes",
+    labelKey: "empresa",
+    icon: Building2,
+  },
 ];

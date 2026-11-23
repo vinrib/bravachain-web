@@ -37,6 +37,8 @@ export const featureFlags = {
   cotacoesAlertas: process.env.NEXT_PUBLIC_FEATURE_COTACOES_ALERTAS === "true",
   /** "Depósito" (PIX deposit) section. */
   deposito: process.env.NEXT_PUBLIC_FEATURE_DEPOSITO === "true",
+  /** "Empresa" (cadastral data, PEP declaration, Avenia docs & limits). Default OFF. */
+  empresa: process.env.NEXT_PUBLIC_FEATURE_EMPRESA === "true",
   /**
    * "Enviar" (outbound remittance) section. Flag + `/enviar` routes land with
    * PR #37 (`feat/enviar`), not merged into this branch — so this is off here
