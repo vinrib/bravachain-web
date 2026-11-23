@@ -67,6 +67,8 @@ describe("PtaxCotacoesView — single aviso when a currency has no data", () => 
     expect(
       screen.getByRole("tablist", { name: /moeda/i }),
     ).toBeTruthy();
+    // Redundant "Moedas" grid card was removed from /cotacoes
+    expect(screen.queryByTestId("ptax-currency-grid")).toBeNull();
   });
 
   it("J: does not call fetchPtaxHistory when switching to a currency whose latest rate is null (currencyHasNoData)", async () => {
