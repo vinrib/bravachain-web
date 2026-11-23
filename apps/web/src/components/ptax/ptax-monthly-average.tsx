@@ -22,6 +22,7 @@ import {
   computeNiceYAxisTicks,
   formatPtaxDecimal,
   formatPtaxPercent,
+  formatYAxisTick,
   formatYearMonthPtBr,
   toChartScaleNumber,
 } from "@/lib/ptax/format";
@@ -53,14 +54,18 @@ export function PtaxMonthlyAverage({
   onRetry,
 }: PtaxMonthlyAverageProps) {
   const entries = data?.months ?? [];
-  const chartData: MonthlyBarDatum[] = entries.map((entry) => ({
-    label: formatYearMonthPtBr(entry.month),
-    scaleValue: toChartScaleNumber(entry.average),
-    entry,
-  }));
+  const chartData: MonthlyBarDatum[] = entries
+    .map((entry) => ({
+      label: formatYearMonthPtBr(entry.month),
+      scaleValue: toChartScaleNumber(entry.average),
+      entry,
+    }))
+    .filter((d) => Number.isFinite(d.scaleValue));
 
   const { domain: yDomain, ticks: yTicks } = computeNiceYAxisTicks(
     chartData.map((d) => d.scaleValue),
+    5,
+    2,
   );
   const partialEntry = entries.find((m) => m.isPartial) ?? null;
 
@@ -104,7 +109,10 @@ export function PtaxMonthlyAverage({
             <Skeleton className="h-[220px] w-full rounded-xl" />
           </div>
         ) : error ? (
-          <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-muted/20 p-6 text-center">
+          <div
+            role="alert"
+            className="flex flex-col items-center gap-3 rounded-xl border border-border bg-muted/20 p-6 text-center"
+          >
             <AlertCircle className="h-6 w-6 text-destructive" />
             <p className="text-xs text-muted-foreground">{error}</p>
             <Button
@@ -201,9 +209,7 @@ export function PtaxMonthlyAverage({
                     domain={yDomain}
                     ticks={yTicks}
                     width={58}
-                    tickFormatter={(v: number) =>
-                      formatPtaxDecimal(String(v), 2)
-                    }
+                    tickFormatter={(v: number) => formatYAxisTick(v, 2)}
                     tick={{
                       fontSize: 10,
                       fill: "var(--muted-foreground)",

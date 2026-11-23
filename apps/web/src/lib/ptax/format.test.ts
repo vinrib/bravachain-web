@@ -9,9 +9,11 @@ import {
   formatPtaxDecimal,
   formatPtaxPercent,
   formatPtaxSignedDelta,
+  formatYAxisTick,
   formatYearMonthPtBr,
   normalizeCalculatorAmount,
   planXAxisTicks,
+  toChartScaleNumber,
 } from "./format";
 import historyUsd1D from "./__fixtures__/history-USD-1D.json";
 
@@ -51,12 +53,48 @@ describe("ptax/format — pure string decimal rounding & pt-BR formatting", () =
 });
 
 describe("ptax/format — calculator input normalization", () => {
-  it("accepts pt-BR comma or dot up to 15 integer digits and 6 decimals", () => {
+  it("accepts pt-BR comma, thousands dots, R$ prefix, leading zeros, and dot decimals up to 15 integer digits and 6 decimals", () => {
     expect(normalizeCalculatorAmount("")).toEqual({ status: "empty" });
     expect(normalizeCalculatorAmount("   ")).toEqual({ status: "empty" });
     expect(normalizeCalculatorAmount("1000,50")).toEqual({
       status: "valid",
       normalized: "1000.50",
+    });
+    expect(normalizeCalculatorAmount("1.000,50")).toEqual({
+      status: "valid",
+      normalized: "1000.50",
+    });
+    expect(normalizeCalculatorAmount("10.000,00")).toEqual({
+      status: "valid",
+      normalized: "10000.00",
+    });
+    expect(normalizeCalculatorAmount("R$ 1.000,50")).toEqual({
+      status: "valid",
+      normalized: "1000.50",
+    });
+    expect(normalizeCalculatorAmount("0000000000000001")).toEqual({
+      status: "valid",
+      normalized: "1",
+    });
+    expect(normalizeCalculatorAmount("1.5")).toEqual({
+      status: "valid",
+      normalized: "1.5",
+    });
+    expect(normalizeCalculatorAmount("1,5")).toEqual({
+      status: "valid",
+      normalized: "1.5",
+    });
+    expect(normalizeCalculatorAmount("1.000")).toEqual({
+      status: "valid",
+      normalized: "1000",
+    });
+    expect(normalizeCalculatorAmount("1.500")).toEqual({
+      status: "valid",
+      normalized: "1500",
+    });
+    expect(normalizeCalculatorAmount("1.000.000")).toEqual({
+      status: "valid",
+      normalized: "1000000",
     });
     expect(normalizeCalculatorAmount("0,5")).toEqual({
       status: "valid",
@@ -68,14 +106,15 @@ describe("ptax/format — calculator input normalization", () => {
     });
   });
 
-  it("rejects zero, negative, scientific notation, multiple separators, and oversized inputs", () => {
+  it("rejects zero, negative, scientific notation, invalid grouping, multiple commas, and oversized inputs", () => {
     for (const bad of [
       "0",
       "0,000000",
       "-1",
       "+5",
       "1e3",
-      "1.000,50",
+      "1.00.0",
+      "1,000,5",
       "1,2,3",
       "1000000000000000", // 16 integer digits
       "1,1234567", // 7 fractional digits
@@ -175,9 +214,58 @@ describe("ptax/format — nice equidistant Y-axis ticks (real 1M/1Y/12-month dat
 
   it("never collapses a flat/single-value series", () => {
     const { domain, ticks } = computeNiceYAxisTicks([5.8889]);
-    expect(ticks.length).toBeGreaterThanOrEqual(2);
+    expect(ticks.length).toBeGreaterThanOrEqual(3);
+    expect(ticks.length).toBeLessThanOrEqual(5);
     expect(domain[0]).toBeLessThan(5.8889);
     expect(domain[1]).toBeGreaterThan(5.8889);
+    // Centered small proportional padding (never ±20-35% like [4, 6])
+    expect(domain[0]).toBeGreaterThan(5.5);
+    expect(domain[1]).toBeLessThan(6.2);
+  });
+
+  it("enforces min step, <= 8 ticks, finite bounds, no duplicate labels, and safe tickFormatter across extreme inputs", () => {
+    const cases: Array<{ name: string; values: number[]; decimals: number }> = [
+      { name: "tiny near zero", values: [1e-7, 2e-7], decimals: 4 },
+      { name: "huge 0..1e308", values: [0, 1e308], decimals: 4 },
+      { name: "overflow 1e308..1.7e308", values: [1e308, 1.7e308], decimals: 4 },
+      { name: "amp < 1e-4", values: [5.0, 5.00001], decimals: 4 },
+      { name: "1 point 5.8889", values: [5.8889], decimals: 4 },
+      { name: "constant 5.5", values: [5.5, 5.5], decimals: 4 },
+    ];
+
+    for (const c of cases) {
+      const { domain, ticks } = computeNiceYAxisTicks(c.values, 5, c.decimals);
+      expect(ticks.length, c.name).toBeGreaterThanOrEqual(2);
+      expect(ticks.length, c.name).toBeLessThanOrEqual(8);
+      expect(Number.isFinite(domain[0]), c.name).toBe(true);
+      expect(Number.isFinite(domain[1]), c.name).toBe(true);
+      expect(ticks.every(Number.isFinite), c.name).toBe(true);
+      const min = Math.min(...c.values);
+      const max = Math.max(...c.values);
+      expect(domain[0], c.name).toBeLessThanOrEqual(min);
+      expect(domain[1], c.name).toBeGreaterThanOrEqual(max);
+
+      const formatted = ticks.map((t) => formatYAxisTick(t, c.decimals));
+      for (const lbl of formatted) {
+        expect(lbl, c.name).not.toMatch(/e[+-]?\d+/i);
+      }
+      // Never duplicate formatted labels for practical PTAX ranges
+      if (max < 1e15) {
+        expect(new Set(formatted).size, c.name).toBe(formatted.length);
+      }
+    }
+
+    // Constant [5.5, 5.5]: 3..5 centered ticks, never [4, 6]
+    const constRes = computeNiceYAxisTicks([5.5, 5.5], 5, 4);
+    expect(constRes.ticks.length).toBeGreaterThanOrEqual(3);
+    expect(constRes.ticks.length).toBeLessThanOrEqual(5);
+    expect(constRes.domain[0]).toBeGreaterThan(5.2);
+    expect(constRes.domain[1]).toBeLessThan(5.8);
+
+    // toChartScaleNumber returns NaN for non-finite values (never 0)
+    expect(Number.isNaN(toChartScaleNumber("NaN"))).toBe(true);
+    expect(Number.isNaN(toChartScaleNumber("1e400"))).toBe(true);
+    expect(Number.isNaN(toChartScaleNumber("invalid"))).toBe(true);
   });
 });
 

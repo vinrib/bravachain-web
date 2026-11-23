@@ -7,9 +7,14 @@ import { PTAX_COPY } from "@/lib/ptax/copy";
 import type { PtaxHistoryResponse, PtaxLatestItem } from "@/lib/ptax/types";
 import { PtaxCalculator } from "./ptax-calculator";
 import { PtaxHeader } from "./ptax-header";
-import { PtaxHistoryChart } from "./ptax-history-chart";
+import {
+  PtaxHistoryChart,
+  renderPtaxXAxisTick,
+} from "./ptax-history-chart";
+import { planXAxisTicks } from "@/lib/ptax/format";
 import usd0423Fixture from "@/lib/ptax/__fixtures__/history-USD-1D-2025-04-23.json";
 import latestFixture from "@/lib/ptax/__fixtures__/latest.json";
+import convertUsdBrlFixture from "@/lib/ptax/__fixtures__/convert-USD-BRL-1000.json";
 
 // Minimal ResizeObserver mock for Recharts ResponsiveContainer in jsdom
 class ResizeObserverMock {
@@ -239,6 +244,159 @@ describe("PtaxCalculator flag & 404 feature_disabled auto-hide", () => {
         expect(screen.queryByTestId("ptax-calculator")).toBeNull();
       },
       { timeout: 2000 },
+    );
+  });
+
+  it("C: displays 'Valor considerado: 1.500,00 USD' for pt-BR input '1.500' and sets aria-live on result container", async () => {
+    vi.spyOn(ptaxApi, "fetchPtaxConvert").mockResolvedValue(
+      convertUsdBrlFixture as never,
+    );
+
+    render(<PtaxCalculator enabled={true} />);
+    const input = screen.getByLabelText(/Valor \(USD\)/i);
+    fireEvent.change(input, { target: { value: "1.500" } });
+
+    expect(screen.getByTestId("ptax-calculator-considered").textContent).toBe(
+      "Valor considerado: 1.500,00 USD",
+    );
+
+    const liveBox = screen.getByTestId("ptax-calculator-result-region");
+    expect(liveBox.getAttribute("aria-live")).toBe("polite");
+    expect(liveBox.getAttribute("aria-atomic")).toBe("true");
+  });
+});
+
+describe("Review fixes A, G, I — XAxis payload.index, refreshError preservation, and keyboard focus", () => {
+  it("A: renderPtaxXAxisTick looks up xTickPlan by payload.index and anchors last visible tick 'end' (or 'middle' when 1 tick)", () => {
+    // 1Y-like 248-point plan where Recharts filters down to 5 visible ticks (index 0..4, payload.index up to 247)
+    const labels1Y = Array.from({ length: 248 }, (_, i) => `d${i}`);
+    const plan1Y = planXAxisTicks(labels1Y);
+
+    const lastTick = renderPtaxXAxisTick(plan1Y, {
+      x: 400,
+      y: 260,
+      index: 4,
+      visibleTicksCount: 5,
+      payload: { value: "19/11/26", index: 247 },
+    });
+    const { container, rerender } = render(<svg>{lastTick}</svg>);
+    const textEl = container.querySelector("text");
+    expect(textEl?.getAttribute("text-anchor")).toBe("end");
+    expect(textEl?.textContent).toBe("19/11/26");
+
+    // Single visible tick (1-point chart) must be centered ("middle"), not "end"
+    const singlePlan = planXAxisTicks(["10:05"]);
+    rerender(
+      <svg>
+        {renderPtaxXAxisTick(singlePlan, {
+          x: 200,
+          y: 260,
+          index: 0,
+          visibleTicksCount: 1,
+          payload: { value: "10:05", index: 0 },
+        })}
+      </svg>,
+    );
+    expect(container.querySelector("text")?.getAttribute("text-anchor")).toBe(
+      "middle",
+    );
+
+    // 1D with duplicate minute at data index 4 (show=false), even when Recharts visible index is 2
+    const plan1D = planXAxisTicks(["10:11", "11:11", "12:11", "13:04", "13:04"]);
+    rerender(
+      <svg>
+        {renderPtaxXAxisTick(plan1D, {
+          x: 350,
+          y: 260,
+          index: 2,
+          visibleTicksCount: 3,
+          payload: { value: "13:04", index: 4 },
+        })}
+      </svg>,
+    );
+    expect(container.querySelector("text")).toBeNull();
+  });
+
+  it("G: PtaxHeader keeps displayed quote & timestamp when refreshError is set, showing discreet notice", () => {
+    render(
+      <PtaxHeader
+        currency="USD"
+        onSelectCurrency={vi.fn()}
+        rate={usdRate}
+        loading={false}
+        error={null}
+        refreshError="Não foi possível atualizar agora."
+        onRetry={vi.fn()}
+      />,
+    );
+    expect(screen.getByTestId("ptax-header-value").textContent).toBe("5,8889");
+    expect(screen.getByTestId("ptax-last-update").textContent).toContain(
+      PTAX_COPY.header.lastUpdateTimezone,
+    );
+    const notice = screen.getByTestId("ptax-refresh-error");
+    expect(notice.getAttribute("role")).toBe("alert");
+    expect(notice.textContent).toContain("Não foi possível atualizar agora.");
+    // Polled quote value MUST NOT have aria-live
+    expect(
+      screen.getByTestId("ptax-header-value").getAttribute("aria-live"),
+    ).toBeNull();
+  });
+
+  it("I: ArrowLeft/ArrowRight/Home/End move DOM focus on currency tabs and period tabs, and chart error has role=alert", () => {
+    const onCurrency = vi.fn();
+    const onPeriod = vi.fn();
+    render(
+      <>
+        <PtaxHeader
+          currency="USD"
+          onSelectCurrency={onCurrency}
+          rate={usdRate}
+          loading={false}
+          error={null}
+          onRetry={vi.fn()}
+        />
+        <PtaxHistoryChart
+          currency="USD"
+          period="1M"
+          onSelectPeriod={onPeriod}
+          data={null}
+          loading={false}
+          error={PTAX_COPY.errors.serverUnavailable}
+          onRetry={vi.fn()}
+        />
+      </>,
+    );
+
+    const usdTab = screen.getByRole("tab", { name: /USD/ });
+    const eurTab = screen.getByRole("tab", { name: /EUR/ });
+    usdTab.focus();
+    fireEvent.keyDown(usdTab, { key: "ArrowRight" });
+    expect(onCurrency).toHaveBeenCalledWith("EUR");
+    expect(document.activeElement).toBe(eurTab);
+    fireEvent.keyDown(eurTab, { key: "Home" });
+    expect(onCurrency).toHaveBeenCalledWith("USD");
+    expect(document.activeElement).toBe(usdTab);
+    fireEvent.keyDown(usdTab, { key: "End" });
+    expect(onCurrency).toHaveBeenCalledWith("EUR");
+    expect(document.activeElement).toBe(eurTab);
+
+    const tab1M = screen.getByRole("tab", { name: PTAX_COPY.periods.ariaLabels["1M"] });
+    const tab3M = screen.getByRole("tab", { name: PTAX_COPY.periods.ariaLabels["3M"] });
+    const tab1D = screen.getByRole("tab", { name: PTAX_COPY.periods.ariaLabels["1D"] });
+    const tab1Y = screen.getByRole("tab", { name: PTAX_COPY.periods.ariaLabels["1Y"] });
+    tab1M.focus();
+    fireEvent.keyDown(tab1M, { key: "ArrowRight" });
+    expect(onPeriod).toHaveBeenCalledWith("3M");
+    expect(document.activeElement).toBe(tab3M);
+    fireEvent.keyDown(tab3M, { key: "Home" });
+    expect(onPeriod).toHaveBeenCalledWith("1D");
+    expect(document.activeElement).toBe(tab1D);
+    fireEvent.keyDown(tab1D, { key: "End" });
+    expect(onPeriod).toHaveBeenCalledWith("1Y");
+    expect(document.activeElement).toBe(tab1Y);
+
+    expect(screen.getByTestId("ptax-chart-error").getAttribute("role")).toBe(
+      "alert",
     );
   });
 });

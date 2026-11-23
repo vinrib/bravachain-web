@@ -22,15 +22,20 @@ export function PtaxCotacoesView() {
   const [period, setPeriod] = useState<PtaxPeriod>("1M");
 
   const latest = usePtaxLatest();
-  const history = usePtaxHistory(currency, period, featureFlags.cotacoesChart);
-  const monthly = usePtaxMonthlyAverage(currency);
-
   const selectedRate = latest.data?.rates[currency] ?? null;
   // Once the header has definitively shown its own "sem dados" notice, a
   // period selector and a second empty chart box underneath it would be a
-  // redundant second warning for the exact same condition — show one aviso.
+  // redundant second warning for the exact same condition — show one aviso,
+  // and skip fetching `/v1/ptax/history` for that currency altogether.
   const currencyHasNoData =
     !latest.loading && !latest.error && !selectedRate;
+
+  const history = usePtaxHistory(
+    currency,
+    period,
+    featureFlags.cotacoesChart && !currencyHasNoData,
+  );
+  const monthly = usePtaxMonthlyAverage(currency);
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
@@ -54,6 +59,7 @@ export function PtaxCotacoesView() {
               rate={selectedRate}
               loading={latest.loading}
               error={latest.error}
+              refreshError={latest.refreshError}
               onRetry={latest.reload}
             />
 

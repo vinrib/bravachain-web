@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, type KeyboardEvent } from "react";
+import { useId, useRef, type KeyboardEvent } from "react";
 import {
   Area,
   AreaChart,
@@ -26,6 +26,7 @@ import {
   formatBrasiliaDateTime,
   formatHistoryPointLabel,
   formatPtaxDecimal,
+  formatYAxisTick,
   planXAxisTicks,
   toChartScaleNumber,
   type XAxisTickPlan,
@@ -56,6 +57,76 @@ interface DotRenderProps {
   payload?: ChartDatum;
 }
 
+export interface PtaxXAxisTickProps {
+  x?: string | number;
+  y?: string | number;
+  index?: number;
+  visibleTicksCount?: number;
+  payload?: { value: string; index?: number };
+}
+
+/**
+ * Custom X-axis tick renderer for Recharts v3:
+ * - Looks up `xTickPlan` by `payload.index` (the point index in `chartData`),
+ *   NOT by `props.index` (which Recharts v3 sets to the filtered visible tick index).
+ * - Anchors the last visible tick (`index === visibleTicksCount - 1`) to "end",
+ *   and keeps single-tick axes centered ("middle").
+ */
+export function renderPtaxXAxisTick(
+  xTickPlan: readonly XAxisTickPlan[],
+  props: PtaxXAxisTickProps,
+) {
+  const { x, y, index, visibleTicksCount, payload } = props;
+  const numX = x === undefined ? undefined : Number(x);
+  const numY = y === undefined ? undefined : Number(y);
+  const dataIndex = payload?.index ?? index;
+  const plan: XAxisTickPlan | undefined =
+    dataIndex !== undefined ? xTickPlan[dataIndex] : undefined;
+
+  if (
+    numX === undefined ||
+    numY === undefined ||
+    !Number.isFinite(numX) ||
+    !Number.isFinite(numY) ||
+    !payload ||
+    !plan ||
+    !plan.show
+  ) {
+    return <g key={`x-tick-${dataIndex ?? index ?? 0}`} />;
+  }
+
+  let textAnchor: "middle" | "end";
+  if (visibleTicksCount !== undefined) {
+    textAnchor =
+      visibleTicksCount <= 1
+        ? "middle"
+        : index === visibleTicksCount - 1
+          ? "end"
+          : "middle";
+  } else {
+    textAnchor =
+      xTickPlan.length <= 1
+        ? "middle"
+        : dataIndex === xTickPlan.length - 1
+          ? "end"
+          : "middle";
+  }
+
+  return (
+    <text
+      key={`x-tick-${dataIndex ?? index ?? 0}`}
+      x={numX}
+      y={numY + 16}
+      textAnchor={textAnchor}
+      fontSize={11}
+      fill="var(--muted-foreground)"
+      fontFamily="var(--font-mono)"
+    >
+      {payload.value}
+    </text>
+  );
+}
+
 export function PtaxHistoryChart({
   currency,
   period,
@@ -67,82 +138,64 @@ export function PtaxHistoryChart({
 }: PtaxHistoryChartProps) {
   const rawId = useId();
   const gradientId = `ptax-area-${rawId.replace(/[^a-zA-Z0-9_-]/g, "")}`;
+  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   const handlePeriodKeyDown = (
     e: KeyboardEvent<HTMLButtonElement>,
     idx: number,
   ) => {
-    if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+    let next: number | null = null;
+    if (e.key === "ArrowRight") {
+      next = (idx + 1) % PTAX_PERIODS.length;
+    } else if (e.key === "ArrowLeft") {
+      next = (idx - 1 + PTAX_PERIODS.length) % PTAX_PERIODS.length;
+    } else if (e.key === "Home") {
+      next = 0;
+    } else if (e.key === "End") {
+      next = PTAX_PERIODS.length - 1;
+    }
+    if (next !== null) {
       e.preventDefault();
-      const delta = e.key === "ArrowRight" ? 1 : -1;
-      const next = (idx + delta + PTAX_PERIODS.length) % PTAX_PERIODS.length;
       const nextPeriod = PTAX_PERIODS[next];
       if (nextPeriod) {
         onSelectPeriod(nextPeriod);
+        tabRefs.current[next]?.focus();
       }
     }
   };
 
   const points = data?.points ?? [];
-  const chartData: ChartDatum[] = points.map((point) => ({
-    label: formatHistoryPointLabel(point, period),
-    scaleValue: toChartScaleNumber(point.value),
-    point,
-  }));
+  const chartData: ChartDatum[] = points
+    .map((point) => ({
+      label: formatHistoryPointLabel(point, period),
+      scaleValue: toChartScaleNumber(point.value),
+      point,
+    }))
+    .filter((d) => Number.isFinite(d.scaleValue));
 
   const numericValues = chartData.map((d) => d.scaleValue);
-  const { domain: yDomain, ticks: yTicks } =
-    computeNiceYAxisTicks(numericValues);
+  const { domain: yDomain, ticks: yTicks } = computeNiceYAxisTicks(
+    numericValues,
+    5,
+    4,
+  );
   const xTickPlan = planXAxisTicks(chartData.map((d) => d.label));
-  const avgScale =
+  const rawAvgScale =
     data?.stats.avg !== null && data?.stats.avg !== undefined
       ? toChartScaleNumber(data.stats.avg)
-      : null;
+      : Number.NaN;
+  const avgScale = Number.isFinite(rawAvgScale) ? rawAvgScale : null;
 
-  const isSinglePoint = points.length === 1;
+  const isSinglePoint = chartData.length === 1;
   const lastIndex = chartData.length - 1;
 
   const chartAriaLabel =
-    data && points.length > 0 && data.stats.min && data.stats.max
+    data && chartData.length > 0 && data.stats.min && data.stats.max
       ? `${PTAX_COPY.chart.ariaLabelTemplate.prefix}${currency}${PTAX_COPY.chart.ariaLabelTemplate.period}${PTAX_COPY.periods.ariaLabels[period]}${PTAX_COPY.chart.ariaLabelTemplate.min}${formatPtaxDecimal(data.stats.min, 4)}${PTAX_COPY.chart.ariaLabelTemplate.max}${formatPtaxDecimal(data.stats.max, 4)}`
       : PTAX_COPY.chart.ariaLabelTemplate.noData;
 
-  const renderXAxisTick = (props: {
-    x?: string | number;
-    y?: string | number;
-    index?: number;
-    payload?: { value: string };
-  }) => {
-    const { x, y, index, payload } = props;
-    const numX = x === undefined ? undefined : Number(x);
-    const numY = y === undefined ? undefined : Number(y);
-    const plan: XAxisTickPlan | undefined =
-      index !== undefined ? xTickPlan[index] : undefined;
-    if (
-      numX === undefined ||
-      numY === undefined ||
-      !Number.isFinite(numX) ||
-      !Number.isFinite(numY) ||
-      !payload ||
-      !plan ||
-      !plan.show
-    ) {
-      return <g key={`x-tick-${index ?? 0}`} />;
-    }
-    return (
-      <text
-        key={`x-tick-${index}`}
-        x={numX}
-        y={numY + 16}
-        textAnchor={plan.textAnchor}
-        fontSize={11}
-        fill="var(--muted-foreground)"
-        fontFamily="var(--font-mono)"
-      >
-        {payload.value}
-      </text>
-    );
-  };
+  const renderXAxisTick = (props: PtaxXAxisTickProps) =>
+    renderPtaxXAxisTick(xTickPlan, props);
 
   const renderLastDot = (props: DotRenderProps) => {
     const { cx, cy, index, payload } = props;
@@ -202,6 +255,9 @@ export function PtaxHistoryChart({
           return (
             <button
               key={p}
+              ref={(el) => {
+                tabRefs.current[idx] = el;
+              }}
               type="button"
               role="tab"
               aria-selected={active}
@@ -232,6 +288,7 @@ export function PtaxHistoryChart({
         </div>
       ) : error ? (
         <div
+          role="alert"
           data-testid="ptax-chart-error"
           className="flex h-[300px] w-full min-w-0 flex-col items-center justify-center gap-3 rounded-xl border border-border bg-muted/20 p-6 text-center"
         >
@@ -247,7 +304,7 @@ export function PtaxHistoryChart({
             {PTAX_COPY.errors.retry}
           </Button>
         </div>
-      ) : points.length === 0 ? (
+      ) : chartData.length === 0 ? (
         <div
           data-testid="ptax-chart-empty"
           className="flex h-[300px] w-full min-w-0 items-center justify-center"
@@ -306,9 +363,7 @@ export function PtaxHistoryChart({
                   domain={yDomain}
                   ticks={yTicks}
                   width={68}
-                  tickFormatter={(v: number) =>
-                    formatPtaxDecimal(String(v), 4)
-                  }
+                  tickFormatter={(v: number) => formatYAxisTick(v, 4)}
                   tick={{
                     fontSize: 11,
                     fill: "var(--muted-foreground)",

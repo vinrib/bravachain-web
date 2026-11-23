@@ -1,6 +1,6 @@
 "use client";
 
-import type { KeyboardEvent } from "react";
+import { useRef, type KeyboardEvent } from "react";
 import { AlertTriangle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { CurrencyFlag } from "@/components/ui/flags";
@@ -27,6 +27,7 @@ interface PtaxHeaderProps {
   rate: PtaxLatestItem | null;
   loading: boolean;
   error: string | null;
+  refreshError?: string | null;
   onRetry: () => void;
 }
 
@@ -36,20 +37,32 @@ export function PtaxHeader({
   rate,
   loading,
   error,
+  refreshError = null,
   onRetry,
 }: PtaxHeaderProps) {
+  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
+
   const handleTabKeyDown = (
     e: KeyboardEvent<HTMLButtonElement>,
     idx: number,
   ) => {
-    if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+    let next: number | null = null;
+    if (e.key === "ArrowRight") {
+      next = (idx + 1) % PTAX_UI_CURRENCIES.length;
+    } else if (e.key === "ArrowLeft") {
+      next =
+        (idx - 1 + PTAX_UI_CURRENCIES.length) % PTAX_UI_CURRENCIES.length;
+    } else if (e.key === "Home") {
+      next = 0;
+    } else if (e.key === "End") {
+      next = PTAX_UI_CURRENCIES.length - 1;
+    }
+    if (next !== null) {
       e.preventDefault();
-      const delta = e.key === "ArrowRight" ? 1 : -1;
-      const next =
-        (idx + delta + PTAX_UI_CURRENCIES.length) % PTAX_UI_CURRENCIES.length;
       const nextCurrency = PTAX_UI_CURRENCIES[next];
       if (nextCurrency) {
         onSelectCurrency(nextCurrency);
+        tabRefs.current[next]?.focus();
       }
     }
   };
@@ -69,6 +82,9 @@ export function PtaxHeader({
             return (
               <button
                 key={code}
+                ref={(el) => {
+                  tabRefs.current[idx] = el;
+                }}
                 type="button"
                 role="tab"
                 aria-selected={active}
@@ -100,12 +116,12 @@ export function PtaxHeader({
       </div>
 
       {/* Main value + delta + metadata */}
-      {loading ? (
+      {loading && !rate ? (
         <div className="space-y-3 py-2" data-testid="ptax-header-loading">
           <Skeleton className="h-11 w-48" />
           <Skeleton className="h-4 w-64" />
         </div>
-      ) : error ? (
+      ) : error && !rate ? (
         <ErrorState message={error} onRetry={onRetry} />
       ) : !rate ? (
         <EmptyState
@@ -171,6 +187,17 @@ export function PtaxHeader({
             >
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
               <span>{PTAX_COPY.header.staleNotice}</span>
+            </div>
+          )}
+
+          {refreshError && (
+            <div
+              role="alert"
+              data-testid="ptax-refresh-error"
+              className="flex items-center gap-2 rounded-xl border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground"
+            >
+              <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-warning" />
+              <span>{refreshError}</span>
             </div>
           )}
 

@@ -20,6 +20,7 @@ export const PTAX_COPY = {
     provisionalBadge: "Valor parcial do dia",
     staleNotice:
       "Sem boletim oficial nos últimos dias úteis. Exibindo o último boletim registrado.",
+    refreshErrorNotice: "Não foi possível atualizar agora.",
     previousClosePrefix: "Fechamento anterior: R$ ",
     buyLabel: "Compra",
     sellLabel: "Venda",
@@ -96,6 +97,7 @@ export const PTAX_COPY = {
     subtitle: "Simulação informativa utilizando o último boletim oficial PTAX.",
     amountLabel: "Valor",
     amountPlaceholder: "1000,00",
+    consideredAmountLabel: "Valor considerado",
     fromLabel: "De",
     toLabel: "Para",
     swapAriaLabel: "Inverter moedas",
