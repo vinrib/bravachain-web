@@ -264,6 +264,50 @@ describe("PtaxCalculator flag & 404 feature_disabled auto-hide", () => {
     expect(liveBox.getAttribute("aria-live")).toBe("polite");
     expect(liveBox.getAttribute("aria-atomic")).toBe("true");
   });
+
+  it("flips direction with the seam arrow and expands the slab picker with auto-swap and Escape close", async () => {
+    vi.spyOn(ptaxApi, "fetchPtaxConvert").mockResolvedValue(
+      convertUsdBrlFixture as never,
+    );
+
+    render(<PtaxCalculator enabled={true} />);
+
+    // Initial state: slab 0 is USD (origin), slab 1 is BRL (target)
+    expect(
+      screen.getByTestId("ptax-swap-slab-0").getAttribute("data-role"),
+    ).toBe("origin");
+    expect(
+      screen.getByTestId("ptax-swap-slab-1").getAttribute("data-role"),
+    ).toBe("target");
+
+    // Flip direction via seam arrow: slabs stay in place, roles reverse (slab 1 BRL becomes origin)
+    fireEvent.click(screen.getByTestId("ptax-swap-direction"));
+    expect(
+      screen.getByTestId("ptax-swap-slab-0").getAttribute("data-role"),
+    ).toBe("target");
+    expect(
+      screen.getByTestId("ptax-swap-slab-1").getAttribute("data-role"),
+    ).toBe("origin");
+    expect(screen.getByLabelText(/Valor \(BRL\)/i)).toBeTruthy();
+
+    // Open slab 0 currency picker and pick BRL (already on slab 1) -> auto-swaps slab 0=BRL, slab 1=USD
+    fireEvent.click(screen.getByTestId("ptax-currency-pill-0"));
+    expect(screen.getByTestId("ptax-currency-picker")).toBeTruthy();
+    fireEvent.click(screen.getByTestId("ptax-picker-option-BRL"));
+    expect(screen.getByTestId("ptax-currency-pill-0").textContent).toContain("BRL");
+    expect(screen.getByTestId("ptax-currency-pill-1").textContent).toContain("USD");
+    await waitFor(() => {
+      expect(screen.queryByTestId("ptax-currency-picker")).toBeNull();
+    });
+
+    // Open picker again on slab 1 and close with Escape
+    fireEvent.click(screen.getByTestId("ptax-currency-pill-1"));
+    expect(screen.getByTestId("ptax-currency-picker")).toBeTruthy();
+    fireEvent.keyDown(window, { key: "Escape" });
+    await waitFor(() => {
+      expect(screen.queryByTestId("ptax-currency-picker")).toBeNull();
+    });
+  });
 });
 
 describe("Review fixes A, G, I — XAxis payload.index, refreshError preservation, and keyboard focus", () => {

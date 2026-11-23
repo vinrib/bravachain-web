@@ -12,7 +12,6 @@ import {
   usePtaxMonthlyAverage,
 } from "@/lib/ptax/hooks";
 import { PtaxCalculator } from "./ptax-calculator";
-import { PtaxCurrencyGrid } from "./ptax-currency-grid";
 import { PtaxHeader } from "./ptax-header";
 import { PtaxHistoryChart } from "./ptax-history-chart";
 import { PtaxMonthlyAverage } from "./ptax-monthly-average";
@@ -88,29 +87,12 @@ export function PtaxCotacoesView() {
         </div>
       </div>
 
-      {/* Bottom row: Reference Calculator (flag-gated) + Currency Grid */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {featureFlags.cotacoesCalculadora && (
-          <div className="min-w-0">
-            <PtaxCalculator enabled={featureFlags.cotacoesCalculadora} />
-          </div>
-        )}
-
-        <div
-          className={
-            featureFlags.cotacoesCalculadora
-              ? "min-w-0 lg:col-span-2"
-              : "min-w-0 lg:col-span-3"
-          }
-        >
-          <PtaxCurrencyGrid
-            selectedCurrency={currency}
-            onSelectCurrency={setCurrency}
-            latest={latest.data}
-            loading={latest.loading}
-          />
+      {/* Bottom row: Reference Calculator (flag-gated, auto-hides on API 404) */}
+      {featureFlags.cotacoesCalculadora && (
+        <div className="min-w-0">
+          <PtaxCalculator enabled={featureFlags.cotacoesCalculadora} />
         </div>
-      </div>
+      )}
 
       {/* Legacy alerts component kept strictly behind cotacoesAlertas (default OFF) */}
       {featureFlags.cotacoesAlertas && (
