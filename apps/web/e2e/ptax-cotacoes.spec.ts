@@ -145,25 +145,30 @@ const PERIOD_ARIA: Record<string, string> = {
   "1Y": "1 ano",
 };
 
-for (const width of [390, 1280]) {
-  test(`renders valid non-empty SVG path across 5 periods x 2 currencies at ${width}px`, async ({
-    page,
-  }) => {
-    await page.setViewportSize({ width, height: 900 });
-    await mockPtaxBackend(page);
-    await page.goto("/cotacoes", { waitUntil: "networkidle" });
+for (const width of [390, 1280] as const) {
+  for (const currency of ["USD", "EUR"] as const) {
+    for (const period of ["1D", "1W", "1M", "3M", "1Y"] as const) {
+      test(`renders valid non-empty SVG path for ${currency} ${period} at ${width}px`, async ({
+        page,
+      }) => {
+        await page.setViewportSize({ width, height: 900 });
+        await mockPtaxBackend(page);
+        await page.goto("/cotacoes", { waitUntil: "networkidle" });
 
-    // Skip gracefully only if route is intentionally 404 when feature flags are off
-    const headerVal = page.getByTestId("ptax-header-value");
-    await expect(headerVal).toBeVisible();
+        const headerVal = page.getByTestId("ptax-header-value");
+        await expect(headerVal).toBeVisible();
 
-    for (const currency of ["USD", "EUR"] as const) {
-      await page.getByRole("tab", { name: new RegExp(`^${currency}`) }).click();
+        if (currency !== "USD") {
+          await page
+            .getByRole("tab", { name: new RegExp(`^${currency}`) })
+            .click();
+        }
 
-      for (const period of ["1D", "1W", "1M", "3M", "1Y"] as const) {
-        await page
-          .getByRole("tab", { name: PERIOD_ARIA[period], exact: true })
-          .click();
+        if (period !== "1M") {
+          await page
+            .getByRole("tab", { name: PERIOD_ARIA[period], exact: true })
+            .click();
+        }
 
         const container = page.getByTestId("ptax-chart-container");
         await expect(container).toBeVisible();
@@ -183,9 +188,9 @@ for (const width of [390, 1280]) {
             });
           })
           .toBe(true);
-      }
+      });
     }
-  });
+  }
 }
 
 test("hides calculator automatically on 404 feature_disabled and renders explicit empty, error, and 1-point states", async ({
