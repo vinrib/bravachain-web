@@ -143,6 +143,16 @@ export const endpoints = {
   onboarding: {
     /** GET (OnboardingController) -> KYB status + documents sent/pending. */
     status: "/v1/onboarding/status",
+    /** POST multipart (`file`, PDF/JPEG/PNG up to 10 MB) -> { documentId, type, fileName, fileSizeKb }. */
+    uploadDocument: (type: string) =>
+      `/v1/onboarding/documents/${encodeURIComponent(type)}`,
+  },
+  /**
+   * Read-only Avenia sub-account operational limits (GET /v1/limits).
+   * Requires Bearer + approved KYB. Bravachain never defines or enforces limits.
+   */
+  limits: {
+    root: "/v1/limits",
   },
   receive: {
     /** GET (Bearer + KYB) -> { accounts: DedicatedAccount[], pendingCurrencies } */
