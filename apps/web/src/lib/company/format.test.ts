@@ -3,6 +3,7 @@ import {
   computeLimitUsagePercent,
   formatCnpj,
   formatCompanyDateBr,
+  formatCompanyDayMonthBr,
   formatLimitAmountPtBr,
   maskCpf,
 } from "./format";
@@ -31,6 +32,13 @@ describe("company formatters", () => {
     // 2026-10-15T01:30:00Z is 2026-10-14 22:30 in America/Sao_Paulo (-03:00)
     expect(formatCompanyDateBr("2026-10-15T01:30:00.000Z")).toBe("14/10/2026");
     expect(formatCompanyDateBr("2026-10-15T15:00:00.000Z")).toBe("15/10/2026");
+  });
+
+  it("formats dd/mm strictly in America/Sao_Paulo regardless of host TZ", () => {
+    expect(formatCompanyDayMonthBr("2026-10-12")).toBe("12/10");
+    expect(formatCompanyDayMonthBr("2026-10-15T01:30:00.000Z")).toBe("14/10");
+    expect(formatCompanyDayMonthBr("2026-10-15T15:00:00.000Z")).toBe("15/10");
+    expect(formatCompanyDayMonthBr("invalid")).toBe("");
   });
 
   it("masks 11-digit CPFs and preserves already masked CPFs", () => {

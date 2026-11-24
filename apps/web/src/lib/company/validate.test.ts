@@ -1,19 +1,24 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import * as clientApi from "@/lib/client-api";
+import { uploadCompanyDocument } from "./api";
 import { COMPANY_DOC_MAX_BYTES } from "./constants";
 import { COMPANY_COPY } from "./copy";
 import {
-  buildCompanyDocuments,
-  buildCompanyLimits,
-  resolveAveniaStatus,
-} from "./fallback-adapter";
-import {
+  mapCompanyDocuments,
+  mapCompanyLimits,
+  mapCompanyProfile,
   parseLimitsResponse,
   parseOnboardingStatus,
+  resolveAveniaStatus,
   validateCompanyDocumentFile,
 } from "./validate";
 
-describe("company parsers & file validation", () => {
-  it("parses valid GET /v1/onboarding/status payload", () => {
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
+describe("company parsers, mappers & upload validation", () => {
+  it("parses valid GET /v1/onboarding/status payload and derives real status without per-document approval", () => {
     const parsed = parseOnboardingStatus({
       kybStatus: "APPROVED",
       kybSubmittedAt: "2026-10-12T14:00:00Z",
@@ -40,11 +45,22 @@ describe("company parsers & file validation", () => {
       label: "Aprovado pela Avenia",
     });
 
-    const docs = buildCompanyDocuments(parsed);
+    const docs = mapCompanyDocuments(parsed);
+    expect(docs).toHaveLength(2);
     const contrato = docs.find((d) => d.apiType === "CONTRATO_SOCIAL");
     const faturamento = docs.find((d) => d.apiType === "FATURAMENTO");
-    expect(contrato?.status).toBe("Aprovado pela Avenia");
-    expect(faturamento?.status).toBe("Pendente de envio");
+    expect(contrato?.kind).toBe("uploaded");
+    expect(contrato?.statusLabel).toBe("Enviado em 12/10");
+    expect(faturamento?.kind).toBe("pending");
+    expect(faturamento?.statusLabel).toBe("Pendente de envio");
+  });
+
+  it("never assumes approved when onboarding is null and returns zero documents", () => {
+    expect(resolveAveniaStatus(null)).toEqual({
+      kind: "unavailable",
+      label: "Status indisponível no momento",
+    });
+    expect(mapCompanyDocuments(null)).toEqual([]);
   });
 
   it("never marks uploaded documents as approved when kybStatus is SUBMITTED", () => {
@@ -65,12 +81,12 @@ describe("company parsers & file validation", () => {
       missingDocuments: [],
     });
 
-    const docs = buildCompanyDocuments(parsed);
-    const contrato = docs.find((d) => d.apiType === "CONTRATO_SOCIAL");
-    expect(contrato?.status).toBe("Enviado — em análise pela Avenia");
+    const docs = mapCompanyDocuments(parsed);
+    expect(docs).toHaveLength(1);
+    expect(docs[0]?.statusLabel).toBe("Enviado em 12/10");
   });
 
-  it("parses GET /v1/limits and maps real Avenia limits with hybrid fallback", () => {
+  it("parses GET /v1/limits and returns ONLY real currencies with data (zero fictional rows)", () => {
     const parsed = parseLimitsResponse({
       avenia: {
         blocked: false,
@@ -95,18 +111,90 @@ describe("company parsers & file validation", () => {
       pixWithdrawal: null,
     });
 
-    const rows = buildCompanyLimits(parsed);
-    expect(rows.map((r) => r.label)).toEqual([
-      "Global (USD)",
-      "BRL",
-      "USD",
-      "EUR",
-    ]);
+    const rows = mapCompanyLimits(parsed);
+    expect(rows.map((r) => r.label)).toEqual(["Global (USD)", "BRL"]);
     expect(rows[0]?.entry).toEqual({ used: 100000, max: 500000, unit: "USD" });
     expect(rows[1]?.exit).toEqual({ used: 25000, max: 300000, unit: "BRL" });
-    // Missing USD/EUR rows fall back cleanly via hybrid adapter
-    expect(rows[2]?.entry.max).toBeGreaterThan(0);
-    expect(rows[3]?.entry.max).toBeGreaterThan(0);
+    expect(mapCompanyLimits(null)).toEqual([]);
+  });
+
+  it("maps profile strictly from real endpoints without inventing missing fields", () => {
+    expect(
+      mapCompanyProfile({ me: null, branding: null, onboarding: null }),
+    ).toBeNull();
+
+    const profile = mapCompanyProfile({
+      me: {
+        id: "u1",
+        email: "real@empresa.com.br",
+        name: "Empresa Real",
+        kycStatus: "PENDING",
+        companyName: null,
+        companyCnpj: null,
+        companyCnae: null,
+      },
+      branding: null,
+      onboarding: null,
+    });
+
+    expect(profile).toEqual({
+      displayName: "Empresa Real",
+      legalName: null,
+      cnpj: null,
+      cnae: null,
+      email: "real@empresa.com.br",
+      aveniaStatusKind: "unavailable",
+      aveniaStatusLabel: "Status indisponível no momento",
+    });
+  });
+
+  it("rejects uploads for unmapped document types and uses real POST response body for mapped types", async () => {
+    const pdf = new File(["%PDF-1.4"], "doc.pdf", { type: "application/pdf" });
+
+    await expect(
+      uploadCompanyDocument(
+        {
+          id: "CUSTOM_DOC",
+          apiType: null,
+          name: "Custom doc",
+          category: "Cadastro societário",
+          fileName: null,
+          uploadedAtLabel: null,
+          uploadedDayMonthLabel: null,
+          kind: "pending",
+          statusLabel: "Pendente de envio",
+        },
+        pdf,
+      ),
+    ).rejects.toThrow(/Upload não suportado/);
+
+    vi.spyOn(clientApi, "apiFetch").mockResolvedValueOnce({
+      documentId: "real-doc-id-99",
+      type: "FATURAMENTO",
+      fileName: "FATURAMENTO_1700000.pdf",
+      fileSizeKb: 42,
+      uploadedAt: "2026-10-15T01:30:00.000Z",
+    });
+
+    const uploaded = await uploadCompanyDocument(
+      {
+        id: "FATURAMENTO",
+        apiType: "FATURAMENTO",
+        name: "Balanço Patrimonial / DRE (Último Exercício)",
+        category: "Demonstrações financeiras",
+        fileName: null,
+        uploadedAtLabel: null,
+        uploadedDayMonthLabel: null,
+        kind: "pending",
+        statusLabel: "Pendente de envio",
+      },
+      pdf,
+    );
+
+    expect(uploaded.id).toBe("real-doc-id-99");
+    expect(uploaded.fileName).toBe("FATURAMENTO_1700000.pdf");
+    expect(uploaded.kind).toBe("uploaded");
+    expect(uploaded.statusLabel).toBe("Enviado em 14/10");
   });
 
   it("validates upload MIME type and 10MB max size", () => {

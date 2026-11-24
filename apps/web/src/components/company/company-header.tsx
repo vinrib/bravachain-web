@@ -17,6 +17,7 @@ const STATUS_BADGE_CLASSES: Record<AveniaStatusKind, string> = {
   approved: "bg-success/10 text-success ring-1 ring-inset ring-success/25",
   in_analysis: "bg-warning/10 text-warning ring-1 ring-inset ring-warning/25",
   pending: "bg-muted text-foreground ring-1 ring-inset ring-border",
+  unavailable: "bg-muted text-muted-foreground ring-1 ring-inset ring-border",
 };
 
 export function CompanyHeader({
@@ -26,6 +27,11 @@ export function CompanyHeader({
   onSelectTab,
   pendingCount,
 }: CompanyHeaderProps) {
+  const badgeText =
+    aveniaStatusKind === "unavailable"
+      ? aveniaStatusLabel
+      : `${COMPANY_COPY.page.aveniaStatusPrefix} ${aveniaStatusLabel}`;
+
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -45,7 +51,7 @@ export function CompanyHeader({
             STATUS_BADGE_CLASSES[aveniaStatusKind],
           )}
         >
-          {COMPANY_COPY.page.aveniaStatusPrefix} {aveniaStatusLabel}
+          {badgeText}
         </span>
       </div>
 

@@ -34,7 +34,8 @@ export function useCompanyData(): UseCompanyDataResult {
   const [reloadNonce, setReloadNonce] = useState(0);
   const [uploadingDocId, setUploadingDocId] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [pepDeclarationAccepted, setPepDeclarationAccepted] = useState(true);
+  // PEP declaration checkbox MUST NEVER start pre-checked.
+  const [pepDeclarationAccepted, setPepDeclarationAccepted] = useState(false);
 
   const reqSeqRef = useRef(0);
 
@@ -68,13 +69,10 @@ export function useCompanyData(): UseCompanyDataResult {
     setReloadNonce((n) => n + 1);
   }, []);
 
-  const pendingDocuments = useMemo(
-    () =>
-      (data?.documents ?? []).filter(
-        (doc) => doc.status === COMPANY_COPY.documents.status.pending,
-      ),
-    [data],
-  );
+  const pendingDocuments = useMemo(() => {
+    if (!data || data.onboardingError) return [];
+    return data.documents.filter((doc) => doc.kind === "pending");
+  }, [data]);
 
   const togglePartnerPep = useCallback(
     async (partnerId: string): Promise<boolean | null> => {
@@ -104,6 +102,11 @@ export function useCompanyData(): UseCompanyDataResult {
 
   const handleUploadDocument = useCallback(
     async (doc: CompanyDocument, file: File): Promise<boolean> => {
+      if (!doc.apiType) {
+        setUploadError(COMPANY_COPY.documents.errors.uploadFailed);
+        return false;
+      }
+
       const validationError = validateCompanyDocumentFile(file);
       if (validationError) {
         setUploadError(validationError);

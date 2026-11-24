@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/toast-provider";
+import { featureFlags } from "@/lib/feature-flags";
 import type { CompanyTab } from "@/lib/company/constants";
 import { COMPANY_COPY } from "@/lib/company/copy";
 import { useCompanyData } from "@/lib/company/hooks";
@@ -16,7 +17,14 @@ import { CompanyLimitsTab } from "./company-limits-tab";
 import { CompanyPendingTab } from "./company-pending-tab";
 import { CompanyProfileTab } from "./company-profile-tab";
 
-export function CompanyView() {
+interface CompanyViewProps {
+  /** Overrides `featureFlags.empresaPep` in tests; defaults to the build-time flag (OFF). */
+  showPepSection?: boolean;
+}
+
+export function CompanyView({
+  showPepSection = featureFlags.empresaPep,
+}: CompanyViewProps = {}) {
   const [activeTab, setActiveTab] = useState<CompanyTab>("perfil");
   const [limitsModalOpen, setLimitsModalOpen] = useState(false);
   const { success } = useToast();
@@ -43,14 +51,8 @@ export function CompanyView() {
   }
 
   async function onTogglePartnerPep(partnerId: string) {
-    const nextIsPep = await togglePartnerPep(partnerId);
-    if (nextIsPep === null) return;
-    success(
-      COMPANY_COPY.pep.updatedToastTitle,
-      nextIsPep
-        ? COMPANY_COPY.pep.updatedToastIsPep
-        : COMPANY_COPY.pep.updatedToastNotPep,
-    );
+    // Do NOT emit any "Informação enviada à Avenia" toast while PEP submit is a local stub.
+    await togglePartnerPep(partnerId);
   }
 
   if (loading) {
@@ -69,8 +71,6 @@ export function CompanyView() {
           <CardContent className="space-y-4 p-6">
             <Skeleton className="h-14 w-64" />
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <Skeleton className="h-12 w-full" />
-              <Skeleton className="h-12 w-full" />
               <Skeleton className="h-12 w-full" />
               <Skeleton className="h-12 w-full" />
             </div>
@@ -108,8 +108,8 @@ export function CompanyView() {
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <CompanyHeader
-        aveniaStatusKind={data.profile.aveniaStatusKind}
-        aveniaStatusLabel={data.profile.aveniaStatusLabel}
+        aveniaStatusKind={data.aveniaStatusKind}
+        aveniaStatusLabel={data.aveniaStatusLabel}
         activeTab={activeTab}
         onSelectTab={setActiveTab}
         pendingCount={pendingDocuments.length}
@@ -118,6 +118,9 @@ export function CompanyView() {
       {activeTab === "perfil" && (
         <CompanyProfileTab
           profile={data.profile}
+          error={data.profileError}
+          onRetry={reload}
+          showPepSection={showPepSection}
           pepPartners={data.pepPartners}
           pepDeclarationAccepted={pepDeclarationAccepted}
           onTogglePartnerPep={onTogglePartnerPep}
@@ -128,6 +131,8 @@ export function CompanyView() {
       {activeTab === "documentos" && (
         <CompanyDocumentsTab
           documents={data.documents}
+          error={data.onboardingError}
+          onRetry={reload}
           uploadingDocId={uploadingDocId}
           uploadError={uploadError}
           onUploadFile={onUploadFile}
@@ -137,6 +142,8 @@ export function CompanyView() {
       {activeTab === "pendencias" && (
         <CompanyPendingTab
           pendingDocuments={pendingDocuments}
+          error={data.onboardingError}
+          onRetry={reload}
           uploadingDocId={uploadingDocId}
           uploadError={uploadError}
           onUploadFile={onUploadFile}
@@ -146,6 +153,9 @@ export function CompanyView() {
       {activeTab === "limites" && (
         <CompanyLimitsTab
           limits={data.limits}
+          error={data.limitsError}
+          unavailableReason={data.limitsUnavailableReason}
+          onRetry={reload}
           onOpenReviewModal={() => setLimitsModalOpen(true)}
         />
       )}

@@ -14,6 +14,12 @@ const SP_DATE_FORMATTER = new Intl.DateTimeFormat("pt-BR", {
   timeZone: "America/Sao_Paulo",
 });
 
+const SP_DAY_MONTH_FORMATTER = new Intl.DateTimeFormat("pt-BR", {
+  day: "2-digit",
+  month: "2-digit",
+  timeZone: "America/Sao_Paulo",
+});
+
 /**
  * Formats a numeric limit amount in `pt-BR`. Whole numbers omit decimals for
  * readability (e.g. `250.000`); fractional values keep 2 decimals (`1.250,50`).
@@ -50,21 +56,42 @@ export function computeLimitUsagePercent(
 
 /**
  * Formats an ISO timestamp or `YYYY-MM-DD` date strictly in `America/Sao_Paulo`
- * so negative/positive browser timezones never shift the calendar date.
+ * as `dd/mm/yyyy` so negative/positive browser timezones never shift the date.
  */
 export function formatCompanyDateBr(input: string | Date): string {
   if (typeof input === "string") {
     const trimmed = input.trim();
+    if (!trimmed) return "";
     const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(trimmed);
     if (dateOnlyMatch) {
       return `${dateOnlyMatch[3]}/${dateOnlyMatch[2]}/${dateOnlyMatch[1]}`;
     }
     const parsed = new Date(trimmed);
-    if (Number.isNaN(parsed.getTime())) return trimmed;
+    if (Number.isNaN(parsed.getTime())) return "";
     return SP_DATE_FORMATTER.format(parsed);
   }
   if (Number.isNaN(input.getTime())) return "";
   return SP_DATE_FORMATTER.format(input);
+}
+
+/**
+ * Formats an ISO timestamp or `YYYY-MM-DD` date strictly in `America/Sao_Paulo`
+ * as `dd/mm` (used in `"Enviado em dd/mm"` document status).
+ */
+export function formatCompanyDayMonthBr(input: string | Date): string {
+  if (typeof input === "string") {
+    const trimmed = input.trim();
+    if (!trimmed) return "";
+    const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(trimmed);
+    if (dateOnlyMatch) {
+      return `${dateOnlyMatch[3]}/${dateOnlyMatch[2]}`;
+    }
+    const parsed = new Date(trimmed);
+    if (Number.isNaN(parsed.getTime())) return "";
+    return SP_DAY_MONTH_FORMATTER.format(parsed);
+  }
+  if (Number.isNaN(input.getTime())) return "";
+  return SP_DAY_MONTH_FORMATTER.format(input);
 }
 
 /**

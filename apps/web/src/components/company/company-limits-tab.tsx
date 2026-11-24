@@ -14,14 +14,17 @@ import type { CompanyLimitRow, CompanyLimitValue } from "@/lib/company/types";
 
 interface CompanyLimitsTabProps {
   limits: CompanyLimitRow[];
+  error: boolean;
+  unavailableReason: string | null;
+  onRetry: () => void;
   onOpenReviewModal: () => void;
 }
 
 function LimitCell({ cell }: { cell: CompanyLimitValue }) {
   if (cell.max === null) {
     return (
-      <td className="px-5 py-4 text-center text-xs text-muted-foreground">
-        {COMPANY_COPY.limits.unavailable}
+      <td className="px-5 py-4 text-center font-mono text-xs text-muted-foreground">
+        —
       </td>
     );
   }
@@ -63,6 +66,9 @@ function LimitCell({ cell }: { cell: CompanyLimitValue }) {
 
 export function CompanyLimitsTab({
   limits,
+  error,
+  unavailableReason,
+  onRetry,
   onOpenReviewModal,
 }: CompanyLimitsTabProps) {
   return (
@@ -93,60 +99,81 @@ export function CompanyLimitsTab({
         </CardContent>
       </Card>
 
-      <Card className="overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[560px] border-collapse">
-            <thead>
-              <tr className="border-b border-border bg-muted/40 font-mono text-[11px] text-muted-foreground">
-                <th
-                  scope="col"
-                  className="w-56 px-5 py-3 text-left font-medium"
-                >
-                  {COMPANY_COPY.limits.tableHeaders.scope}
-                </th>
-                <th scope="col" className="px-4 py-3 text-center font-medium">
-                  {COMPANY_COPY.limits.tableHeaders.entry}
-                </th>
-                <th scope="col" className="px-4 py-3 text-center font-medium">
-                  {COMPANY_COPY.limits.tableHeaders.exit}
-                </th>
-              </tr>
-            </thead>
-
-            <tbody className="divide-y divide-border">
-              {limits.map((row) => (
-                <tr
-                  key={row.id}
-                  className="transition-colors hover:bg-muted/30"
-                >
-                  <td className="px-5 py-4">
-                    {row.isGlobal ? (
-                      <div className="inline-flex items-center gap-2.5">
-                        <Globe
-                          className="h-4 w-4 shrink-0 text-muted-foreground"
-                          aria-hidden="true"
-                        />
-                        <span className="rounded-lg border border-border bg-muted px-2.5 py-1 text-xs font-semibold text-foreground">
-                          {row.label}
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="inline-flex items-center gap-2.5">
-                        <CurrencyFlag currency={row.scope} size={22} />
-                        <span className="rounded-md bg-foreground px-2.5 py-0.5 font-mono text-xs font-semibold text-background">
-                          {row.label}
-                        </span>
-                      </div>
-                    )}
-                  </td>
-                  <LimitCell cell={row.entry} />
-                  <LimitCell cell={row.exit} />
+      {error ? (
+        <Card>
+          <CardContent className="space-y-3 py-8 text-center">
+            <p className="text-sm text-muted-foreground">
+              {COMPANY_COPY.limits.loadError}
+            </p>
+            <Button type="button" variant="secondary" size="sm" onClick={onRetry}>
+              {COMPANY_COPY.page.retryAction}
+            </Button>
+          </CardContent>
+        </Card>
+      ) : limits.length === 0 ? (
+        <Card>
+          <CardContent className="py-8 text-center">
+            <p className="text-sm text-muted-foreground">
+              {unavailableReason ?? COMPANY_COPY.limits.empty}
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[560px] border-collapse">
+              <thead>
+                <tr className="border-b border-border bg-muted/40 font-mono text-[11px] text-muted-foreground">
+                  <th
+                    scope="col"
+                    className="w-56 px-5 py-3 text-left font-medium"
+                  >
+                    {COMPANY_COPY.limits.tableHeaders.scope}
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-center font-medium">
+                    {COMPANY_COPY.limits.tableHeaders.entry}
+                  </th>
+                  <th scope="col" className="px-4 py-3 text-center font-medium">
+                    {COMPANY_COPY.limits.tableHeaders.exit}
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+              </thead>
+
+              <tbody className="divide-y divide-border">
+                {limits.map((row) => (
+                  <tr
+                    key={row.id}
+                    className="transition-colors hover:bg-muted/30"
+                  >
+                    <td className="px-5 py-4">
+                      {row.isGlobal ? (
+                        <div className="inline-flex items-center gap-2.5">
+                          <Globe
+                            className="h-4 w-4 shrink-0 text-muted-foreground"
+                            aria-hidden="true"
+                          />
+                          <span className="rounded-lg border border-border bg-muted px-2.5 py-1 text-xs font-semibold text-foreground">
+                            {row.label}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="inline-flex items-center gap-2.5">
+                          <CurrencyFlag currency={row.scope} size={22} />
+                          <span className="rounded-md bg-foreground px-2.5 py-0.5 font-mono text-xs font-semibold text-background">
+                            {row.label}
+                          </span>
+                        </div>
+                      )}
+                    </td>
+                    <LimitCell cell={row.entry} />
+                    <LimitCell cell={row.exit} />
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
     </div>
   );
 }

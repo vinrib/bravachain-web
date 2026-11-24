@@ -37,8 +37,13 @@ export const featureFlags = {
   cotacoesAlertas: process.env.NEXT_PUBLIC_FEATURE_COTACOES_ALERTAS === "true",
   /** "Depósito" (PIX deposit) section. */
   deposito: process.env.NEXT_PUBLIC_FEATURE_DEPOSITO === "true",
-  /** "Empresa" (cadastral data, PEP declaration, Avenia docs & limits). Default OFF. */
+  /** "Empresa" (cadastral data, Avenia docs & limits). Default OFF. */
   empresa: process.env.NEXT_PUBLIC_FEATURE_EMPRESA === "true",
+  /**
+   * "Declaração de PEP" section inside `/empresa` (Perfil tab). Default OFF
+   * until a real client-facing UBO/PEP endpoint exists in the backend.
+   */
+  empresaPep: process.env.NEXT_PUBLIC_FEATURE_EMPRESA_PEP === "true",
   /**
    * "Enviar" (outbound remittance) section. Flag + `/enviar` routes land with
    * PR #37 (`feat/enviar`), not merged into this branch — so this is off here

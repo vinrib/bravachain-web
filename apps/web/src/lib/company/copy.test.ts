@@ -47,25 +47,35 @@ describe("COMPANY_COPY regulatory & compliance policy", () => {
     expect(entries.length).toBeGreaterThan(25);
   });
 
-  it("matches every mandatory client-facing string verbatim", () => {
+  it("matches every mandatory client-facing string verbatim and excludes fictional/misleading copy", () => {
     expect(COMPANY_COPY.page.title).toBe("Empresa");
+    expect(COMPANY_COPY.page.retryAction).toBe("Tentar de novo");
+    expect(COMPANY_COPY.aveniaStatus.approved).toBe("Aprovado pela Avenia");
+    expect(COMPANY_COPY.aveniaStatus.unavailable).toBe(
+      "Status indisponível no momento",
+    );
     expect(COMPANY_COPY.pep.title).toBe(
       "Declaração de PEP dos sócios e beneficiários finais",
-    );
-    expect(COMPANY_COPY.pep.statusNotPep).toBe("Declaração registrada");
-    expect(COMPANY_COPY.pep.statusIsPep).toBe(
-      "Informação enviada à Avenia para análise",
     );
     expect(COMPANY_COPY.pep.declarationCheckbox).toBe(
       "Declaro que as informações sobre a condição de Pessoa Politicamente Exposta (PEP) dos representantes e beneficiários finais estão corretas e atualizadas.",
     );
-    expect(COMPANY_COPY.documents.status.approved).toBe("Aprovado pela Avenia");
-    expect(COMPANY_COPY.documents.status.pending).toBe("Pendente de envio");
-    expect(COMPANY_COPY.documents.status.inAnalysis).toBe(
-      "Enviado — em análise pela Avenia",
+    // PEP must never claim submission to Avenia while stubbed
+    expect(JSON.stringify(COMPANY_COPY.pep)).not.toContain(
+      "Informação enviada à Avenia",
     );
+    // Per-document statuses never claim "Aprovado pela Avenia"
+    expect(JSON.stringify(COMPANY_COPY.documents.status)).not.toContain(
+      "Aprovado pela Avenia",
+    );
+    expect(COMPANY_COPY.documents.status.uploadedPrefix).toBe("Enviado em");
+    expect(COMPANY_COPY.documents.status.pending).toBe("Pendente de envio");
     expect(COMPANY_COPY.documents.toastUploaded).toBe(
       "Documento enviado. A análise é feita pela Avenia.",
+    );
+    // Limits copy has no dead "Não informado pela Avenia" string
+    expect(JSON.stringify(COMPANY_COPY.limits)).not.toContain(
+      "Não informado pela Avenia",
     );
     expect(COMPANY_COPY.limits.title).toBe("Limites da sua conta");
     expect(COMPANY_COPY.limits.subtitle).toBe("Limites definidos pela Avenia.");
