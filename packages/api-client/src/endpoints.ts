@@ -141,6 +141,8 @@ export const endpoints = {
     branding: "/v1/profile/branding",
   },
   onboarding: {
+    /** GET (OnboardingController) -> { legalName, cnpj, cnae } (each string | null). */
+    company: "/v1/onboarding/company",
     /** GET (OnboardingController) -> KYB status + documents sent/pending. */
     status: "/v1/onboarding/status",
     /** POST multipart (`file`, PDF/JPEG/PNG up to 10 MB) -> { documentId, type, fileName, fileSizeKb }. */

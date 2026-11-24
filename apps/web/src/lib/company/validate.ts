@@ -18,11 +18,11 @@ import type {
   CompanyDocument,
   CompanyLimitRow,
   CompanyProfile,
-  RawBrandingResponse,
   RawLimitCurrency,
   RawLimitModality,
   RawLimitsResponse,
   RawMeResponse,
+  RawOnboardingCompany,
   RawOnboardingDocument,
   RawOnboardingStatus,
   RawUploadedDocumentResponse,
@@ -47,6 +47,18 @@ function asFiniteNumber(value: unknown): number | null {
   return null;
 }
 
+function asUsedPctString(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  return /^\d+(?:\.\d+)?$/.test(trimmed) ? trimmed : null;
+}
+
+function asReferenceMonthString(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  return /^\d{4}-(0[1-9]|1[0-2])$/.test(trimmed) ? trimmed : null;
+}
+
 const VALID_KYB_STATUSES = new Set([
   "PENDING",
   "SUBMITTED",
@@ -54,6 +66,35 @@ const VALID_KYB_STATUSES = new Set([
   "REJECTED",
   "RESUBMIT",
 ]);
+
+const ONBOARDING_COMPANY_KEYS = ["legalName", "cnpj", "cnae"] as const;
+
+/**
+ * Strictly validates `GET /v1/onboarding/company` response:
+ * MUST be an object containing EXACTLY the 3 keys `{ legalName, cnpj, cnae }`,
+ * each being a `string` or `null`. Any missing key, extra key, or other value
+ * type returns `null` (error).
+ */
+export function parseOnboardingCompany(
+  raw: unknown,
+): RawOnboardingCompany | null {
+  if (!isRecord(raw)) return null;
+
+  const keys = Object.keys(raw);
+  if (keys.length !== ONBOARDING_COMPANY_KEYS.length) return null;
+
+  for (const key of ONBOARDING_COMPANY_KEYS) {
+    if (!Object.prototype.hasOwnProperty.call(raw, key)) return null;
+    const val = raw[key];
+    if (val !== null && typeof val !== "string") return null;
+  }
+
+  return {
+    legalName: raw.legalName === null ? null : asNonEmptyString(raw.legalName),
+    cnpj: raw.cnpj === null ? null : asNonEmptyString(raw.cnpj),
+    cnae: raw.cnae === null ? null : asNonEmptyString(raw.cnae),
+  };
+}
 
 export function parseOnboardingStatus(raw: unknown): RawOnboardingStatus | null {
   if (!isRecord(raw)) return null;
@@ -112,12 +153,13 @@ export function parseUploadedDocumentResponse(
 
 function parseModality(raw: unknown): RawLimitModality {
   if (!isRecord(raw)) {
-    return { max: null, used: null, available: null };
+    return { max: null, used: null, available: null, usedPct: null };
   }
   return {
     max: asFiniteNumber(raw.max),
     used: asFiniteNumber(raw.used),
     available: asFiniteNumber(raw.available),
+    usedPct: asUsedPctString(raw.usedPct),
   };
 }
 
@@ -142,6 +184,9 @@ export function parseLimitsResponse(raw: unknown): RawLimitsResponse | null {
     if (!currency) continue;
     byCurrency.push({
       currency: currency.toUpperCase(),
+      period: row.period === "monthly" ? "monthly" : null,
+      referenceMonth: asReferenceMonthString(row.referenceMonth),
+      unlocked: typeof row.unlocked === "boolean" ? row.unlocked : null,
       fiatIn: parseModality(row.fiatIn),
       fiatOut: parseModality(row.fiatOut),
       chainIn: parseModality(row.chainIn),
@@ -168,19 +213,6 @@ export function parseMeResponse(raw: unknown): RawMeResponse | null {
     email,
     name: asNonEmptyString(raw.name),
     kycStatus: asNonEmptyString(raw.kycStatus) ?? "NOT_SUBMITTED",
-    companyName: asNonEmptyString(raw.companyName),
-    companyCnpj: asNonEmptyString(raw.companyCnpj),
-    companyCnae: asNonEmptyString(raw.companyCnae),
-  };
-}
-
-export function parseBrandingResponse(
-  raw: unknown,
-): RawBrandingResponse | null {
-  if (!isRecord(raw)) return null;
-  return {
-    companyDisplayName: asNonEmptyString(raw.companyDisplayName),
-    companyLogoUrl: asNonEmptyString(raw.companyLogoUrl),
   };
 }
 
@@ -240,24 +272,25 @@ export function resolveAveniaStatus(
 }
 
 /**
- * Maps real profile fields returned by `/auth/me` and `/v1/profile/branding`.
- * Returns `null` when neither endpoint succeeded, and never invents missing fields.
+ * Maps real profile fields from `GET /v1/onboarding/company` and email from `/auth/me`.
+ * Returns `null` when `/v1/onboarding/company` failed or failed strict 3-key validation.
+ * Never invents missing fields or uses user personal `name` as company name.
  */
 export function mapCompanyProfile(input: {
+  company: RawOnboardingCompany | null;
   me: RawMeResponse | null;
-  branding: RawBrandingResponse | null;
   onboarding: RawOnboardingStatus | null;
 }): CompanyProfile | null {
-  if (!input.me && !input.branding) {
+  if (!input.company) {
     return null;
   }
 
   const status = resolveAveniaStatus(input.onboarding);
 
   return {
-    legalName: input.me?.companyName ?? null,
-    cnpj: input.me?.companyCnpj ? formatCnpj(input.me.companyCnpj) : null,
-    cnae: input.me?.companyCnae ?? null,
+    legalName: input.company.legalName,
+    cnpj: input.company.cnpj ? formatCnpj(input.company.cnpj) : null,
+    cnae: input.company.cnae,
     email: input.me?.email ?? null,
     aveniaStatusKind: status.kind,
     aveniaStatusLabel: status.label,
@@ -272,7 +305,11 @@ function humanizeUnknownDocType(type: string): string {
 
 export function formatUploadedDocumentStatus(
   uploadedAt: string | Date | null,
-): { uploadedAtLabel: string | null; uploadedDayMonthLabel: string | null; statusLabel: string } {
+): {
+  uploadedAtLabel: string | null;
+  uploadedDayMonthLabel: string | null;
+  statusLabel: string;
+} {
   if (!uploadedAt) {
     return {
       uploadedAtLabel: null,
@@ -393,9 +430,20 @@ function normalizeLimitScope(currency: string): {
   };
 }
 
+function selectModality(
+  fiat: RawLimitModality,
+  chain: RawLimitModality,
+): RawLimitModality {
+  if (fiat.max !== null || fiat.used !== null || fiat.usedPct !== null) {
+    return fiat;
+  }
+  return chain;
+}
+
 /**
- * Maps ONLY currencies actually returned by `GET /v1/limits` with at least one
- * finite limit value. Never fabricates rows for missing currencies.
+ * Maps ONLY currencies actually returned by `GET /v1/limits`.
+ * Preserves rows with `unlocked === false` even when limit figures are null so
+ * they display `"Moeda ainda não habilitada"`. Never fabricates rows for absent currencies.
  */
 export function mapCompanyLimits(
   limitsResponse: RawLimitsResponse | null,
@@ -407,12 +455,14 @@ export function mapCompanyLimits(
 
   const rows: CompanyLimitRow[] = [];
   for (const raw of byCurrency) {
-    const entryMax = raw.fiatIn.max ?? raw.chainIn.max;
-    const entryUsed = raw.fiatIn.used ?? raw.chainIn.used;
-    const exitMax = raw.fiatOut.max ?? raw.chainOut.max;
-    const exitUsed = raw.fiatOut.used ?? raw.chainOut.used;
+    const entrySource = selectModality(raw.fiatIn, raw.chainIn);
+    const exitSource = selectModality(raw.fiatOut, raw.chainOut);
 
-    if (entryMax === null && exitMax === null) {
+    if (
+      raw.unlocked !== false &&
+      entrySource.max === null &&
+      exitSource.max === null
+    ) {
       continue;
     }
 
@@ -422,8 +472,21 @@ export function mapCompanyLimits(
       scope: meta.scope,
       label: meta.label,
       isGlobal: meta.isGlobal,
-      entry: { used: entryUsed, max: entryMax, unit: meta.unit },
-      exit: { used: exitUsed, max: exitMax, unit: meta.unit },
+      period: raw.period,
+      referenceMonth: raw.referenceMonth,
+      unlocked: raw.unlocked,
+      entry: {
+        used: entrySource.used,
+        max: entrySource.max,
+        usedPct: entrySource.usedPct,
+        unit: meta.unit,
+      },
+      exit: {
+        used: exitSource.used,
+        max: exitSource.max,
+        usedPct: exitSource.usedPct,
+        unit: meta.unit,
+      },
     });
   }
 

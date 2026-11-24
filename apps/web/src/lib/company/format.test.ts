@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
-  computeLimitUsagePercent,
+  computeLimitBarScale,
   formatCnpj,
   formatCompanyDateBr,
   formatCompanyDayMonthBr,
   formatLimitAmountPtBr,
+  formatReferenceMonthPtBr,
+  formatUsedPctPtBr,
   maskCpf,
 } from "./format";
 
@@ -17,14 +19,50 @@ describe("company formatters", () => {
     expect(formatLimitAmountPtBr(Number.NaN)).toBe("0");
   });
 
-  it("computes clamped usage percentages safely", () => {
-    expect(computeLimitUsagePercent(42500, 100000)).toBe(43);
-    expect(computeLimitUsagePercent(0, 80000)).toBe(0);
-    expect(computeLimitUsagePercent(150000, 100000)).toBe(100);
-    expect(computeLimitUsagePercent(-10, 100)).toBe(0);
-    expect(computeLimitUsagePercent(10, 0)).toBe(0);
-    expect(computeLimitUsagePercent(null, 100)).toBe(0);
-    expect(computeLimitUsagePercent(50, null)).toBe(0);
+  it("formats backend usedPct strings in pt-BR without float math", () => {
+    expect(formatUsedPctPtBr("43.00")).toBe("43,00%");
+    expect(formatUsedPctPtBr("0.00")).toBe("0,00%");
+    expect(formatUsedPctPtBr("150.00")).toBe("150,00%");
+    expect(formatUsedPctPtBr("1250.50")).toBe("1.250,50%");
+    expect(formatUsedPctPtBr(null)).toBeNull();
+    expect(formatUsedPctPtBr("")).toBeNull();
+    expect(formatUsedPctPtBr("abc")).toBeNull();
+  });
+
+  it("computes visual-only progress bar scale clamped to 100 and flags > 100%", () => {
+    expect(computeLimitBarScale("43.00")).toEqual({
+      widthPct: 43,
+      exceeded: false,
+    });
+    expect(computeLimitBarScale("0.00")).toEqual({
+      widthPct: 0,
+      exceeded: false,
+    });
+    expect(computeLimitBarScale("100.00")).toEqual({
+      widthPct: 100,
+      exceeded: false,
+    });
+    expect(computeLimitBarScale("150.00")).toEqual({
+      widthPct: 100,
+      exceeded: true,
+    });
+    expect(computeLimitBarScale(null)).toBeNull();
+    expect(computeLimitBarScale("invalid")).toBeNull();
+  });
+
+  it("formats referenceMonth YYYY-MM by string split without Date or assuming current month", () => {
+    expect(formatReferenceMonthPtBr("2026-11")).toBe("Uso mensal · nov/26");
+    expect(formatReferenceMonthPtBr("2026-01")).toBe("Uso mensal · jan/26");
+    expect(formatReferenceMonthPtBr("2027-12")).toBe("Uso mensal · dez/27");
+    expect(formatReferenceMonthPtBr(null)).toBe(
+      "Uso mensal · mês de referência não informado",
+    );
+    expect(formatReferenceMonthPtBr("2026-13")).toBe(
+      "Uso mensal · mês de referência não informado",
+    );
+    expect(formatReferenceMonthPtBr("invalid")).toBe(
+      "Uso mensal · mês de referência não informado",
+    );
   });
 
   it("formats YYYY-MM-DD and ISO dates without timezone off-by-one", () => {

@@ -32,12 +32,14 @@ export const COMPANY_COPY = {
   },
 
   profile: {
+    defaultTitle: "Empresa",
     sectionLabel: "Dados cadastrais da empresa titular",
+    loadingLabel: "Carregando dados cadastrais da empresa…",
     fields: {
-      legalName: "Razão Social",
+      legalName: "Nome da empresa",
       cnpj: "CNPJ",
       email: "E-mail",
-      cnae: "Atividade Principal (CNAE)",
+      cnae: "CNAE",
     },
     loadError: "Não foi possível carregar os dados cadastrais no momento.",
     empty: "Nenhum dado cadastral disponível no momento.",
@@ -95,12 +97,20 @@ export const COMPANY_COPY = {
     title: "Limites da sua conta",
     subtitle: "Limites definidos pela Avenia.",
     reviewAction: "Como revisar meus limites",
+    loadingLabel: "Carregando limites da conta…",
     tableHeaders: {
       scope: "Moeda / Escopo",
       entry: "Entrada",
       exit: "Saída",
     },
     globalLabel: "Global (USD)",
+    monthlyPeriodPrefix: "Uso mensal",
+    monthlyPeriodUnknown: "Uso mensal · mês de referência não informado",
+    currencyLocked: "Moeda ainda não habilitada",
+    exceededBadge: "Acima do limite",
+    // TODO-ADVOGADO: revisar mensagem exibida quando GET /v1/limits retorna HTTP 403 (cadastro ainda não aprovado pela Avenia).
+    notApproved:
+      "Os limites ficam disponíveis depois que a Avenia aprovar o cadastro.",
     loadError: "Não foi possível carregar os limites no momento.",
     empty: "Nenhum limite disponível no momento.",
     modal: {

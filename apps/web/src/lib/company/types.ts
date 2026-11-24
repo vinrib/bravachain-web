@@ -7,11 +7,11 @@ export type AveniaStatusKind =
   | "unavailable";
 
 export interface CompanyProfile {
-  /** Legal name ONLY when provided by a real backend endpoint; otherwise null (hidden). */
+  /** Company name reported during onboarding (`GET /v1/onboarding/company`); null when absent (hidden). */
   legalName: string | null;
-  /** CNPJ ONLY when provided by a real backend endpoint; otherwise null (hidden). */
+  /** Formatted CNPJ from `GET /v1/onboarding/company` digits; null when absent (hidden). */
   cnpj: string | null;
-  /** CNAE ONLY when provided by a real backend endpoint; otherwise null (hidden). */
+  /** CNAE from `GET /v1/onboarding/company`; null when absent (hidden). */
   cnae: string | null;
   /** Real email from `GET /auth/me`; null when absent (hidden). */
   email: string | null;
@@ -50,6 +50,8 @@ export interface CompanyDocument {
 export interface CompanyLimitValue {
   used: number | null;
   max: number | null;
+  /** Exact decimal string from backend (e.g. `"43.00"`, `"150.00"`), or null. Frontend NEVER computes this. */
+  usedPct: string | null;
   unit: string;
 }
 
@@ -58,6 +60,11 @@ export interface CompanyLimitRow {
   scope: CompanyLimitScope | string;
   label: string;
   isGlobal: boolean;
+  period: "monthly" | null;
+  /** Reference month in `YYYY-MM` format, or null. */
+  referenceMonth: string | null;
+  /** `false` => currency not enabled yet; `true` => enabled; `null` => unknown (render normal row without claim). */
+  unlocked: boolean | null;
   entry: CompanyLimitValue;
   exit: CompanyLimitValue;
 }
@@ -72,7 +79,16 @@ export interface CompanyBundle {
   onboardingError: boolean;
   limits: CompanyLimitRow[];
   limitsError: boolean;
+  /** True when `GET /v1/limits` returns HTTP 403 (onboarding not yet approved by Avenia). */
+  limitsForbidden: boolean;
   limitsUnavailableReason: string | null;
+}
+
+/** Strict 3-key payload returned by `GET /v1/onboarding/company`. */
+export interface RawOnboardingCompany {
+  legalName: string | null;
+  cnpj: string | null;
+  cnae: string | null;
 }
 
 /** Raw backend payloads parsed defensively in `validate.ts`. */
@@ -105,10 +121,14 @@ export interface RawLimitModality {
   max: number | null;
   used: number | null;
   available: number | null;
+  usedPct: string | null;
 }
 
 export interface RawLimitCurrency {
   currency: string;
+  period: "monthly" | null;
+  referenceMonth: string | null;
+  unlocked: boolean | null;
   fiatIn: RawLimitModality;
   fiatOut: RawLimitModality;
   chainIn: RawLimitModality;
@@ -128,12 +148,4 @@ export interface RawMeResponse {
   email: string;
   name: string | null;
   kycStatus: string;
-  companyName: string | null;
-  companyCnpj: string | null;
-  companyCnae: string | null;
-}
-
-export interface RawBrandingResponse {
-  companyDisplayName: string | null;
-  companyLogoUrl: string | null;
 }
