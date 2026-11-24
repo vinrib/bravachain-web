@@ -138,7 +138,6 @@ describe("company parsers, mappers & upload validation", () => {
     });
 
     expect(profile).toEqual({
-      displayName: "Empresa Real",
       legalName: null,
       cnpj: null,
       cnae: null,

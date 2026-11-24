@@ -7,8 +7,6 @@ export type AveniaStatusKind =
   | "unavailable";
 
 export interface CompanyProfile {
-  /** Optional display title from `/v1/profile/branding` or `/auth/me` (never mislabeled as Razão Social). */
-  displayName: string | null;
   /** Legal name ONLY when provided by a real backend endpoint; otherwise null (hidden). */
   legalName: string | null;
   /** CNPJ ONLY when provided by a real backend endpoint; otherwise null (hidden). */

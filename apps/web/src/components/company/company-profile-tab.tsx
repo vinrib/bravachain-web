@@ -77,7 +77,8 @@ export function CompanyProfileTab({
     });
   }
 
-  const headingText = profile.legalName ?? profile.displayName ?? null;
+  // Never use a person's name / displayName as the company heading or legal name.
+  const headingText = profile.legalName ?? COMPANY_COPY.page.title;
   const statusSubtitle =
     profile.aveniaStatusKind === "unavailable"
       ? profile.aveniaStatusLabel

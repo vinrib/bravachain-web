@@ -255,7 +255,6 @@ export function mapCompanyProfile(input: {
   const status = resolveAveniaStatus(input.onboarding);
 
   return {
-    displayName: input.branding?.companyDisplayName ?? input.me?.name ?? null,
     legalName: input.me?.companyName ?? null,
     cnpj: input.me?.companyCnpj ? formatCnpj(input.me.companyCnpj) : null,
     cnae: input.me?.companyCnae ?? null,

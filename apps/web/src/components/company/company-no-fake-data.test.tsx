@@ -247,4 +247,47 @@ describe("CompanyView — zero fictional data & strict error/flag guardrails", (
       "Nenhum sócio ou beneficiário final cadastrado.",
     );
   });
+
+  it("never displays a person's displayName/name as legalName or card title, falling back to 'Empresa'", async () => {
+    vi.spyOn(clientApi, "apiFetch").mockImplementation(async (path: string) => {
+      if (path === "/auth/me") {
+        return {
+          id: "u1",
+          email: "vinicius@empresa.com.br",
+          name: "Vinicius Ribeiro de Souza",
+          kycStatus: "APPROVED",
+        };
+      }
+      if (path === "/v1/profile/branding") {
+        // Backend ProfileController falls back companyDisplayName to user.name
+        return {
+          companyDisplayName: "Vinicius Ribeiro de Souza",
+          companyLogoUrl: null,
+        };
+      }
+      if (path === "/v1/onboarding/status") {
+        return {
+          kybStatus: "APPROVED",
+          kybSubmittedAt: null,
+          kybApprovedAt: null,
+          kybRejectedReason: null,
+          documents: [],
+          missingDocuments: [],
+        };
+      }
+      if (path === "/v1/limits") {
+        return { avenia: null, aveniaReason: null, pixWithdrawal: null };
+      }
+      throw new ApiError(404, "Not found");
+    });
+
+    renderView();
+
+    await screen.findByText("vinicius@empresa.com.br");
+    const panel = screen.getByRole("tabpanel");
+    const cardHeading = within(panel).getByRole("heading", { level: 2 });
+    expect(cardHeading.textContent).toBe("Empresa");
+    expect(panel.textContent).not.toContain("Vinicius Ribeiro de Souza");
+    expect(panel.textContent).not.toContain("Razão Social");
+  });
 });

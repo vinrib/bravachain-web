@@ -17,7 +17,6 @@ import { CompanyView } from "./company-view";
 function makeBundle(overrides: Partial<CompanyBundle> = {}): CompanyBundle {
   return {
     profile: {
-      displayName: "Exportadora Real Ltda",
       legalName: "Exportadora Real Ltda",
       cnpj: "12.345.678/0001-99",
       cnae: "46.37-1-99",
