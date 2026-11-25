@@ -10,80 +10,77 @@ import {
 } from "@testing-library/react";
 import { ToastProvider } from "@/components/toast-provider";
 import { COMPANY_COPY } from "@/lib/company/copy";
-import type { CompanyBundle } from "@/lib/company/types";
+import * as clientApi from "@/lib/client-api";
 import * as companyApi from "@/lib/company/api";
 import { CompanyView } from "./company-view";
 
-function makeBundle(overrides: Partial<CompanyBundle> = {}): CompanyBundle {
-  return {
-    profile: {
-      legalName: "Exportadora Real Ltda",
-      cnpj: "12.345.678/0001-99",
-      cnae: "46.37-1-99",
-      email: "financeiro@exportadora-real.com.br",
-      aveniaStatusKind: "approved",
-      aveniaStatusLabel: "Aprovado pela Avenia",
-    },
-    profileError: false,
-    aveniaStatusKind: "approved",
-    aveniaStatusLabel: "Aprovado pela Avenia",
-    pepPartners: [
-      {
-        id: "ubo-1",
+function mockHappyApis() {
+  vi.spyOn(clientApi, "apiFetch").mockImplementation(async (path: string) => {
+    if (path === "/v1/onboarding/company") {
+      return {
+        legalName: "Exportadora Real Ltda",
+        cnpj: "12345678000199",
+        cnae: "46.37-1-99",
+      };
+    }
+    if (path === "/auth/me") {
+      return {
+        id: "u1",
+        email: "financeiro@exportadora-real.com.br",
         name: "Representante Real A",
-        role: "Sócio Administrador",
-        ownership: "60%",
-        cpfMasked: "***.456.789-**",
-        isPep: false,
-      },
-    ],
-    documents: [
-      {
-        id: "doc-1",
-        apiType: "CONTRATO_SOCIAL",
-        name: "Contrato Social Consolidado",
-        category: "Cadastro societário",
-        fileName: "Contrato_Social.pdf",
-        uploadedAtLabel: "12/10/2026",
-        uploadedDayMonthLabel: "12/10",
-        kind: "uploaded",
-        statusLabel: "Enviado em 12/10",
-      },
-      {
-        id: "FATURAMENTO",
-        apiType: "FATURAMENTO",
-        name: "Balanço Patrimonial / DRE (Último Exercício)",
-        category: "Demonstrações financeiras",
-        fileName: null,
-        uploadedAtLabel: null,
-        uploadedDayMonthLabel: null,
-        kind: "pending",
-        statusLabel: "Pendente de envio",
-      },
-    ],
-    onboardingError: false,
-    limits: [
-      {
-        id: "GLOBAL",
-        scope: "GLOBAL",
-        label: "Global (USD)",
-        isGlobal: true,
-        entry: { used: 42500, max: 100000, unit: "USD" },
-        exit: { used: 12000, max: 100000, unit: "USD" },
-      },
-      {
-        id: "BRL",
-        scope: "BRL",
-        label: "BRL",
-        isGlobal: false,
-        entry: { used: 65000, max: 250000, unit: "BRL" },
-        exit: { used: 68900, max: 250000, unit: "BRL" },
-      },
-    ],
-    limitsError: false,
-    limitsUnavailableReason: null,
-    ...overrides,
-  };
+        kycStatus: "APPROVED",
+      };
+    }
+    if (path === "/v1/onboarding/status") {
+      return {
+        kybStatus: "APPROVED",
+        kybSubmittedAt: "2026-10-12T14:00:00Z",
+        kybApprovedAt: "2026-10-13T16:00:00Z",
+        kybRejectedReason: null,
+        documents: [
+          {
+            id: "doc-1",
+            type: "CONTRATO_SOCIAL",
+            fileName: "Contrato_Social.pdf",
+            fileSizeKb: 180,
+            uploadedAt: "2026-10-12T14:00:00Z",
+          },
+        ],
+        missingDocuments: ["FATURAMENTO"],
+      };
+    }
+    if (path === "/v1/limits") {
+      return {
+        avenia: {
+          blocked: false,
+          byCurrency: [
+            {
+              currency: "*",
+              period: "monthly",
+              referenceMonth: "2026-11",
+              unlocked: true,
+              fiatIn: { max: 100000, used: 43000, available: 57000, usedPct: "43.00" },
+              fiatOut: { max: 100000, used: 0, available: 100000, usedPct: "0.00" },
+              chainIn: { max: null, used: null, available: null, usedPct: null },
+              chainOut: { max: null, used: null, available: null, usedPct: null },
+            },
+            {
+              currency: "BRL",
+              period: "monthly",
+              referenceMonth: "2026-11",
+              unlocked: true,
+              fiatIn: { max: 250000, used: 65000, available: 185000, usedPct: "26.00" },
+              fiatOut: { max: 250000, used: 68900, available: 181100, usedPct: "27.56" },
+              chainIn: { max: null, used: null, available: null, usedPct: null },
+              chainOut: { max: null, used: null, available: null, usedPct: null },
+            },
+          ],
+        },
+        aveniaReason: null,
+      };
+    }
+    throw new Error(`Unexpected path: ${path}`);
+  });
 }
 
 function renderView(showPepSection = false) {
@@ -95,7 +92,7 @@ function renderView(showPepSection = false) {
 }
 
 beforeEach(() => {
-  vi.spyOn(companyApi, "fetchCompanyBundle").mockResolvedValue(makeBundle());
+  mockHappyApis();
   vi.spyOn(companyApi, "submitPartnerPepDeclaration").mockImplementation(
     async (partnerId, isPep) => ({ partnerId, isPep, persisted: false }),
   );
@@ -118,7 +115,7 @@ afterEach(() => {
 });
 
 describe("CompanyView (/empresa)", () => {
-  it("renders header, global Avenia status badge, 4 tabs with pending counter, and real Perfil fields without PEP by default", async () => {
+  it("renders header, global Avenia status badge, 4 tabs with pending counter, and real Perfil fields without 'Razão Social' or PEP by default", async () => {
     renderView(false);
 
     const heading = await screen.findByRole("heading", {
@@ -126,9 +123,12 @@ describe("CompanyView (/empresa)", () => {
       name: "Empresa",
     });
     expect(heading).toBeTruthy();
-    expect(
-      screen.getByTestId("company-avenia-status-badge").textContent,
-    ).toContain("Status do cadastro na Avenia: Aprovado pela Avenia");
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId("company-avenia-status-badge").textContent,
+      ).toContain("Status do cadastro na Avenia: Aprovado pela Avenia");
+    });
 
     const tablist = screen.getByRole("tablist");
     expect(within(tablist).getByRole("tab", { name: "Perfil" })).toBeTruthy();
@@ -141,15 +141,21 @@ describe("CompanyView (/empresa)", () => {
     expect(within(tablist).getByRole("tab", { name: "Limites" })).toBeTruthy();
     expect(screen.getByTestId("company-pending-counter").textContent).toBe("1");
 
-    // Real profile fields present
-    expect(screen.getByText("Razão Social")).toBeTruthy();
-    expect(screen.getByText("CNPJ")).toBeTruthy();
-    expect(screen.getByText("12.345.678/0001-99")).toBeTruthy();
-    expect(screen.getByText("E-mail")).toBeTruthy();
+    // Real profile fields present with new labels (NO "Razão Social")
+    const panel = screen.getByRole("tabpanel");
+    await within(panel).findByText("Nome da empresa");
+    expect(within(panel).getByRole("heading", { level: 2 }).textContent).toBe(
+      "Exportadora Real Ltda",
+    );
+    expect(within(panel).getByText("CNPJ")).toBeTruthy();
+    expect(within(panel).getByText("12.345.678/0001-99")).toBeTruthy();
+    expect(within(panel).getByText("E-mail")).toBeTruthy();
     expect(
-      screen.getByText("financeiro@exportadora-real.com.br"),
+      within(panel).getByText("financeiro@exportadora-real.com.br"),
     ).toBeTruthy();
-    expect(screen.getByText("Atividade Principal (CNAE)")).toBeTruthy();
+    expect(within(panel).getByText("CNAE")).toBeTruthy();
+    expect(within(panel).getByText("46.37-1-99")).toBeTruthy();
+    expect(document.body.textContent).not.toContain("Razão Social");
 
     // PEP section hidden by default when flag is OFF
     expect(
@@ -158,7 +164,7 @@ describe("CompanyView (/empresa)", () => {
     expect(screen.queryByText(/Declaro que/)).toBeNull();
   });
 
-  it("when PEP flag is enabled, renders unchecked checkbox and toggles partner locally without emitting any 'Informação enviada à Avenia' toast", async () => {
+  it("when PEP flag is enabled, renders unchecked checkbox and never emits 'Informação enviada à Avenia'", async () => {
     renderView(true);
 
     const checkbox = (await screen.findByLabelText(
@@ -166,21 +172,6 @@ describe("CompanyView (/empresa)", () => {
     )) as HTMLInputElement;
     expect(checkbox.checked).toBe(false);
 
-    const toggleButtons = screen.getAllByRole("button", {
-      name: /Declarado PEP:/,
-    });
-    const firstToggle = toggleButtons[0];
-    expect(firstToggle).toBeDefined();
-    if (!firstToggle) return;
-
-    expect(firstToggle.textContent).toContain("Declarado PEP: NÃO");
-    fireEvent.click(firstToggle);
-
-    await waitFor(() => {
-      expect(firstToggle.textContent).toContain("Declarado PEP: SIM");
-    });
-
-    // Must never show "Informação enviada à Avenia" toast while stubbed
     expect(document.body.textContent).not.toContain(
       "Informação enviada à Avenia",
     );
@@ -189,7 +180,11 @@ describe("CompanyView (/empresa)", () => {
   it("uploads a pending document using real response body, displays 'Enviado em dd/mm' (never per-doc approval), shows toast, and empties Pendências", async () => {
     renderView(false);
 
-    const docsTab = await screen.findByRole("tab", { name: "Documentos" });
+    await waitFor(() => {
+      expect(screen.getByTestId("company-pending-counter").textContent).toBe("1");
+    });
+
+    const docsTab = screen.getByRole("tab", { name: "Documentos" });
     fireEvent.click(docsTab);
 
     const docsPanel = screen.getByRole("tabpanel");
@@ -225,12 +220,13 @@ describe("CompanyView (/empresa)", () => {
     ).toBeTruthy();
   });
 
-  it("renders Limites table only with real currencies returned by API, Entrada/Saída columns, Taupe progress bar, and informative modal", async () => {
+  it("renders Limites table only with real currencies returned by API, Entrada/Saída columns, backend usedPct, Taupe progress bar, and informative modal", async () => {
     renderView(false);
 
     const limitsTab = await screen.findByRole("tab", { name: "Limites" });
     fireEvent.click(limitsTab);
 
+    await screen.findByText("Global (USD)");
     expect(screen.getByText("Limites da sua conta")).toBeTruthy();
     expect(screen.getByText("Limites definidos pela Avenia.")).toBeTruthy();
 
@@ -239,15 +235,20 @@ describe("CompanyView (/empresa)", () => {
       .map((th) => th.textContent);
     expect(headers).toEqual(["Moeda / Escopo", "Entrada", "Saída"]);
 
-    expect(screen.getByText("Global (USD)")).toBeTruthy();
     expect(screen.getByText("BRL")).toBeTruthy();
     expect(screen.queryByText("EUR")).toBeNull();
+    expect(screen.queryByText("USD")).toBeNull();
     expect(screen.getByText("65.000 / 250.000 BRL")).toBeTruthy();
+    expect(screen.getByText("43,00%")).toBeTruthy();
+    expect(screen.getByText("0,00%")).toBeTruthy();
+    expect(screen.getAllByText("Uso mensal · nov/26").length).toBeGreaterThan(0);
 
     const bars = screen.getAllByTestId("company-limit-progress-bar");
     expect(bars).toHaveLength(4);
     // #B5AAA6 converts to rgb(181, 170, 166) in jsdom inline style
     expect(bars[0]?.style.backgroundColor).toBe("rgb(181, 170, 166)");
+    expect(bars[0]?.style.width).toBe("43%");
+    expect(bars[1]?.style.width).toBe("0%");
 
     // Open "Como revisar meus limites" modal
     fireEvent.click(

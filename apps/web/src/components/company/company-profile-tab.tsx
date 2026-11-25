@@ -3,6 +3,7 @@
 import { Building2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { COMPANY_COPY } from "@/lib/company/copy";
 import type { CompanyProfile, PepPartner } from "@/lib/company/types";
@@ -10,6 +11,7 @@ import { CompanyPepSection } from "./company-pep-section";
 
 interface CompanyProfileTabProps {
   profile: CompanyProfile | null;
+  loading?: boolean;
   error: boolean;
   onRetry: () => void;
   showPepSection: boolean;
@@ -21,6 +23,7 @@ interface CompanyProfileTabProps {
 
 export function CompanyProfileTab({
   profile,
+  loading = false,
   error,
   onRetry,
   showPepSection,
@@ -29,12 +32,56 @@ export function CompanyProfileTab({
   onTogglePartnerPep,
   onChangePepDeclarationAccepted,
 }: CompanyProfileTabProps) {
+  const pepCard = showPepSection ? (
+    <CompanyPepSection
+      partners={pepPartners}
+      declarationAccepted={pepDeclarationAccepted}
+      onTogglePartnerPep={onTogglePartnerPep}
+      onChangeDeclarationAccepted={onChangePepDeclarationAccepted}
+    />
+  ) : null;
+
+  if (loading) {
+    return (
+      <div
+        id="company-panel-perfil"
+        role="tabpanel"
+        aria-labelledby="company-tab-perfil"
+        className="space-y-6"
+      >
+        <Card
+          data-testid="company-profile-skeleton"
+          aria-busy="true"
+          aria-label={COMPANY_COPY.profile.loadingLabel}
+        >
+          <CardContent className="space-y-6 p-6 sm:p-8">
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-14 w-14 shrink-0 rounded-full" />
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-48" />
+                <Skeleton className="h-3.5 w-64" />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 gap-5 border-t border-border pt-5 md:grid-cols-2">
+              <Skeleton className="h-11 w-full" />
+              <Skeleton className="h-11 w-full" />
+              <Skeleton className="h-11 w-full" />
+              <Skeleton className="h-11 w-full" />
+            </div>
+          </CardContent>
+        </Card>
+        {pepCard}
+      </div>
+    );
+  }
+
   if (error || !profile) {
     return (
       <div
         id="company-panel-perfil"
         role="tabpanel"
         aria-labelledby="company-tab-perfil"
+        className="space-y-6"
       >
         <Card>
           <CardContent className="space-y-3 py-8 text-center">
@@ -46,6 +93,7 @@ export function CompanyProfileTab({
             </Button>
           </CardContent>
         </Card>
+        {pepCard}
       </div>
     );
   }
@@ -77,8 +125,8 @@ export function CompanyProfileTab({
     });
   }
 
-  // Never use a person's name / displayName as the company heading or legal name.
-  const headingText = profile.legalName ?? COMPANY_COPY.page.title;
+  // Never use a person's displayName/name as the company heading; fall back to "Empresa".
+  const headingText = profile.legalName ?? COMPANY_COPY.profile.defaultTitle;
   const statusSubtitle =
     profile.aveniaStatusKind === "unavailable"
       ? profile.aveniaStatusLabel
@@ -98,11 +146,9 @@ export function CompanyProfileTab({
               <Building2 className="h-6 w-6" aria-hidden="true" />
             </div>
             <div className="min-w-0">
-              {headingText && (
-                <h2 className="font-sans text-lg font-semibold text-foreground">
-                  {headingText}
-                </h2>
-              )}
+              <h2 className="font-sans text-lg font-semibold text-foreground">
+                {headingText}
+              </h2>
               <p className="mt-0.5 font-mono text-xs text-muted-foreground">
                 {statusSubtitle}
               </p>
@@ -138,14 +184,7 @@ export function CompanyProfileTab({
         </CardContent>
       </Card>
 
-      {showPepSection && (
-        <CompanyPepSection
-          partners={pepPartners}
-          declarationAccepted={pepDeclarationAccepted}
-          onTogglePartnerPep={onTogglePartnerPep}
-          onChangeDeclarationAccepted={onChangePepDeclarationAccepted}
-        />
-      )}
+      {pepCard}
     </div>
   );
 }

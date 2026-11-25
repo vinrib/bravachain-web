@@ -1,5 +1,6 @@
 "use client";
 
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { COMPANY_TABS, type CompanyTab } from "@/lib/company/constants";
 import { COMPANY_COPY } from "@/lib/company/copy";
@@ -8,6 +9,7 @@ import type { AveniaStatusKind } from "@/lib/company/types";
 interface CompanyHeaderProps {
   aveniaStatusKind: AveniaStatusKind;
   aveniaStatusLabel: string;
+  statusLoading?: boolean;
   activeTab: CompanyTab;
   onSelectTab: (tab: CompanyTab) => void;
   pendingCount: number;
@@ -23,6 +25,7 @@ const STATUS_BADGE_CLASSES: Record<AveniaStatusKind, string> = {
 export function CompanyHeader({
   aveniaStatusKind,
   aveniaStatusLabel,
+  statusLoading = false,
   activeTab,
   onSelectTab,
   pendingCount,
@@ -44,15 +47,19 @@ export function CompanyHeader({
           </p>
         </div>
 
-        <span
-          data-testid="company-avenia-status-badge"
-          className={cn(
-            "inline-flex items-center rounded-xl px-3 py-1.5 font-mono text-xs font-medium",
-            STATUS_BADGE_CLASSES[aveniaStatusKind],
-          )}
-        >
-          {badgeText}
-        </span>
+        {statusLoading ? (
+          <Skeleton className="h-7 w-56 rounded-xl" aria-hidden="true" />
+        ) : (
+          <span
+            data-testid="company-avenia-status-badge"
+            className={cn(
+              "inline-flex items-center rounded-xl px-3 py-1.5 font-mono text-xs font-medium",
+              STATUS_BADGE_CLASSES[aveniaStatusKind],
+            )}
+          >
+            {badgeText}
+          </span>
+        )}
       </div>
 
       <div

@@ -1,21 +1,30 @@
 import { endpoints } from "@bravachain/api-client";
-import { apiFetch } from "@/lib/client-api";
+import { ApiError, apiFetch } from "@/lib/client-api";
 import { BACKEND_KYB_DOCUMENT_TYPE_SET } from "./constants";
-import type { CompanyBundle, CompanyDocument } from "./types";
+import type {
+  CompanyBundle,
+  CompanyDocument,
+  CompanyLimitRow,
+  RawMeResponse,
+  RawOnboardingCompany,
+  RawOnboardingStatus,
+} from "./types";
 import {
   formatUploadedDocumentStatus,
   mapCompanyDocuments,
   mapCompanyLimits,
   mapCompanyProfile,
-  parseBrandingResponse,
   parseLimitsResponse,
   parseMeResponse,
+  parseOnboardingCompany,
   parseOnboardingStatus,
   parseUploadedDocumentResponse,
   resolveAveniaStatus,
 } from "./validate";
 
-type FetchOutcome<T> = { ok: true; data: T } | { ok: false };
+type FetchOutcome<T> =
+  | { ok: true; data: T }
+  | { ok: false; status: number | null };
 
 async function fetchParsed<T>(
   path: string,
@@ -26,55 +35,145 @@ async function fetchParsed<T>(
     const raw = await apiFetch<unknown>(path, { signal });
     const parsed = parser(raw);
     if (parsed === null) {
-      return { ok: false };
+      return { ok: false, status: null };
     }
     return { ok: true, data: parsed };
   } catch (err) {
     if (err instanceof Error && err.name === "AbortError") {
       throw err;
     }
-    return { ok: false };
+    const status = err instanceof ApiError ? err.status : null;
+    return { ok: false, status };
   }
 }
 
+export interface ProfileSectionResult {
+  company: RawOnboardingCompany | null;
+  me: RawMeResponse | null;
+  error: boolean;
+}
+
+export interface OnboardingSectionResult {
+  onboarding: RawOnboardingStatus | null;
+  error: boolean;
+}
+
+export interface LimitsSectionResult {
+  limits: CompanyLimitRow[];
+  error: boolean;
+  forbidden: boolean;
+  unavailableReason: string | null;
+}
+
 /**
- * Fetches real backend endpoints in parallel without any hardcoded fallback data.
- * Each section tracks its own real fetch outcome so partial failures degrade
- * honestly into explicit error states with retry.
+ * Fetches Perfil data (`GET /v1/onboarding/company` + `GET /auth/me` for email).
+ * Fails ONLY when `/v1/onboarding/company` errors or fails strict 3-key validation.
+ */
+export async function fetchCompanyProfileSection(
+  signal?: AbortSignal,
+): Promise<ProfileSectionResult> {
+  const [companyRes, meRes] = await Promise.all([
+    fetchParsed(endpoints.onboarding.company, parseOnboardingCompany, signal),
+    fetchParsed(endpoints.auth.me, parseMeResponse, signal),
+  ]);
+
+  return {
+    company: companyRes.ok ? companyRes.data : null,
+    me: meRes.ok ? meRes.data : null,
+    error: !companyRes.ok,
+  };
+}
+
+/**
+ * Fetches global Avenia onboarding status & document list (`GET /v1/onboarding/status`).
+ */
+export async function fetchCompanyOnboardingSection(
+  signal?: AbortSignal,
+): Promise<OnboardingSectionResult> {
+  const onboardingRes = await fetchParsed(
+    endpoints.onboarding.status,
+    parseOnboardingStatus,
+    signal,
+  );
+
+  return {
+    onboarding: onboardingRes.ok ? onboardingRes.data : null,
+    error: !onboardingRes.ok,
+  };
+}
+
+/**
+ * Fetches Avenia operational limits (`GET /v1/limits`).
+ * Distinguishes HTTP 403 (onboarding not yet approved) from technical errors.
+ */
+export async function fetchCompanyLimitsSection(
+  signal?: AbortSignal,
+): Promise<LimitsSectionResult> {
+  const limitsRes = await fetchParsed(
+    endpoints.limits.root,
+    parseLimitsResponse,
+    signal,
+  );
+
+  if (!limitsRes.ok) {
+    if (limitsRes.status === 403) {
+      return {
+        limits: [],
+        error: false,
+        forbidden: true,
+        unavailableReason: null,
+      };
+    }
+    return {
+      limits: [],
+      error: true,
+      forbidden: false,
+      unavailableReason: null,
+    };
+  }
+
+  const limitsPayload = limitsRes.data;
+  return {
+    limits: mapCompanyLimits(limitsPayload),
+    error: false,
+    forbidden: false,
+    unavailableReason:
+      limitsPayload.avenia === null ? limitsPayload.aveniaReason : null,
+  };
+}
+
+/**
+ * Fetches all company sections in parallel without any hardcoded fallback data.
  */
 export async function fetchCompanyBundle(
   signal?: AbortSignal,
 ): Promise<CompanyBundle> {
-  const [onboardingRes, limitsRes, meRes, brandingRes] = await Promise.all([
-    fetchParsed(endpoints.onboarding.status, parseOnboardingStatus, signal),
-    fetchParsed(endpoints.limits.root, parseLimitsResponse, signal),
-    fetchParsed(endpoints.auth.me, parseMeResponse, signal),
-    fetchParsed(endpoints.profile.branding, parseBrandingResponse, signal),
+  const [profileSection, onboardingSection, limitsSection] = await Promise.all([
+    fetchCompanyProfileSection(signal),
+    fetchCompanyOnboardingSection(signal),
+    fetchCompanyLimitsSection(signal),
   ]);
 
-  const onboarding = onboardingRes.ok ? onboardingRes.data : null;
-  const limitsPayload = limitsRes.ok ? limitsRes.data : null;
-  const me = meRes.ok ? meRes.data : null;
-  const branding = brandingRes.ok ? brandingRes.data : null;
-
-  const status = resolveAveniaStatus(onboarding);
-  const profile = mapCompanyProfile({ me, branding, onboarding });
+  const status = resolveAveniaStatus(onboardingSection.onboarding);
+  const profile = mapCompanyProfile({
+    company: profileSection.company,
+    me: profileSection.me,
+    onboarding: onboardingSection.onboarding,
+  });
 
   return {
     profile,
-    profileError: profile === null,
+    profileError: profileSection.error || profile === null,
     aveniaStatusKind: status.kind,
     aveniaStatusLabel: status.label,
     // No client-facing UBO/PEP endpoint exists yet; never fabricate partners.
     pepPartners: [],
-    documents: mapCompanyDocuments(onboarding),
-    onboardingError: !onboardingRes.ok,
-    limits: mapCompanyLimits(limitsPayload),
-    limitsError: !limitsRes.ok,
-    limitsUnavailableReason:
-      limitsPayload && limitsPayload.avenia === null
-        ? limitsPayload.aveniaReason
-        : null,
+    documents: mapCompanyDocuments(onboardingSection.onboarding),
+    onboardingError: onboardingSection.error,
+    limits: limitsSection.limits,
+    limitsError: limitsSection.error,
+    limitsForbidden: limitsSection.forbidden,
+    limitsUnavailableReason: limitsSection.unavailableReason,
   };
 }
 

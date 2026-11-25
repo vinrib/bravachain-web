@@ -1,3 +1,5 @@
+import { COMPANY_COPY } from "./copy";
+
 const PT_BR_INTEGER_FORMATTER = new Intl.NumberFormat("pt-BR", {
   maximumFractionDigits: 0,
 });
@@ -20,6 +22,23 @@ const SP_DAY_MONTH_FORMATTER = new Intl.DateTimeFormat("pt-BR", {
   timeZone: "America/Sao_Paulo",
 });
 
+const PT_BR_MONTH_ABBR: Record<string, string> = {
+  "01": "jan",
+  "02": "fev",
+  "03": "mar",
+  "04": "abr",
+  "05": "mai",
+  "06": "jun",
+  "07": "jul",
+  "08": "ago",
+  "09": "set",
+  "10": "out",
+  "11": "nov",
+  "12": "dez",
+};
+
+const USED_PCT_PATTERN = /^\d+(?:\.\d+)?$/;
+
 /**
  * Formats a numeric limit amount in `pt-BR`. Whole numbers omit decimals for
  * readability (e.g. `250.000`); fractional values keep 2 decimals (`1.250,50`).
@@ -34,24 +53,68 @@ export function formatLimitAmountPtBr(value: number): string {
 }
 
 /**
- * Computes a safe clamped usage percentage (`0` to `100`) for progress bars.
+ * Formats a backend `usedPct` decimal string (e.g. `"43.00"`, `"0.00"`, `"150.00"`)
+ * into pt-BR display text (`"43,00%"`, `"0,00%"`, `"150,00%"`) strictly via string
+ * manipulation — NEVER calls `parseFloat` or `Number` for display and NEVER
+ * calculates percentages in the frontend.
  */
-export function computeLimitUsagePercent(
-  used: number | null,
-  max: number | null,
-): number {
-  if (
-    used === null ||
-    max === null ||
-    !Number.isFinite(used) ||
-    !Number.isFinite(max) ||
-    max <= 0 ||
-    used <= 0
-  ) {
-    return 0;
+export function formatUsedPctPtBr(usedPct: string | null): string | null {
+  if (typeof usedPct !== "string") return null;
+  const trimmed = usedPct.trim();
+  if (!USED_PCT_PATTERN.test(trimmed)) return null;
+
+  const [rawInt = "", rawDec] = trimmed.split(".");
+  const intFormatted = rawInt.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return rawDec !== undefined
+    ? `${intFormatted},${rawDec}%`
+    : `${intFormatted}%`;
+}
+
+/**
+ * Derives visual-only bar width (`0..100`) and overflow flag (`> 100`) from the
+ * backend `usedPct` string. Used ONLY for CSS bar width — displayed text always
+ * comes from `formatUsedPctPtBr`.
+ */
+export function computeLimitBarScale(
+  usedPct: string | null,
+): { widthPct: number; exceeded: boolean } | null {
+  if (typeof usedPct !== "string") return null;
+  const trimmed = usedPct.trim();
+  if (!USED_PCT_PATTERN.test(trimmed)) return null;
+
+  const numeric = Number(trimmed);
+  if (!Number.isFinite(numeric)) return null;
+
+  return {
+    widthPct: Math.max(0, Math.min(100, numeric)),
+    exceeded: numeric > 100,
+  };
+}
+
+/**
+ * Formats a `YYYY-MM` reference month into `"Uso mensal · nov/26"` strictly by
+ * splitting the string (NEVER uses `new Date` and NEVER assumes the current month).
+ * Returns `"Uso mensal · mês de referência não informado"` when absent or invalid.
+ */
+export function formatReferenceMonthPtBr(
+  referenceMonth: string | null,
+): string {
+  if (typeof referenceMonth !== "string") {
+    return COMPANY_COPY.limits.monthlyPeriodUnknown;
   }
-  const raw = Math.round((used / max) * 100);
-  return Math.max(0, Math.min(100, raw));
+  const parts = referenceMonth.trim().split("-");
+  if (parts.length !== 2) {
+    return COMPANY_COPY.limits.monthlyPeriodUnknown;
+  }
+  const [year, month] = parts;
+  if (!year || !month || !/^\d{4}$/.test(year)) {
+    return COMPANY_COPY.limits.monthlyPeriodUnknown;
+  }
+  const monthAbbr = PT_BR_MONTH_ABBR[month];
+  if (!monthAbbr) {
+    return COMPANY_COPY.limits.monthlyPeriodUnknown;
+  }
+  return `${COMPANY_COPY.limits.monthlyPeriodPrefix} · ${monthAbbr}/${year.slice(2)}`;
 }
 
 /**
